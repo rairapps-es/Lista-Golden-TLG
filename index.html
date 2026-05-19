@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Ads Portal</title>
+    <title>Lista Golden Ads</title>
     <!-- Tailwind CSS para un diseño ultra moderno -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome para Iconos -->
@@ -569,8 +569,8 @@
         function checkout() {
             if(carrito.length === 0) return alert("Tu cesta está vacía.");
 
-            let textoPedido = `¡Hola! Quiero contratar publicidad a través de tu Web App.%0A%0A`;
-            textoPedido += `📋 *RESUMEN DEL PEDIDO:*%0A`;
+            let textoPedido = `¡Hola! Quiero contratar publicidad.%0A%0A`;
+            textoPedido += `📋 *PEDIDO:*%0A`;
             let total = 0;
 
             carrito.forEach((item, i) => {
@@ -584,7 +584,7 @@
             });
 
             textoPedido += `%0A💰 *TOTAL ESTIMADO:* $${total.toFixed(2)} USD%0A`;
-            textoPedido += `💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.`;
+            textoPedido += `💳 *MÉTODOS DE PAGO:* PayPal, Estrellas o USDT.`;
 
             window.open(`https://t.me/${MI_TELEGRAM_USER}?text=${textoPedido}`, '_blank');
             
