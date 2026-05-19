@@ -20,17 +20,110 @@
             color: var(--tg-theme-text);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             padding-bottom: 80px;
+            overflow-x: hidden;
         }
         .active-tab {
             color: var(--tg-theme-accent);
             border-top: 2px solid var(--tg-theme-accent);
         }
+
+        /* --- ANIMACIÓN DEL CHECK VERDE ESTILO PREMIUM --- */
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+        .success-checkmark .check-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            border: 4px solid #4ade80;
+        }
+        .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
+            content: '';
+            position: absolute;
+            background: #1e293b;
+            transform: rotate(45deg);
+        }
+        .success-checkmark .check-icon .icon-line {
+            height: 5px;
+            background-color: #4ade80;
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+        }
+        .success-checkmark .check-icon .icon-line.line-tip {
+            width: 25px;
+            left: 14px;
+            top: 43px;
+            transform: rotate(45deg);
+            animation: icon-line-tip 0.75s;
+        }
+        .success-checkmark .check-icon .icon-line.line-long {
+            width: 47px;
+            right: 8px;
+            top: 38px;
+            transform: rotate(-45deg);
+            animation: icon-line-long 0.75s;
+        }
+        .success-checkmark .check-icon .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(74, 222, 128, 0.2);
+            position: absolute;
+            left: -4px;
+            top: -4px;
+            z-index: 1;
+        }
+
+        @keyframes icon-line-tip {
+            0% { width: 0; left: 1px; top: 19px; }
+            54% { width: 0; left: 1px; top: 19px; }
+            70% { width: 50px; left: -8px; top: 37px; }
+            84% { width: 17px; left: 21px; top: 48px; }
+            100% { width: 25px; left: 14px; top: 43px; }
+        }
+        @keyframes icon-line-long {
+            0% { width: 0; right: 46px; top: 54px; }
+            65% { width: 0; right: 46px; top: 54px; }
+            84% { width: 55px; right: 0px; top: 35px; }
+            100% { width: 47px; right: 8px; top: 38px; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA DE CARGA INICIAL (SPINNER ATRACTIVO) -->
+    <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative w-20 h-20">
+            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-t-sky-400 border-r-indigo-500 animate-spin"></div>
+        </div>
+        <h2 class="mt-6 font-bold text-lg text-slate-300 tracking-wider">Cargando Catálogo...</h2>
+        <p class="text-xs text-slate-500 mt-1">MyAds Network</p>
+    </div>
+
+    <!-- NOTIFICACIÓN FLOTANTE / POP-UP DEL CHECK VERDE -->
+    <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-slate-800 border border-slate-700/60 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center scale-75 transition-transform duration-300" id="toast-box">
+            <div class="success-checkmark mb-4">
+                <div class="check-icon">
+                    <span class="icon-line line-tip"></span>
+                    <span class="icon-line line-long"></span>
+                    <div class="icon-circle"></div>
+                </div>
+            </div>
+            <h3 id="toast-title" class="text-slate-100 font-bold text-lg">¡Completado!</h3>
+            <p id="toast-desc" class="text-slate-400 text-xs mt-1">Acción realizada con éxito.</p>
+        </div>
+    </div>
+
     <!-- HEADER / CARRITO FLOTANTE -->
-    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-50 border-b border-slate-800 shadow-xl">
+    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800 shadow-xl">
         <div class="flex items-center gap-2">
             <i class="fa-brands fa-telegram text-sky-400 text-2xl animate-pulse"></i>
             <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">MyAds Network</h1>
@@ -79,7 +172,7 @@
     </main>
 
     <!-- MENÚ INFERIOR FIJO -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-40">
         <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors active-tab">
             <i class="fa-solid fa-layer-group text-lg"></i>Catálogo
         </button>
@@ -93,7 +186,7 @@
 
     <!-- MODAL DEL CARRITO Y PASOS DE PAGO -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col animate-slide-up">
+        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
                 <div class="flex items-center gap-2">
                     <h3 class="font-bold text-lg text-slate-200"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
@@ -131,12 +224,11 @@
 
     <!-- CONFIGURACIÓN DE TU USUARIO DE TELEGRAM -->
     <script>
-        const MI_TELEGRAM_USER = "Airdayz"; // 👈 CAMBIA ESTO SIN EL '@' (Ej: "juan_perez")
+        const MI_TELEGRAM_USER = "TuUsuarioDeTelegram"; // 👈 CAMBIA ESTO SIN EL '@'
     </script>
 
     <!-- SCRIPT DE LÓGICA Y RENDERIZADO -->
     <script>
-        // BASE DE DATOS LOCAL DE TUS CANALES
         const canalesData = [
             {
                 id: 1,
@@ -150,7 +242,7 @@
                 imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150&auto=format&fit=crop&q=60",
                 descripcion: "Canal dedicado al análisis técnico diario de Bitcoin y criptomonedas con alta tasa de lectura.",
                 duracion: "24 horas arriba (1 hora en el top)",
-                fijado: "Sí, durante las primeras 2 hours"
+                fijado: "Sí, durante las primeras 2 horas"
             },
             {
                 id: 2,
@@ -187,10 +279,46 @@
         let currentCategory = 'todos';
         let currentView = 'catalog';
 
+        // EFECTO DE CARGA INICIAL SIMULADO PARA FLUIDEZ
         document.addEventListener("DOMContentLoaded", () => {
             renderChannels();
             updateCartBadge();
+            
+            setTimeout(() => {
+                const loader = document.getElementById('global-loader');
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.remove(), 500);
+            }, 1200); // 1.2 segundos de carga elegante
         });
+
+        // DISPARADOR DEL CHECK ANIMADO PREMIUM
+        function triggerSuccessAnimation(title, desc) {
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-desc').innerText = desc;
+            
+            const toast = document.getElementById('success-toast');
+            const box = document.getElementById('toast-box');
+            
+            // Fuerza reinicio de la animación eliminando y re-añadiendo el nodo del check icon
+            const checkArea = box.querySelector('.success-checkmark');
+            checkArea.innerHTML = `
+                <div class="check-icon">
+                    <span class="icon-line line-tip"></span>
+                    <span class="icon-line line-long"></span>
+                    <div class="icon-circle"></div>
+                </div>
+            `;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-75');
+            box.classList.add('scale-100');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+                box.classList.remove('scale-100');
+                box.classList.add('scale-75');
+            }, 1800); // Se oculta tras la hermosa animación
+        }
 
         function switchView(view) {
             currentView = view;
@@ -223,7 +351,6 @@
         function renderChannels() {
             const container = document.getElementById('channels-container');
             container.innerHTML = '';
-            
             let canalesFiltrados = [...canalesData];
 
             if (currentView === 'offers') {
@@ -238,13 +365,10 @@
             if (sortVal === 'price-desc') canalesFiltrados.sort((a,b) => getPrecio(b) - getPrecio(a));
 
             if(canalesFiltrados.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No se encontraron canales en esta sección.</p>`;
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No se encontraron canales.</p>`;
                 return;
             }
-
-            canalesFiltrados.forEach(c => {
-                container.appendChild(createChannelCard(c));
-            });
+            canalesFiltrados.forEach(c => container.appendChild(createChannelCard(c)));
         }
 
         function renderFavorites() {
@@ -254,11 +378,10 @@
             const favs = canalesData.filter(c => favoritos.includes(c.id));
             
             if(favs.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No tienes canales guardados como favoritos todavía.</p>`;
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No tienes favoritos todavía.</p>`;
                 clearFavsBtn.classList.add('hidden');
                 return;
             }
-            
             clearFavsBtn.classList.remove('hidden');
             favs.forEach(c => container.appendChild(createChannelCard(c)));
         }
@@ -329,27 +452,28 @@
             return card;
         }
 
-        // CONTROL DE FAVORITOS
         function toggleFav(id) {
+            const canal = canalesData.find(c => c.id === id);
             if (favoritos.includes(id)) {
                 favoritos = favoritos.filter(fId => fId !== id);
+                triggerSuccessAnimation("Eliminado", "Quitado de favoritos correctamente.");
             } else {
                 favoritos.push(id);
+                triggerSuccessAnimation("¡Guardado!", `Añadiste "${canal.nombre}" a favoritos.`);
             }
             localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
             currentView === 'favorites' ? renderFavorites() : renderChannels();
         }
 
-        // FUNCIÓN NUEVA: VACIAR TODOS LOS FAVORITOS
         function clearFavorites() {
             if(confirm("¿Seguro que quieres eliminar todos tus canales favoritos?")) {
                 favoritos = [];
                 localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
                 renderFavorites();
+                triggerSuccessAnimation("Lista Vacía", "Se borraron todos tus favoritos.");
             }
         }
 
-        // SISTEMA DEL CARRITO DE COMPRAS
         function addToCart(id) {
             const canal = canalesData.find(c => c.id === id);
             const chkPack = document.getElementById(`up-pack-${id}`);
@@ -368,8 +492,7 @@
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
             
-            document.getElementById('cart-count').parentElement.classList.add('scale-110');
-            setTimeout(() => document.getElementById('cart-count').parentElement.classList.remove('scale-110'), 200);
+            triggerSuccessAnimation("Añadido", `"${canal.nombre}" está en la cesta.`);
 
             if (chkPack) chkPack.checked = false;
             if (chkFixed) chkFixed.checked = false;
@@ -433,13 +556,13 @@
             openCartModal();
         }
 
-        // FUNCIÓN NUEVA: VACIAR TODO EL CARRITO
         function clearCart() {
             if(confirm("¿Quieres eliminar todos los canales de tu cesta?")) {
                 carrito = [];
                 localStorage.setItem('ads_carrito', JSON.stringify(carrito));
                 updateCartBadge();
                 openCartModal();
+                triggerSuccessAnimation("Cesta Vacía", "Se borró todo el contenido.");
             }
         }
 
