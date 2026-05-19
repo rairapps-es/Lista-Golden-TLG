@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Ads Portal</title>
+    <!-- Tailwind CSS para un diseño ultra moderno -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --tg-theme-bg-color: #0f172a;
+            --tg-theme-secondary-bg-color: #1e293b;
+            --tg-theme-accent: #38bdf8;
+            --tg-theme-text: #f8fafc;
+        }
+        body {
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding-bottom: 80px;
+        }
+        .active-tab {
+            color: var(--tg-theme-accent);
+            border-top: 2px solid var(--tg-theme-accent);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER / CARRITO FLOTANTE -->
+    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-50 border-b border-slate-800 shadow-xl">
+        <div class="flex items-center gap-2">
+            <i class="fa-brands fa-telegram text-sky-400 text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">MyAds Network</h1>
+        </div>
+        <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-full font-bold text-sm shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
+            <i class="fa-solid fa-basket-shopping"></i>
+            <span>Cesta</span>
+            <span id="cart-count" class="bg-white text-slate-950 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black">0</span>
+        </button>
+    </header>
+
+    <!-- VISTA 1: CATÁLOGO (Y OFERTAS) -->
+    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-6">
+        <!-- FILTROS Y CATEGORÍAS -->
+        <section class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 space-y-3">
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="category-filters">
+                <button onclick="filterCategory('todos')" class="cat-btn bg-sky-500/20 text-sky-300 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-sky-500/30">Todos</button>
+                <button onclick="filterCategory('Tecnología')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Tecnología</button>
+                <button onclick="filterCategory('Finanzas')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Finanzas</button>
+                <button onclick="filterCategory('Entretenimiento')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Entretenimiento</button>
+            </div>
+            
+            <div class="flex gap-2">
+                <select id="sort-filter" onchange="renderChannels()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-sky-500">
+                    <option value="default">Ordenar por...</option>
+                    <option value="subs-desc">Más Suscriptores</option>
+                    <option value="price-asc">Precio: Menor a Mayor</option>
+                    <option value="price-desc">Precio: Mayor a Menor</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- CONTENEDOR DE TARJETAS -->
+        <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
+    </main>
+
+    <!-- VISTA 2: FAVORITAS -->
+    <main id="view-favorites" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-sky-400"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Mis Canales Guardados</h2>
+            <button onclick="clearFavorites()" id="btn-clear-favs" class="hidden bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-trash-can text-[10px]"></i> Borrar todos
+            </button>
+        </div>
+        <div id="favorites-container" class="grid gap-4 sm:grid-cols-2"></div>
+    </main>
+
+    <!-- MENÚ INFERIOR FIJO -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-50">
+        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors active-tab">
+            <i class="fa-solid fa-layer-group text-lg"></i>Catálogo
+        </button>
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors">
+            <i class="fa-solid fa-star text-lg"></i>Favoritos
+        </button>
+        <button onclick="switchView('offers')" id="nav-offers" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors">
+            <i class="fa-solid fa-tags text-lg"></i>Ofertas
+        </button>
+    </nav>
+
+    <!-- MODAL DEL CARRITO Y PASOS DE PAGO -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col animate-slide-up">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-lg text-slate-200"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
+                    <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-rose-400 hover:text-rose-300 text-xs font-semibold underline ml-2">Vaciar cesta</button>
+                </div>
+                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Lista de productos añadidos -->
+            <div id="cart-items" class="p-4 overflow-y-auto space-y-3 flex-1"></div>
+
+            <!-- Total y Pasos de Pago -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800 space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 font-medium">Total Estimado:</span>
+                    <span id="cart-total" class="text-2xl font-black text-emerald-400">$0.00 USD</span>
+                </div>
+                
+                <div class="space-y-2 bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
+                    <p class="font-bold text-slate-300 mb-1"><i class="fa-solid fa-circle-info text-sky-400 mr-1"></i>Pasos para contratar:</p>
+                    <ol class="list-decimal list-inside space-y-1">
+                        <li>Elige tus canales y mejoras en la cesta.</li>
+                        <li>Haz clic en "Enviar Pedido a Telegram".</li>
+                        <li>Se abrirá un chat conmigo con tu resumen copiado.</li>
+                        <li>Te indicaré la wallet/cuenta según elijas pagar con: <strong class="text-slate-200">PayPal, Estrellas o USDT</strong>.</li>
+                    </ol>
+                </div>
+
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3.5 rounded-xl font-bold text-center text-sm shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+                    <i class="fa-brands fa-telegram text-base"></i> Enviar Pedido a Telegram
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIGURACIÓN DE TU USUARIO DE TELEGRAM -->
+    <script>
+        const MI_TELEGRAM_USER = "Airdayz"; // 👈 CAMBIA ESTO SIN EL '@' (Ej: "juan_perez")
+    </script>
+
+    <!-- SCRIPT DE LÓGICA Y RENDERIZADO -->
+    <script>
+        // BASE DE DATOS LOCAL DE TUS CANALES
+        const canalesData = [
+            {
+                id: 1,
+                nombre: "Crypto Alertas Pro",
+                username: "crypto_alertas_test",
+                categoria: "Finanzas",
+                subs: 45000,
+                precioBase: 50,
+                descuento: 15,
+                oferta: true,
+                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150&auto=format&fit=crop&q=60",
+                descripcion: "Canal dedicado al análisis técnico diario de Bitcoin y criptomonedas con alta tasa de lectura.",
+                duracion: "24 horas arriba (1 hora en el top)",
+                fijado: "Sí, durante las primeras 2 hours"
+            },
+            {
+                id: 2,
+                nombre: "Tech & Gadgets Mundiales",
+                username: "tech_gadgets_test",
+                categoria: "Tecnología",
+                subs: 120000,
+                precioBase: 90,
+                descuento: 0,
+                oferta: false,
+                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60",
+                descripcion: "Unboxings, reviews de teléfonos y noticias de tecnología de vanguardia.",
+                duracion: "Permanente",
+                fijado: "No"
+            },
+            {
+                id: 3,
+                nombre: "Memes & Humor Viral",
+                username: "memes_humor_test",
+                categoria: "Entretenimiento",
+                subs: 85000,
+                precioBase: 30,
+                descuento: 30,
+                oferta: true,
+                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150&auto=format&fit=crop&q=60",
+                descripcion: "Tráfico masivo de jóvenes, ideal para marcas de ropa, apps de juegos o canales personales.",
+                duracion: "48 horas",
+                fijado: "Sí, 1 hora al inicio"
+            }
+        ];
+
+        let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
+        let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
+        let currentCategory = 'todos';
+        let currentView = 'catalog';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderChannels();
+            updateCartBadge();
+        });
+
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
+            document.getElementById('view-catalog').classList.add('hidden');
+            document.getElementById('view-favorites').classList.add('hidden');
+
+            if (view === 'catalog' || view === 'offers') {
+                document.getElementById('view-catalog').classList.remove('hidden');
+                document.getElementById(`nav-${view}`).classList.add('active-tab');
+                renderChannels();
+            } else if (view === 'favorites') {
+                document.getElementById('view-favorites').classList.remove('hidden');
+                document.getElementById('nav-favorites').classList.add('active-tab');
+                renderFavorites();
+            }
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.replace('bg-sky-500/20', 'bg-slate-800');
+                btn.classList.replace('text-sky-300', 'text-slate-400');
+            });
+            event.target.classList.replace('bg-slate-800', 'bg-sky-500/20');
+            event.target.classList.replace('text-slate-400', 'text-sky-300');
+            renderChannels();
+        }
+
+        function renderChannels() {
+            const container = document.getElementById('channels-container');
+            container.innerHTML = '';
+            
+            let canalesFiltrados = [...canalesData];
+
+            if (currentView === 'offers') {
+                canalesFiltrados = canalesFiltrados.filter(c => c.oferta);
+            } else if (currentCategory !== 'todos') {
+                canalesFiltrados = canalesFiltrados.filter(c => c.categoria === currentCategory);
+            }
+
+            const sortVal = document.getElementById('sort-filter').value;
+            if (sortVal === 'subs-desc') canalesFiltrados.sort((a,b) => b.subs - a.subs);
+            if (sortVal === 'price-asc') canalesFiltrados.sort((a,b) => getPrecio(a) - getPrecio(b));
+            if (sortVal === 'price-desc') canalesFiltrados.sort((a,b) => getPrecio(b) - getPrecio(a));
+
+            if(canalesFiltrados.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No se encontraron canales en esta sección.</p>`;
+                return;
+            }
+
+            canalesFiltrados.forEach(c => {
+                container.appendChild(createChannelCard(c));
+            });
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favorites-container');
+            const clearFavsBtn = document.getElementById('btn-clear-favs');
+            container.innerHTML = '';
+            const favs = canalesData.filter(c => favoritos.includes(c.id));
+            
+            if(favs.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No tienes canales guardados como favoritos todavía.</p>`;
+                clearFavsBtn.classList.add('hidden');
+                return;
+            }
+            
+            clearFavsBtn.classList.remove('hidden');
+            favs.forEach(c => container.appendChild(createChannelCard(c)));
+        }
+
+        function getPrecio(canal) {
+            return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase;
+        }
+
+        function createChannelCard(c) {
+            const isFav = favoritos.includes(c.id);
+            const precioFinal = getPrecio(c);
+            const card = document.createElement('div');
+            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 relative flex flex-col justify-between shadow-md hover:border-slate-600 transition-all";
+            
+            card.innerHTML = `
+                <div>
+                    <div class="flex gap-3 items-start">
+                        <img src="${c.imagen}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="">
+                        <div class="flex-1 min-w-0">
+                            <span class="bg-slate-700 text-slate-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded-md">${c.categoria}</span>
+                            <h3 class="font-bold text-slate-200 text-sm mt-1 truncate">${c.nombre}</h3>
+                            <p class="text-slate-400 text-xs"><i class="fa-solid fa-users text-sky-500 mr-1"></i>${c.subs.toLocaleString()} subs</p>
+                        </div>
+                        <button onclick="toggleFav(${c.id})" class="text-lg focus:outline-none p-1 text-${isFav ? 'amber-400' : 'slate-600'} hover:scale-110 transition-transform">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-3 flex items-baseline gap-2 bg-slate-900/40 p-2 rounded-xl border border-slate-800">
+                        <span class="text-xl font-black text-emerald-400">$${precioFinal.toFixed(2)}</span>
+                        ${c.descuento > 0 ? `<span class="text-xs text-slate-500 line-through">$${c.precioBase}</span> <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 rounded">-${c.descuento}% OFF</span>` : ''}
+                    </div>
+
+                    <details class="mt-3 group border-t border-slate-800/80 pt-2">
+                        <summary class="list-none flex justify-between items-center text-xs text-sky-400 font-semibold cursor-pointer select-none">
+                            <span>Ver detalles e hiper-packs</span>
+                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-[10px]"></i>
+                        </summary>
+                        <div class="mt-2 space-y-2 text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800/50">
+                            <p><strong class="text-slate-400">Descripción:</strong> ${c.descripcion}</p>
+                            <p><strong class="text-slate-400">Permanencia:</strong> ${c.duracion}</p>
+                            <p><strong class="text-slate-400">Mensaje Fijado:</strong> ${c.fijado}</p>
+                            
+                            <div class="mt-3 border-t border-slate-800 pt-2 space-y-1">
+                                <p class="font-bold text-amber-400 text-[11px] mb-1"><i class="fa-solid fa-bolt mr-1"></i>¿Potenciar campaña?</p>
+                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
+                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Pack x3 Anuncios (Semanal)</span>
+                                    <span class="text-emerald-400 font-bold text-[11px]">+$25</span>
+                                </label>
+                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
+                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Fijado 24 horas completas</span>
+                                    <span class="text-emerald-400 font-bold text-[11px]">+$10</span>
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-4">
+                    <a href="https://t.me/${c.username}" target="_blank" class="bg-slate-800 text-center py-2 rounded-xl text-xs font-bold text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Ver Canal
+                    </a>
+                    <button onclick="addToCart(${c.id})" class="bg-sky-600/90 hover:bg-sky-500 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-md shadow-sky-600/10 active:scale-[0.97] flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-cart-plus"></i> Añadir Cesta
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        // CONTROL DE FAVORITOS
+        function toggleFav(id) {
+            if (favoritos.includes(id)) {
+                favoritos = favoritos.filter(fId => fId !== id);
+            } else {
+                favoritos.push(id);
+            }
+            localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
+            currentView === 'favorites' ? renderFavorites() : renderChannels();
+        }
+
+        // FUNCIÓN NUEVA: VACIAR TODOS LOS FAVORITOS
+        function clearFavorites() {
+            if(confirm("¿Seguro que quieres eliminar todos tus canales favoritos?")) {
+                favoritos = [];
+                localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
+                renderFavorites();
+            }
+        }
+
+        // SISTEMA DEL CARRITO DE COMPRAS
+        function addToCart(id) {
+            const canal = canalesData.find(c => c.id === id);
+            const chkPack = document.getElementById(`up-pack-${id}`);
+            const chkFixed = document.getElementById(`up-fixed-${id}`);
+            
+            const item = {
+                idUnique: Date.now() + Math.random(), 
+                id: canal.id,
+                nombre: canal.nombre,
+                precioBase: getPrecio(canal),
+                packExtra: chkPack ? chkPack.checked : false,
+                fixedExtra: chkFixed ? chkFixed.checked : false
+            };
+
+            carrito.push(item);
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            
+            document.getElementById('cart-count').parentElement.classList.add('scale-110');
+            setTimeout(() => document.getElementById('cart-count').parentElement.classList.remove('scale-110'), 200);
+
+            if (chkPack) chkPack.checked = false;
+            if (chkFixed) chkFixed.checked = false;
+        }
+
+        function updateCartBadge() {
+            document.getElementById('cart-count').innerText = carrito.length;
+        }
+
+        function openCartModal() {
+            const modal = document.getElementById('cart-modal');
+            const container = document.getElementById('cart-items');
+            const clearCartBtn = document.getElementById('btn-clear-cart');
+            container.innerHTML = '';
+            let total = 0;
+
+            modal.classList.remove('hidden');
+
+            if(carrito.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Tu cesta está vacía. Añade canales desde el catálogo.</p>`;
+                document.getElementById('cart-total').innerText = "$0.00 USD";
+                clearCartBtn.classList.add('hidden');
+                return;
+            }
+
+            clearCartBtn.classList.remove('hidden');
+
+            carrito.forEach(item => {
+                let precioItem = item.precioBase;
+                let detallesMejoras = [];
+                
+                if (item.packExtra) { precioItem += 25; detallesMejoras.push("Pack x3 Anuncios (+$25)"); }
+                if (item.fixedExtra) { precioItem += 10; detallesMejoras.push("Fijado 24h (+$10)"); }
+                
+                total += precioItem;
+
+                const div = document.createElement('div');
+                div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700/60 flex justify-between items-center";
+                div.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-bold text-sm text-slate-200 truncate">${item.nombre}</h4>
+                        ${detallesMejoras.length > 0 ? `<p class="text-[10px] text-amber-400 font-medium">${detallesMejoras.join(' + ')}</p>` : `<p class="text-[10px] text-slate-400">Espacio estándar contratado</p>`}
+                        <span class="text-xs font-bold text-emerald-400">$${precioItem.toFixed(2)}</span>
+                    </div>
+                    <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400/70 hover:text-rose-400 p-2 text-sm"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)} USD`;
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function removeFromCart(idUnique) {
+            carrito = carrito.filter(item => item.idUnique !== idUnique);
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            openCartModal();
+        }
+
+        // FUNCIÓN NUEVA: VACIAR TODO EL CARRITO
+        function clearCart() {
+            if(confirm("¿Quieres eliminar todos los canales de tu cesta?")) {
+                carrito = [];
+                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+                updateCartBadge();
+                openCartModal();
+            }
+        }
+
+        function checkout() {
+            if(carrito.length === 0) return alert("Tu cesta está vacía.");
+
+            let textoPedido = `¡Hola! Quiero contratar publicidad a través de tu Web App.%0A%0A`;
+            textoPedido += `📋 *RESUMEN DEL PEDIDO:*%0A`;
+            let total = 0;
+
+            carrito.forEach((item, i) => {
+                let subtotal = item.precioBase;
+                let mejoras = [];
+                if (item.packExtra) { subtotal += 25; mejoras.push("Pack x3"); }
+                if (item.fixedExtra) { subtotal += 10; mejoras.push("Fijado 24h"); }
+                total += subtotal;
+
+                textoPedido += `${i+1}. *${item.nombre}* [Precio: $${subtotal}] ${mejoras.length > 0 ? `(${mejoras.join(', ')})` : ''}%0A`;
+            });
+
+            textoPedido += `%0A💰 *TOTAL ESTIMADO:* $${total.toFixed(2)} USD%0A`;
+            textoPedido += `💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.`;
+
+            window.open(`https://t.me/${MI_TELEGRAM_USER}?text=${textoPedido}`, '_blank');
+            
+            carrito = [];
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            closeCartModal();
+        }
+    </script>
+</body>
+</html>
