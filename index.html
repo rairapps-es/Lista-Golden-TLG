@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Golden Ads</title>
-    <!-- Tailwind CSS para un diseño ultra moderno -->
+    <title>Lista Golden Ads [DEBUG MODE]</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome para Iconos -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -20,218 +20,80 @@
             color: var(--tg-theme-text);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             padding-bottom: 80px;
-            overflow-x: hidden;
         }
         .active-tab {
             color: var(--tg-theme-accent);
             border-top: 2px solid var(--tg-theme-accent);
         }
-
-        /* --- ANIMACIÓN DEL CHECK VERDE ESTILO PREMIUM --- */
-        .success-checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-        }
-        .success-checkmark .check-icon {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            border-radius: 50%;
-            box-sizing: content-box;
-            border: 4px solid #4ade80;
-        }
-        .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
-            content: '';
-            position: absolute;
-            background: #1e293b;
-            transform: rotate(45deg);
-        }
-        .success-checkmark .check-icon .icon-line {
-            height: 5px;
-            background-color: #4ade80;
-            display: block;
-            border-radius: 2px;
-            position: absolute;
-            z-index: 10;
-        }
-        .success-checkmark .check-icon .icon-line.line-tip {
-            width: 25px;
-            left: 14px;
-            top: 43px;
-            transform: rotate(45deg);
-            animation: icon-line-tip 0.75s;
-        }
-        .success-checkmark .check-icon .icon-line.line-long {
-            width: 47px;
-            right: 8px;
-            top: 38px;
-            transform: rotate(-45deg);
-            animation: icon-line-long 0.75s;
-        }
-        .success-checkmark .check-icon .icon-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid rgba(74, 222, 128, 0.2);
-            position: absolute;
-            left: -4px;
-            top: -4px;
-            z-index: 1;
-        }
-
-        @keyframes icon-line-tip {
-            0% { width: 0; left: 1px; top: 19px; }
-            54% { width: 0; left: 1px; top: 19px; }
-            70% { width: 50px; left: -8px; top: 37px; }
-            84% { width: 17px; left: 21px; top: 48px; }
-            100% { width: 25px; left: 14px; top: 43px; }
-        }
-        @keyframes icon-line-long {
-            0% { width: 0; right: 46px; top: 54px; }
-            65% { width: 0; right: 46px; top: 54px; }
-            84% { width: 55px; right: 0px; top: 35px; }
-            100% { width: 47px; right: 8px; top: 38px; }
-        }
     </style>
 </head>
 <body>
-<button onclick="localStorage.clear(); alert('Limpio'); location.reload();" class="fixed top-20 left-4 z-50 bg-red-600 text-white p-3 rounded-xl font-bold text-xs">
-    ⚠️ BORRAR MEMORIA VIEJA
-</button>
 
-    <!-- PANTALLA DE CARGA INICIAL -->
-    <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative w-20 h-20">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-t-sky-400 border-r-indigo-500 animate-spin"></div>
-        </div>
-        <h2 class="mt-6 font-bold text-lg text-slate-300 tracking-wider">Cargando Catálogo...</h2>
-        <p class="text-xs text-slate-500 mt-1">Lista Golden Ads</p>
+    <!-- BOTÓN DE EMERGENCIA PARA LIMPIAR TODO -->
+    <div class="fixed top-20 left-4 z-50">
+        <button onclick="localStorage.clear(); alert('¡Memoria del teléfono limpia a la fuerza!'); location.reload();" class="bg-red-600 hover:bg-red-700 text-white font-black text-xs px-3 py-2 rounded-xl shadow-lg border border-red-400">
+            💥 DESTRUIR MEMORIA VIEJA
+        </button>
     </div>
 
-    <!-- NOTIFICACIÓN FLOTANTE / POP-UP DEL CHECK VERDE -->
-    <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-800 border border-slate-700/60 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center scale-75 transition-transform duration-300" id="toast-box">
-            <div class="success-checkmark mb-4">
-                <div class="check-icon">
-                    <span class="icon-line line-tip"></span>
-                    <span class="icon-line line-long"></span>
-                    <div class="icon-circle"></div>
-                </div>
-            </div>
-            <h3 id="toast-title" class="text-slate-100 font-bold text-lg">¡Completado!</h3>
-            <p id="toast-desc" class="text-slate-400 text-xs mt-1">Acción realizada con éxito.</p>
-        </div>
+    <!-- PANTALLA DE CARGA -->
+    <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-sky-500 border-t-transparent"></div>
+        <h2 class="mt-4 font-bold text-slate-300">Cargando modo Debug...</h2>
     </div>
 
-    <!-- HEADER / CARRITO FLOTANTE -->
-    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800 shadow-xl">
-        <div class="flex items-center gap-2">
-            <i class="fa-brands fa-telegram text-sky-400 text-2xl animate-pulse"></i>
-            <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Lista Golden Ads</h1>
-        </div>
-        <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-full font-bold text-sm shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
+    <!-- HEADER / CESTA -->
+    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800">
+        <h1 class="text-xl font-bold bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Lista Golden Ads</h1>
+        <button onclick="openCartModal()" class="bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2">
             <i class="fa-solid fa-basket-shopping"></i>
             <span>Cesta</span>
             <span id="cart-count" class="bg-white text-slate-950 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black">0</span>
         </button>
     </header>
 
-    <!-- VISTA 1: CATÁLOGO -->
+    <!-- CATÁLOGO -->
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-6">
-        <!-- FILTROS Y CATEGORÍAS -->
-        <section class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 space-y-3">
-            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="category-filters">
-                <button onclick="filterCategory('todos')" class="cat-btn bg-sky-500/20 text-sky-300 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-sky-500/30">Todos</button>
-                <button onclick="filterCategory('Tecnología')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Tecnología</button>
-                <button onclick="filterCategory('Finanzas')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Finanzas</button>
-                <button onclick="filterCategory('Entretenimiento')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Entretenimiento</button>
-            </div>
-            
-            <div class="flex gap-2">
-                <select id="sort-filter" onchange="renderChannels()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-sky-500">
-                    <option value="default">Ordenar por...</option>
-                    <option value="subs-desc">Más Suscriptores</option>
-                    <option value="price-asc">Precio: Menor a Mayor</option>
-                    <option value="price-desc">Precio: Mayor a Menor</option>
-                </select>
-            </div>
-        </section>
-
-        <!-- CONTENEDOR DE TARJETAS -->
         <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
     </main>
 
-    <!-- VISTA 2: FAVORITAS -->
-    <main id="view-favorites" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
-        <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-sky-400"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Mis Canales Guardados</h2>
-            <button onclick="clearFavorites()" id="btn-clear-favs" class="hidden bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1">
-                <i class="fa-solid fa-trash-can text-[10px]"></i> Borrar todos
-            </button>
-        </div>
-        <div id="favorites-container" class="grid gap-4 sm:grid-cols-2"></div>
-    </main>
-
-    <!-- MENÚ INFERIOR FIJO -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-40">
-        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors active-tab">
-            <i class="fa-solid fa-layer-group text-lg"></i>Catálogo
-        </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors">
-            <i class="fa-solid fa-star text-lg"></i>Favoritos
-        </button>
-        <button onclick="switchView('offers')" id="nav-offers" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors">
-            <i class="fa-solid fa-tags text-lg"></i>Ofertas
-        </button>
-    </nav>
-
-    <!-- MODAL DEL CARRITO -->
+    <!-- MODAL DEL CARRITO MODIFICADO PARA REVISAR VARIABLES -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-lg text-slate-200"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
-                    <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-rose-400 hover:text-rose-300 text-xs font-semibold underline ml-2">Vaciar cesta</button>
-                </div>
-                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="font-bold text-slate-200">🔍 Consola de Diagnóstico de la Cesta</h3>
+                <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Lista de productos añadidos -->
+            <!-- Productos añadidos -->
             <div id="cart-items" class="p-4 overflow-y-auto space-y-3 flex-1"></div>
 
-            <!-- Total y Pasos de Pago -->
-            <div class="p-4 bg-slate-950 border-t border-slate-800 space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-400 font-medium">Total Estimado:</span>
-                    <span id="cart-total" class="text-2xl font-black text-emerald-400">$0.00 USD</span>
-                </div>
+            <!-- ================= VENTANA DE DEBUG (MUESTRA LAS TRIPAS DEL SISTEMA) ================= -->
+            <div class="p-3 bg-slate-950 border-t border-yellow-600/30 space-y-2">
+                <p class="text-[11px] font-bold text-yellow-400"><i class="fa-solid fa-bug mr-1"></i> VARIABLES DEL CARRITO EN TIEMPO REAL:</p>
+                <textarea id="debug-json-box" class="w-full h-20 bg-slate-900 text-emerald-400 font-mono text-[10px] p-2 border border-slate-800 rounded-lg" readonly placeholder="Ningún dato todavía..."></textarea>
                 
-                <div class="space-y-2 bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
-                    <p class="font-bold text-slate-300 mb-1"><i class="fa-solid fa-circle-info text-sky-400 mr-1"></i>Pasos para contratar:</p>
-                    <ol class="list-decimal list-inside space-y-1">
-                        <li>Elige tus canales y mejoras en la cesta.</li>
-                        <li>Haz clic en "Enviar Pedido a Telegram".</li>
-                        <li>Se abrirá un chat conmigo con tu resumen copiado.</li>
-                        <li>Te indicaré la wallet/cuenta según elijas pagar con: <strong class="text-slate-200">PayPal, Estrellas o USDT</strong>.</li>
-                    </ol>
-                </div>
+                <p class="text-[11px] font-bold text-sky-400"><i class="fa-solid fa-link mr-1"></i> ENLACE FINAL QUE SE VA A ABRIR:</p>
+                <textarea id="debug-url-box" class="w-full h-20 bg-slate-900 text-sky-300 font-mono text-[10px] p-2 border border-slate-800 rounded-lg" readonly placeholder="Generando enlace..."></textarea>
+            </div>
+            <!-- ===================================================================================== -->
 
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3.5 rounded-xl font-bold text-center text-sm shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-                    <i class="fa-brands fa-telegram text-base"></i> Enviar Pedido a Telegram
+            <div class="p-4 bg-slate-950 border-t border-slate-800 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-sm">Total Estimado:</span>
+                    <span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-emerald-600 p-3 rounded-xl font-bold text-center text-sm flex justify-center items-center gap-2">
+                    <i class="fa-brands fa-telegram"></i> Probar Envío a Telegram
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CONFIGURACIÓN DE TU USUARIO DE TELEGRAM -->
     <script>
         const MI_TELEGRAM_USER = "Airdayz";
-    </script>
 
-    <!-- SCRIPT DE LÓGICA -->
-    <script>
         const canalesData = [
             {
                 id: 1,
@@ -241,11 +103,7 @@
                 subs: 45000,
                 precioBase: 50,
                 descuento: 15,
-                oferta: true,
-                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Canal dedicado al análisis técnico diario de Bitcoin y criptomonedas con alta tasa de lectura.",
-                duracion: "24 horas arriba (1 hora en el top)",
-                fijado: "Sí, durante las primeras 2 horas"
+                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150"
             },
             {
                 id: 2,
@@ -255,11 +113,7 @@
                 subs: 120000,
                 precioBase: 90,
                 descuento: 0,
-                oferta: false,
-                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Unboxings, reviews de teléfonos y noticias de tecnología de vanguardia.",
-                duracion: "Permanente",
-                fijado: "No"
+                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150"
             },
             {
                 id: 3,
@@ -269,234 +123,53 @@
                 subs: 85000,
                 precioBase: 30,
                 descuento: 30,
-                oferta: true,
-                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Tráfico masivo de jóvenes, ideal para marcas de ropa, apps de juegos o canales personales.",
-                duracion: "48 horas",
-                fijado: "Sí, 1 hora al inicio"
+                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150"
             }
         ];
 
-        let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
-        let currentCategory = 'todos';
-        let currentView = 'catalog';
 
         document.addEventListener("DOMContentLoaded", () => {
             renderChannels();
             updateCartBadge();
-            
-            setTimeout(() => {
-                const loader = document.getElementById('global-loader');
-                if(loader) loader.classList.add('opacity-0');
-                setTimeout(() => { if(loader) loader.remove(); }, 500);
-            }, 1200);
+            setTimeout(() => document.getElementById('global-loader').remove(), 500);
         });
-
-        function triggerSuccessAnimation(title, desc) {
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-desc').innerText = desc;
-            
-            const toast = document.getElementById('success-toast');
-            const box = document.getElementById('toast-box');
-            
-            const checkArea = box.querySelector('.success-checkmark');
-            checkArea.innerHTML = `
-                <div class="check-icon">
-                    <span class="icon-line line-tip"></span>
-                    <span class="icon-line line-long"></span>
-                    <div class="icon-circle"></div>
-                </div>
-            `;
-
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.remove('scale-75');
-            box.classList.add('scale-100');
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-                box.classList.remove('scale-100');
-                box.classList.add('scale-75');
-            }, 1800);
-        }
-
-        function switchView(view) {
-            currentView = view;
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById('view-catalog').classList.add('hidden');
-            document.getElementById('view-favorites').classList.add('hidden');
-
-            if (view === 'catalog' || view === 'offers') {
-                document.getElementById('view-catalog').classList.remove('hidden');
-                document.getElementById(`nav-${view}`).classList.add('active-tab');
-                renderChannels();
-            } else if (view === 'favorites') {
-                document.getElementById('view-favorites').classList.remove('hidden');
-                document.getElementById('nav-favorites').classList.add('active-tab');
-                renderFavorites();
-            }
-        }
-
-        function filterCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.replace('bg-sky-500/20', 'bg-slate-800');
-                btn.classList.replace('text-sky-300', 'text-slate-400');
-            });
-            event.target.classList.replace('bg-slate-800', 'bg-sky-500/20');
-            event.target.classList.replace('text-slate-400', 'text-sky-300');
-            renderChannels();
-        }
 
         function renderChannels() {
             const container = document.getElementById('channels-container');
             container.innerHTML = '';
-            let canalesFiltrados = [...canalesData];
-
-            if (currentView === 'offers') {
-                canalesFiltrados = canalesFiltrados.filter(c => c.oferta);
-            } else if (currentCategory !== 'todos') {
-                canalesFiltrados = canalesFiltrados.filter(c => c.categoria === currentCategory);
-            }
-
-            const sortVal = document.getElementById('sort-filter').value;
-            if (sortVal === 'subs-desc') canalesFiltrados.sort((a,b) => b.subs - a.subs);
-            if (sortVal === 'price-asc') canalesFiltrados.sort((a,b) => getPrecio(a) - getPrecio(b));
-            if (sortVal === 'price-desc') canalesFiltrados.sort((a,b) => getPrecio(b) - getPrecio(a));
-
-            if(canalesFiltrados.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No se encontraron canales.</p>`;
-                return;
-            }
-            canalesFiltrados.forEach(c => container.appendChild(createChannelCard(c)));
-        }
-
-        function renderFavorites() {
-            const container = document.getElementById('favorites-container');
-            const clearFavsBtn = document.getElementById('btn-clear-favs');
-            container.innerHTML = '';
-            const favs = canalesData.filter(c => favoritos.includes(c.id));
             
-            if(favs.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No tienes favoritos todavía.</p>`;
-                clearFavsBtn.classList.add('hidden');
-                return;
-            }
-            clearFavsBtn.classList.remove('hidden');
-            favs.forEach(c => container.appendChild(createChannelCard(c)));
-        }
-
-        function getPrecio(canal) {
-            return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase;
-        }
-
-        function createChannelCard(c) {
-            const isFav = favoritos.includes(c.id);
-            const precioFinal = getPrecio(c);
-            const card = document.createElement('div');
-            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 relative flex flex-col justify-between shadow-md hover:border-slate-600 transition-all";
-            
-            card.innerHTML = `
-                <div>
-                    <div class="flex gap-3 items-start">
-                        <img src="${c.imagen}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="">
-                        <div class="flex-1 min-w-0">
-                            <span class="bg-slate-700 text-slate-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded-md">${c.categoria}</span>
-                            <h3 class="font-bold text-slate-200 text-sm mt-1 truncate">${c.nombre}</h3>
-                            <p class="text-slate-400 text-xs"><i class="fa-solid fa-users text-sky-500 mr-1"></i>${c.subs.toLocaleString()} subs</p>
+            canalesData.forEach(c => {
+                const precio = c.descuento > 0 ? c.precioBase * (1 - c.descuento/100) : c.precioBase;
+                const card = document.createElement('div');
+                card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="flex gap-3 items-center">
+                        <img src="${c.imagen}" class="w-10 h-10 rounded-xl object-cover" alt="">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-200">${c.nombre}</h3>
+                            <p class="text-xs text-slate-400">$${precio.toFixed(2)} USD</p>
                         </div>
-                        <button onclick="toggleFav(${c.id})" class="text-lg focus:outline-none p-1 text-${isFav ? 'amber-400' : 'slate-600'} hover:scale-110 transition-transform">
-                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
-                        </button>
                     </div>
-
-                    <div class="mt-3 flex items-baseline gap-2 bg-slate-900/40 p-2 rounded-xl border border-slate-800">
-                        <span class="text-xl font-black text-emerald-400">$${precioFinal.toFixed(2)}</span>
-                        ${c.descuento > 0 ? `<span class="text-xs text-slate-500 line-through">$${c.precioBase}</span> <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 rounded">-${c.descuento}% OFF</span>` : ''}
-                    </div>
-
-                    <details class="mt-3 group border-t border-slate-800/80 pt-2">
-                        <summary class="list-none flex justify-between items-center text-xs text-sky-400 font-semibold cursor-pointer select-none">
-                            <span>Ver detalles e hiper-packs</span>
-                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-[10px]"></i>
-                        </summary>
-                        <div class="mt-2 space-y-2 text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800/50">
-                            <p><strong class="text-slate-400">Descripción:</strong> ${c.descripcion}</p>
-                            <p><strong class="text-slate-400">Permanencia:</strong> ${c.duracion}</p>
-                            <p><strong class="text-slate-400">Mensaje Fijado:</strong> ${c.fijado}</p>
-                            
-                            <div class="mt-3 border-t border-slate-800 pt-2 space-y-1">
-                                <p class="font-bold text-amber-400 text-[11px] mb-1"><i class="fa-solid fa-bolt mr-1"></i>¿Potenciar campaña?</p>
-                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
-                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Pack x3 Anuncios (Semanal)</span>
-                                    <span class="text-emerald-400 font-bold text-[11px]">+$25</span>
-                                </label>
-                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
-                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Fijado 24 horas completas</span>
-                                    <span class="text-emerald-400 font-bold text-[11px]">+$10</span>
-                                </label>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <a href="https://t.me/${c.username}" target="_blank" class="bg-slate-800 text-center py-2 rounded-xl text-xs font-bold text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Ver Canal
-                    </a>
-                    <button onclick="addToCart(${c.id})" class="bg-sky-600/90 hover:bg-sky-500 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-md shadow-sky-600/10 active:scale-[0.97] flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-cart-plus"></i> Añadir Cesta
+                    <button onclick="addToCart(${c.id})" class="mt-3 w-full bg-sky-600 py-1.5 rounded-xl text-xs font-bold text-white">
+                        + Añadir Cesta
                     </button>
-                </div>
-            `;
-            return card;
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function toggleFav(id) {
-            const targetCanal = canalesData.find(item => item.id === id);
-            if (favoritos.includes(id)) {
-                favoritos = favoritos.filter(fId => fId !== id);
-                triggerSuccessAnimation("Eliminado", "Quitado de favoritos correctamente.");
-            } else {
-                favoritos.push(id);
-                triggerSuccessAnimation("¡Guardado!", `Añadiste "${targetCanal.nombre}" a favoritos.`);
-            }
-            localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
-            currentView === 'favorites' ? renderFavorites() : renderChannels();
-        }
-
-        function clearFavorites() {
-            if(confirm("¿Seguro que quieres eliminar todos tus canales favoritos?")) {
-                favoritos = [];
-                localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
-                renderFavorites();
-                triggerSuccessAnimation("Lista Vacía", "Se borraron todos tus favoritos.");
-            }
-        }
-
-        // LÓGICA DE AGREGADO TOTALMENTE REDISEÑADA E INMUNIZADA
         function addToCart(id) {
-            const baseCanal = canalesData.find(item => item.id === id);
-            if (!baseCanal) return;
-
-            const chkPack = document.getElementById(`up-pack-${id}`);
-            const chkFixed = document.getElementById(`up-fixed-${id}`);
-            
+            // Generamos un objeto limpio y plano sin referencias externas problemáticas
             const nuevoItem = {
-                idUnique: Date.now() + Math.random(), 
-                idCanalOriginal: Number(baseCanal.id),
-                packExtra: chkPack ? chkPack.checked : false,
-                fixedExtra: chkFixed ? chkFixed.checked : false
+                registroId: Date.now() + Math.floor(Math.random() * 1000),
+                idDelCanalElegido: parseInt(id)
             };
 
             carrito.push(nuevoItem);
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
-            
-            triggerSuccessAnimation("Añadido", `"${baseCanal.nombre}" está en la cesta.`);
-
-            if (chkPack) chkPack.checked = false;
-            if (chkFixed) chkFixed.checked = false;
+            alert("Añadido. Abre la cesta arriba para auditar las variables.");
         }
 
         function updateCartBadge() {
@@ -506,112 +179,75 @@
         function openCartModal() {
             const modal = document.getElementById('cart-modal');
             const container = document.getElementById('cart-items');
-            const clearCartBtn = document.getElementById('btn-clear-cart');
             container.innerHTML = '';
             let total = 0;
 
             modal.classList.remove('hidden');
 
+            // 1. Mostrar JSON crudo en la caja de debug para ver si se guardan IDs erróneos
+            document.getElementById('debug-json-box').value = JSON.stringify(carrito, null, 2);
+
             if(carrito.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Tu cesta está vacía. Añade canales desde el catálogo.</p>`;
+                container.innerHTML = `<p class="text-center text-slate-500 py-4 text-xs">Cesta vacía.</p>`;
                 document.getElementById('cart-total').innerText = "$0.00 USD";
-                clearCartBtn.classList.add('hidden');
+                document.getElementById('debug-url-box').value = "Ninguno - Cesta vacía";
                 return;
             }
 
-            clearCartBtn.classList.remove('hidden');
-
+            // 2. Construir la vista física de la cesta
             carrito.forEach(item => {
-                // Buscamos el canal original directamente usando su ID guardado en cada renderizado
-                const datosCanal = canalesData.find(c => c.id === item.idCanalOriginal);
+                const datosCanal = canalesData.find(c => c.id === item.idDelCanalElegido);
                 if (!datosCanal) return;
 
-                let precioItem = Number(getPrecio(datosCanal));
-                let detallesMejoras = [];
-                
-                if (item.packExtra) { precioItem += 25; detallesMejoras.push("Pack x3 Anuncios (+$25)"); }
-                if (item.fixedExtra) { precioItem += 10; detallesMejoras.push("Fijado 24h (+$10)"); }
-                
+                let precioItem = datosCanal.descuento > 0 ? datosCanal.precioBase * (1 - datosCanal.descuento/100) : datosCanal.precioBase;
                 total += precioItem;
 
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700/60 flex justify-between items-center";
+                div.className = "bg-slate-800 p-2 rounded-xl flex justify-between items-center text-xs";
                 div.innerHTML = `
-                    <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-sm text-slate-200 truncate">${datosCanal.nombre}</h4>
-                        ${detallesMejoras.length > 0 ? `<p class="text-[10px] text-amber-400 font-medium">${detallesMejoras.join(' + ')}</p>` : `<p class="text-[10px] text-slate-400">Espacio estándar contratado</p>`}
-                        <span class="text-xs font-bold text-emerald-400">$${precioItem.toFixed(2)}</span>
+                    <div>
+                        <h4 class="font-bold text-slate-200">${datosCanal.nombre}</h4>
+                        <span class="text-emerald-400 font-mono">ID Buscado: ${item.idDelCanalElegido}</span>
                     </div>
-                    <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400/70 hover:text-rose-400 p-2 text-sm"><i class="fa-solid fa-trash-can"></i></button>
+                    <button onclick="removeFromCart(${item.registroId})" class="text-rose-400 px-2"><i class="fa-solid fa-trash-can"></i></button>
                 `;
                 container.appendChild(div);
             });
 
             document.getElementById('cart-total').innerText = `$${total.toFixed(2)} USD`;
+
+            // 3. Simular y previsualizar la URL de Telegram exacta que va a dispararse
+            generarPrevisualizacionURL(total);
+        }
+
+        function generarPrevisualizacionURL(total) {
+            let texto = "¡Hola! Mi pedido:\n";
+            carrito.forEach((item, index) => {
+                const canal = canalesData.find(c => c.id === item.idDelCanalElegido);
+                if(canal) {
+                    texto += `${index + 1}. ${canal.nombre}\n`;
+                }
+            });
+            texto += `Total: $${total.toFixed(2)} USD`;
+            
+            document.getElementById('debug-url-box').value = "https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(texto);
+        }
+
+        function removeFromCart(registroId) {
+            carrito = carrito.filter(item => item.registroId !== registroId);
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            openCartModal();
         }
 
         function closeCartModal() {
             document.getElementById('cart-modal').classList.add('hidden');
         }
 
-        function removeFromCart(idUnique) {
-            carrito = carrito.filter(item => item.idUnique !== idUnique);
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
-            openCartModal();
-        }
-
-        function clearCart() {
-            if(confirm("¿Quieres eliminar todos los canales de tu cesta?")) {
-                carrito = [];
-                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-                updateCartBadge();
-                openCartModal();
-                triggerSuccessAnimation("Cesta Vacía", "Se borró todo el contenido.");
-            }
-        }
-
-        // GENERADOR DE TEXTO ABSOLUTAMENTE INMUNE A CRUCES DE VARIABLES
         function checkout() {
-            if(carrito.length === 0) return alert("Tu cesta está vacía.");
-
-            let textoPedido = "¡Hola! Quiero contratar publicidad.\n\n";
-            textoPedido += "📋 *RESUMEN DEL PEDIDO:*\n";
-            let totalAcumulado = 0;
-
-            for (let i = 0; i < carrito.length; i++) {
-                let itemCarrito = carrito[i];
-                let canalAsociado = canalesData.find(c => c.id === itemCarrito.idCanalOriginal);
-                
-                if (!canalAsociado) continue;
-
-                let subtotalCanal = Number(getPrecio(canalAsociado));
-                let mejorasAplicadas = [];
-                
-                if (itemCarrito.packExtra) { subtotalCanal += 25; mejorasAplicadas.push("Pack x3"); }
-                if (itemCarrito.fixedExtra) { subtotalCanal += 10; mejorasAplicadas.push("Fijado 24h"); }
-                
-                totalAcumulado += subtotalCanal;
-
-                let enumeracion = i + 1;
-                let stringMejoras = mejorasAplicadas.length > 0 ? " (" + mejorasAplicadas.join(', ') + ")" : "";
-                
-                textoPedido += `${enumeracion}. *${canalAsociado.nombre}* [Precio: $${subtotalCanal}]${stringMejoras}\n`;
-            }
-
-            textoPedido += `\n💰 *TOTAL ESTIMADO:* $${totalAcumulado.toFixed(2)} USD\n`;
-            textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
-
-            // Codificación limpia para prevenir problemas de caracteres
-            let urlFinalTelegram = "https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido);
-            
-            window.open(urlFinalTelegram, "_blank");
-            
-            // Limpieza absoluta tras el checkout exitoso
-            carrito = [];
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
-            closeCartModal();
+            if(carrito.length === 0) return alert("Cesta vacía.");
+            const urlAabrir = document.getElementById('debug-url-box').value;
+            window.open(urlAabrir, "_blank");
         }
     </script>
 </body>
