@@ -19,141 +19,103 @@
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
             overflow-x: hidden;
         }
         .active-tab {
             color: var(--tg-theme-accent);
             border-top: 2px solid var(--tg-theme-accent);
         }
-
-        /* ANIMACIÓN DEL CHECK VERDE */
-        .success-checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-        }
-        .success-checkmark .check-icon {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            border-radius: 50%;
-            box-sizing: content-box;
-            border: 4px solid #4ade80;
-        }
-        .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
-            content: '';
-            position: absolute;
-            background: #1e293b;
-            transform: rotate(45deg);
-        }
-        .success-checkmark .check-icon .icon-line {
-            height: 5px;
-            background-color: #4ade80;
-            display: block;
-            border-radius: 2px;
-            position: absolute;
-            z-index: 10;
-        }
-        .success-checkmark .check-icon .icon-line.line-tip {
-            width: 25px;
-            left: 14px;
-            top: 43px;
-            transform: rotate(45deg);
-            animation: icon-line-tip 0.75s;
-        }
-        .success-checkmark .check-icon .icon-line.line-long {
-            width: 47px;
-            right: 8px;
-            top: 38px;
-            transform: rotate(-45deg);
-            animation: icon-line-long 0.75s;
-        }
-        .success-checkmark .check-icon .icon-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid rgba(74, 222, 128, 0.2);
-            position: absolute;
-            left: -4px;
-            top: -4px;
-            z-index: 1;
-        }
-
-        @keyframes icon-line-tip {
-            0% { width: 0; left: 1px; top: 19px; }
-            54% { width: 0; left: 1px; top: 19px; }
-            70% { width: 50px; left: -8px; top: 37px; }
-            84% { width: 17px; left: 21px; top: 48px; }
-            100% { width: 25px; left: 14px; top: 43px; }
-        }
-        @keyframes icon-line-long {
-            0% { width: 0; right: 46px; top: 54px; }
-            65% { width: 0; right: 46px; top: 54px; }
-            84% { width: 55px; right: 0px; top: 35px; }
-            100% { width: 47px; right: 8px; top: 38px; }
-        }
+        /* Ocultar barra de scroll en categorías */
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
 
     <!-- PANTALLA DE CARGA INICIAL -->
     <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative w-20 h-20">
+        <div class="relative w-16 h-16">
             <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
             <div class="absolute inset-0 rounded-full border-4 border-t-sky-400 border-r-indigo-500 animate-spin"></div>
         </div>
-        <h2 class="mt-6 font-bold text-lg text-slate-300 tracking-wider">Cargando Catálogo...</h2>
-        <p class="text-xs text-slate-500 mt-1">Lista Golden Ads</p>
+        <h2 class="mt-6 font-bold text-sm text-slate-400 tracking-widest uppercase">Cargando SmartApp...</h2>
     </div>
 
-    <!-- NOTIFICACIÓN POP-UP DEL CHECK VERDE -->
-    <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <!-- NOTIFICACIÓN POP-UP GLOBAL -->
+    <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-slate-800 border border-slate-700/60 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center scale-75 transition-transform duration-300" id="toast-box">
-            <div class="success-checkmark mb-4">
-                <div class="check-icon">
-                    <span class="icon-line line-tip"></span>
-                    <span class="icon-line line-long"></span>
-                    <div class="icon-circle"></div>
-                </div>
+            <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center text-xl mb-3 border border-emerald-500/20">
+                <i class="fa-solid fa-circle-check"></i>
             </div>
-            <h3 id="toast-title" class="text-slate-100 font-bold text-lg">¡Completado!</h3>
+            <h3 id="toast-title" class="text-slate-100 font-bold text-base">¡Completado!</h3>
             <p id="toast-desc" class="text-slate-400 text-xs mt-1">Acción realizada con éxito.</p>
         </div>
     </div>
 
-    <!-- HEADER / CESTA FLOTANTE -->
-    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800 shadow-xl">
+    <!-- HEADER -->
+    <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800/80 shadow-xl">
         <div class="flex items-center gap-2">
-            <i class="fa-brands fa-telegram text-sky-400 text-2xl animate-pulse"></i>
-            <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Lista Golden Ads</h1>
+            <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
+            <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Golden Ads</h1>
         </div>
-        <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-full font-bold text-sm shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
+        <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
             <i class="fa-solid fa-basket-shopping"></i>
             <span>Cesta</span>
-            <span id="cart-count" class="bg-white text-slate-950 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black">0</span>
+            <span id="cart-count" class="bg-white text-slate-950 text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-black">0</span>
         </button>
     </header>
 
     <!-- VISTA 1: CATÁLOGO -->
-    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-6">
-        <!-- FILTROS Y CATEGORÍAS -->
-        <section class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 space-y-3">
-            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="category-filters">
-                <button onclick="filterCategory('todos')" class="cat-btn bg-sky-500/20 text-sky-300 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-sky-500/30">Todos</button>
-                <button onclick="filterCategory('Tecnología')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Tecnología</button>
-                <button onclick="filterCategory('Finanzas')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Finanzas</button>
-                <button onclick="filterCategory('Entretenimiento')" class="cat-btn bg-slate-800 text-slate-400 px-4 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Entretenimiento</button>
+    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
+        <!-- SECCIÓN DE PREMIOS GAMIFICADA -->
+        <section class="bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-gift text-amber-400 text-sm animate-bounce"></i>
+                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Progreso de Premios</h3>
+                </div>
+                <span id="rewards-current-spend" class="text-xs font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-md">$0.00 USD</span>
             </div>
             
-            <div class="flex gap-2">
-                <select id="sort-filter" onchange="renderChannels()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-sky-500">
-                    <option value="default">Ordenar por...</option>
-                    <option value="subs-desc">Más Suscriptores</option>
-                    <option value="price-asc">Precio: Menor a Mayor</option>
-                    <option value="price-desc">Precio: Mayor a Menor</option>
-                </select>
+            <!-- Barra de Progreso -->
+            <div class="relative w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div id="rewards-bar" class="h-full bg-gradient-to-r from-sky-400 via-indigo-500 to-emerald-400 w-0 transition-all duration-500"></div>
             </div>
+
+            <!-- Hitos / Ranuras de Regalo -->
+            <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+                <div id="tier-1" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
+                    <p class="font-bold text-slate-300">Nivel 1 ($30)</p>
+                    <p class="text-emerald-400 font-semibold mt-0.5">5% OFF</p>
+                    <button onclick="applyRewardCoupon('GOLDEN5', 30)" id="btn-tier-1" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                </div>
+                <div id="tier-2" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
+                    <p class="font-bold text-slate-300">Nivel 2 ($70)</p>
+                    <p class="text-emerald-400 font-semibold mt-0.5">10% OFF</p>
+                    <button onclick="applyRewardCoupon('GOLDEN10', 70)" id="btn-tier-2" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                </div>
+                <div id="tier-3" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
+                    <p class="font-bold text-slate-300">Nivel 3 ($120)</p>
+                    <p class="text-emerald-400 font-semibold mt-0.5">15% OFF</p>
+                    <button onclick="applyRewardCoupon('GOLDEN15', 120)" id="btn-tier-3" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTROS Y CATEGORÍAS -->
+        <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
+            <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
+                <button onclick="filterCategory('todos')" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border border-sky-500/30">Todos</button>
+                <button onclick="filterCategory('Tecnología')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Tecnología</button>
+                <button onclick="filterCategory('Finanzas')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Finanzas</button>
+                <button onclick="filterCategory('Entretenimiento')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-700">Entretenimiento</button>
+            </div>
+            <select id="sort-filter" onchange="renderChannels()" class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 text-xs text-slate-300 focus:outline-none">
+                <option value="default">⇅</option>
+                <option value="subs-desc">Muestras más grandes</option>
+                <option value="price-asc">Precio más bajo</option>
+            </select>
         </section>
 
         <!-- CONTENEDOR DE TARJETAS -->
@@ -163,21 +125,80 @@
     <!-- VISTA 2: FAVORITAS -->
     <main id="view-favorites" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
         <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-sky-400"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Mis Canales Guardados</h2>
-            <button onclick="clearFavorites()" id="btn-clear-favs" class="hidden bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1">
-                <i class="fa-solid fa-trash-can text-[10px]"></i> Borrar todos
-            </button>
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Tus Favoritos</h2>
+            <button onclick="clearFavorites()" id="btn-clear-favs" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-3 py-1 rounded-xl text-xs font-bold">Borrar Todo</button>
         </div>
         <div id="favorites-container" class="grid gap-4 sm:grid-cols-2"></div>
     </main>
 
-    <!-- MENÚ INFERIOR FIJO -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-40">
-        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors active-tab">
-            <i class="fa-solid fa-layer-group text-lg"></i>Catálogo
+    <!-- VISTA 3: HISTORIAL DE CAMPAÑAS -->
+    <main id="view-campaigns" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
+        <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-sky-400 mr-2"></i>Tus Campañas Solicitadas</h2>
+        <div id="campaigns-container" class="space-y-3"></div>
+    </main>
+
+    <!-- VISTA 4: GARANTÍAS & FAQ ACCORDION -->
+    <main id="view-faq" class="p-4 max-w-2xl mx-auto space-y-4 hidden">
+        <div class="text-center max-w-md mx-auto pb-2">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i>Garantía y Soporte Pro</h2>
+            <p class="text-xs text-slate-400 mt-1">Transparencia absoluta. Respuestas claras antes de realizar tu inversión publicitaria.</p>
+        </div>
+        
+        <div class="space-y-2.5" id="faq-accordion-group">
+            <!-- FAQ ITEM 1 -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
+                <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
+                    <span>¿Cuánto tiempo tarda en publicarse mi anuncio?</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
+                </button>
+                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
+                        Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 horas. Recibirás un enlace directo de confirmación cuando esté arriba.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ ITEM 2 -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
+                <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
+                    <span>¿Qué métodos de pago aceptan actualmente?</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
+                </button>
+                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
+                        Aceptamos pagos globales rápidos a través de <strong class="text-emerald-400">PayPal, Estrellas de Telegram</strong> y criptomonedas estables como <strong class="text-sky-400">USDT (Red TRC20)</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ ITEM 3 -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
+                <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
+                    <span>¿Existe garantía si eliminan el post antes de tiempo?</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
+                </button>
+                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
+                        Sí, 100% garantizado. Respetamos rigurosamente los tiempos contratados (24h, 48h o Permanente). Si por algún error del sistema el post se borra antes, te compensamos relanzando tu campaña con un <strong class="text-amber-400">fijado extra gratuito de 12 horas</strong>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MENÚ INFERIOR FIJO (4 BOTONES PERFECTAMENTE EQUILIBRADOS) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
+        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold transition-colors active-tab">
+            <i class="fa-solid fa-layer-group text-base"></i>Catálogo
         </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-4 text-xs font-medium transition-colors">
-            <i class="fa-solid fa-star text-lg"></i>Favoritos
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold transition-colors">
+            <i class="fa-solid fa-star text-base"></i>Favoritos
+        </button>
+        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold transition-colors">
+            <i class="fa-solid fa-rectangle-ad text-base"></i>Campañas
+        </button>
+        <button onclick="switchView('faq')" id="nav-faq" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold transition-colors">
+            <i class="fa-solid fa-shield-halved text-base"></i>Garantía
         </button>
     </nav>
 
@@ -186,46 +207,46 @@
         <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
                 <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-lg text-slate-200"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
-                    <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-rose-400 hover:text-rose-300 text-xs font-semibold underline ml-2">Vaciar cesta</button>
+                    <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
+                    <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-rose-400 text-xs font-semibold underline ml-2">Vaciar</button>
                 </div>
-                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Lista de productos añadidos -->
-            <div id="cart-items" class="p-4 overflow-y-auto space-y-3 flex-1"></div>
+            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
 
-            <!-- Total y Pasos de Pago -->
-            <div class="p-4 bg-slate-950 border-t border-slate-800 space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-400 font-medium">Total Estimado:</span>
-                    <span id="cart-total" class="text-2xl font-black text-emerald-400">$0.00 USD</span>
-                </div>
-                
-                <div class="space-y-2 bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
-                    <p class="font-bold text-slate-300 mb-1"><i class="fa-solid fa-circle-info text-sky-400 mr-1"></i>Pasos para contratar:</p>
-                    <ol class="list-decimal list-inside space-y-1">
-                        <li>Elige tus canales y mejoras en la cesta.</li>
-                        <li>Haz clic en "Enviar Pedido a Telegram".</li>
-                        <li>Se abrirá un chat conmigo con tu resumen copiado.</li>
-                        <li>Te indicaré la wallet/cuenta según elijas pagar con: <strong class="text-slate-200">PayPal, Estrellas o USDT</strong>.</li>
-                    </ol>
+            <!-- Zona de totales y cupones -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-3">
+                <div id="coupon-display-area" class="hidden flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-xs text-emerald-400 font-medium">
+                    <span><i class="fa-solid fa-ticket mr-1"></i> Cupón activo: <strong id="active-coupon-name">NINGUNO</strong></span>
+                    <button onclick="removeCoupon()" class="text-rose-400 font-bold ml-2 underline text-[10px]">Quitar</button>
                 </div>
 
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3.5 rounded-xl font-bold text-center text-sm shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-                    <i class="fa-brands fa-telegram text-base"></i> Enviar Pedido a Telegram
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span>Subtotal Canales:</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium">
+                        <span>Descuento Aplicado:</span>
+                        <span id="cart-discount">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-800">
+                        <span class="text-slate-200 font-bold text-sm">Total Neto:</span>
+                        <span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span>
+                    </div>
+                </div>
+
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-center text-xs uppercase tracking-wider flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/15">
+                    <i class="fa-brands fa-telegram text-sm"></i> Enviar Pedido a Telegram
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CONFIGURACIÓN DE TU USUARIO DE TELEGRAM -->
     <script>
         const MI_TELEGRAM_USER = "Airdayz";
-    </script>
 
-    <!-- SCRIPT DE LÓGICA MÁSTER SANEADA -->
-    <script>
         const canalesData = [
             {
                 id: 1,
@@ -235,11 +256,7 @@
                 subs: 45000,
                 precioBase: 50,
                 descuento: 15,
-                oferta: true,
-                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Canal dedicado al análisis técnico diario de Bitcoin y criptomonedas.",
-                duracion: "24 horas arriba (1 hora en el top)",
-                fijado: "Sí, durante las primeras 2 horas"
+                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150"
             },
             {
                 id: 2,
@@ -249,11 +266,7 @@
                 subs: 120000,
                 precioBase: 90,
                 descuento: 0,
-                oferta: false,
-                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Unboxings, reviews de teléfonos y noticias de tecnología.",
-                duracion: "Permanente",
-                fijado: "No"
+                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150"
             },
             {
                 id: 3,
@@ -263,28 +276,22 @@
                 subs: 85000,
                 precioBase: 30,
                 descuento: 30,
-                oferta: true,
-                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150&auto=format&fit=crop&q=60",
-                descripcion: "Tráfico masivo de jóvenes, ideal para marcas de ropa o apps.",
-                duracion: "48 horas",
-                fijado: "Sí, 1 hora al inicio"
+                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150"
             }
         ];
 
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
+        let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
+        let activeCoupon = null;
+        let activeCouponPct = 0;
         let currentCategory = 'todos';
-        let currentView = 'catalog';
 
         document.addEventListener("DOMContentLoaded", () => {
             renderChannels();
             updateCartBadge();
-            
-            setTimeout(() => {
-                const loader = document.getElementById('global-loader');
-                if(loader) loader.classList.add('opacity-0');
-                setTimeout(() => { if(loader) loader.remove(); }, 500);
-            }, 1200);
+            updateRewardsPanel();
+            setTimeout(() => document.getElementById('global-loader').remove(), 500);
         });
 
         function triggerSuccessAnimation(title, desc) {
@@ -297,24 +304,20 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'pointer-events-none');
                 box.classList.replace('scale-100', 'scale-75');
-            }, 1800);
+            }, 1500);
         }
 
         function switchView(view) {
-            currentView = view;
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
             document.getElementById('view-catalog').classList.add('hidden');
             document.getElementById('view-favorites').classList.add('hidden');
+            document.getElementById('view-campaigns').classList.add('hidden');
+            document.getElementById('view-faq').classList.add('hidden');
 
-            if (view === 'catalog') {
-                document.getElementById('view-catalog').classList.remove('hidden');
-                document.getElementById('nav-catalog').classList.add('active-tab');
-                renderChannels();
-            } else if (view === 'favorites') {
-                document.getElementById('view-favorites').classList.remove('hidden');
-                document.getElementById('nav-favorites').classList.add('active-tab');
-                renderFavorites();
-            }
+            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); }
+            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
+            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
+            if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
         }
 
         function filterCategory(cat) {
@@ -332,244 +335,332 @@
             return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase;
         }
 
+        function calculateCartSubtotal() {
+            let subtotal = 0;
+            carrito.forEach(item => {
+                const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                if(canal) {
+                    let p = getPrecio(canal);
+                    if(item.packExtra) p += 25;
+                    if(item.fixedExtra) p += 10;
+                    subtotal += p;
+                }
+            });
+            return subtotal;
+        }
+
+        function updateRewardsPanel() {
+            const currentSpend = calculateCartSubtotal();
+            document.getElementById('rewards-current-spend').innerText = `$${currentSpend.toFixed(2)} USD`;
+            
+            // Lógica de porcentaje de la barra de progreso (máximo hito en $120)
+            const pct = Math.min((currentSpend / 120) * 100, 100);
+            document.getElementById('rewards-bar').style.width = `${pct}%`;
+
+            // Evaluar los hitos
+            evaluateTier(1, currentSpend >= 30);
+            evaluateTier(2, currentSpend >= 70);
+            evaluateTier(3, currentSpend >= 120);
+        }
+
+        function evaluateTier(tierNumber, unlocked) {
+            const element = document.getElementById(`tier-${tierNumber}`);
+            const btn = document.getElementById(`btn-tier-${tierNumber}`);
+            
+            if(unlocked) {
+                element.classList.remove('opacity-50');
+                element.classList.add('border-emerald-500/40', 'bg-emerald-500/5');
+                btn.removeAttribute('disabled');
+                if (btn.innerText === "Bloqueado" || btn.innerText === "Aplicar") {
+                    btn.innerText = "Aplicar";
+                    btn.className = "mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 py-1 rounded-md text-[9px] font-bold text-white transition-colors cursor-pointer";
+                }
+            } else {
+                element.classList.add('opacity-50');
+                element.classList.remove('border-emerald-500/40', 'bg-emerald-500/5');
+                btn.setAttribute('disabled', 'true');
+                btn.innerText = "Bloqueado";
+                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400";
+            }
+        }
+
+        function applyRewardCoupon(couponCode, minSpend) {
+            if(calculateCartSubtotal() < minSpend) return;
+            activeCoupon = couponCode;
+            activeCouponPct = couponCode === 'GOLDEN5' ? 5 : (couponCode === 'GOLDEN10' ? 10 : 15);
+            triggerSuccessAnimation("¡Cupón Aplicado!", `Código ${couponCode} añadido al pedido.`);
+            openCartModal();
+        }
+
+        function removeCoupon() {
+            activeCoupon = null;
+            activeCouponPct = 0;
+            openCartModal();
+        }
+
         function renderChannels() {
             const container = document.getElementById('channels-container');
             container.innerHTML = '';
             let filtrados = [...canalesData];
 
-            if (currentCategory !== 'todos') {
-                filtrados = filtrados.filter(c => c.categoria === currentCategory);
-            }
-
-            const sortVal = document.getElementById('sort-filter').value;
-            if (sortVal === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
-            if (sortVal === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
-            if (sortVal === 'price-desc') filtrados.sort((a,b) => getPrecio(b) - getPrecio(a));
+            if (currentCategory !== 'todos') filtrados = filtrados.filter(c => c.categoria === currentCategory);
+            if (document.getElementById('sort-filter').value === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
+            if (document.getElementById('sort-filter').value === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
 
             filtrados.forEach(c => container.appendChild(createChannelCard(c)));
         }
 
-        function renderFavorites() {
-            const container = document.getElementById('favorites-container');
-            const clearFavsBtn = document.getElementById('btn-clear-favs');
-            container.innerHTML = '';
-            const favs = canalesData.filter(c => favoritos.includes(c.id));
-            
-            if(favs.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-500 text-sm">No tienes favoritos todavía.</p>`;
-                clearFavsBtn.classList.add('hidden');
-                return;
-            }
-            clearFavsBtn.classList.remove('hidden');
-            favs.forEach(c => container.appendChild(createChannelCard(c)));
-        }
-
         function createChannelCard(c) {
             const isFav = favoritos.includes(c.id);
-            const precioFinal = getPrecio(c);
             const card = document.createElement('div');
-            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between shadow-md hover:border-slate-600 transition-all";
-            
+            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between shadow-md";
             card.innerHTML = `
                 <div>
                     <div class="flex gap-3 items-start">
-                        <img src="${c.imagen}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="">
+                        <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover" alt="">
                         <div class="flex-1 min-w-0">
-                            <span class="bg-slate-700 text-slate-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded-md">${c.categoria}</span>
-                            <h3 class="font-bold text-slate-200 text-sm mt-1 truncate">${c.nombre}</h3>
-                            <p class="text-slate-400 text-xs"><i class="fa-solid fa-users text-sky-500 mr-1"></i>${c.subs.toLocaleString()} subs</p>
+                            <span class="bg-slate-700 text-slate-300 text-[9px] uppercase font-bold px-2 py-0.5 rounded">${c.categoria}</span>
+                            <h3 class="font-bold text-slate-200 text-xs mt-1 truncate">${c.nombre}</h3>
                         </div>
-                        <button onclick="toggleFav(${c.id})" class="text-lg text-${isFav ? 'amber-400' : 'slate-600'} hover:scale-110 transition-transform">
+                        <button onclick="toggleFav(${c.id})" class="text-sm text-${isFav ? 'amber-400' : 'slate-600'}">
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                         </button>
                     </div>
-
-                    <div class="mt-3 flex items-baseline gap-2 bg-slate-900/40 p-2 rounded-xl border border-slate-800">
-                        <span class="text-xl font-black text-emerald-400">$${precioFinal.toFixed(2)}</span>
-                        ${c.descuento > 0 ? `<span class="text-xs text-slate-500 line-through">$${c.precioBase}</span> <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 rounded">-${c.descuento}% OFF</span>` : ''}
+                    <div class="mt-2 text-xs font-black text-emerald-400 bg-slate-950/40 p-2 rounded-xl border border-slate-800">
+                        $${getPrecio(c).toFixed(2)} USD
                     </div>
-
-                    <details class="mt-3 group border-t border-slate-800/80 pt-2">
-                        <summary class="list-none flex justify-between items-center text-xs text-sky-400 font-semibold cursor-pointer select-none">
-                            <span>Ver detalles e hiper-packs</span>
-                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-[10px]"></i>
-                        </summary>
-                        <div class="mt-2 space-y-2 text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-slate-800/50">
-                            <p><strong class="text-slate-400">Descripción:</strong> ${c.descripcion}</p>
-                            <p><strong class="text-slate-400">Permanencia:</strong> ${c.duracion}</p>
-                            <p><strong class="text-slate-400">Mensaje Fijado:</strong> ${c.fijado}</p>
-                            
-                            <div class="mt-3 border-t border-slate-800 pt-2 space-y-1">
-                                <p class="font-bold text-amber-400 text-[11px] mb-1"><i class="fa-solid fa-bolt mr-1"></i>¿Potenciar campaña?</p>
-                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
-                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Pack x3 Anuncios (Semanal)</span>
-                                    <span class="text-emerald-400 font-bold text-[11px]">+$25</span>
-                                </label>
-                                <label class="flex items-center justify-between p-1 hover:bg-slate-800 rounded cursor-pointer">
-                                    <span class="text-slate-400 text-[11px]"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-2 border-slate-700 bg-slate-900"> Fijado 24 horas completas</span>
-                                    <span class="text-emerald-400 font-bold text-[11px]">+$10</span>
-                                </label>
-                            </div>
-                        </div>
-                    </details>
+                    <div class="mt-2 space-y-1 bg-slate-900/40 p-2 rounded-xl text-[11px] text-slate-400">
+                        <label class="flex justify-between cursor-pointer"><span class="flex items-center"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Pack x3 Posts Semanal</span> <span class="text-emerald-400">+$25</span></label>
+                        <label class="flex justify-between cursor-pointer"><span class="flex items-center"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Fijado 24 Horas</span> <span class="text-emerald-400">+$10</span></label>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <a href="https://t.me/${c.username}" target="_blank" class="bg-slate-800 text-center py-2 rounded-xl text-xs font-bold text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors flex items-center justify-center gap-1">
-                        Ver Canal
-                    </a>
-                    <button onclick="addToCart(${c.id})" class="bg-sky-600 hover:bg-sky-500 py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.97] flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-cart-plus"></i> Añadir Cesta
-                    </button>
-                </div>
+                <button onclick="addToCart(${c.id})" class="mt-3 w-full bg-sky-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-sky-500 transition-colors">+ Añadir a la Cesta</button>
             `;
             return card;
         }
 
         function toggleFav(id) {
-            if (favoritos.includes(id)) {
-                favoritos = favoritos.filter(fId => fId !== id);
-            } else {
-                favoritos.push(id);
-            }
+            favoritos = favoritos.includes(id) ? favoritos.filter(fId => fId !== id) : [...favoritos, id];
             localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
-            currentView === 'favorites' ? renderFavorites() : renderChannels();
+            switchView(document.getElementById('view-catalog').classList.contains('hidden') ? 'favorites' : 'catalog');
         }
 
-        function clearFavorites() {
-            if(confirm("¿Eliminar todos tus favoritos?")) {
-                favoritos = [];
-                localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
-                renderFavorites();
-            }
+        function renderFavorites() {
+            const container = document.getElementById('favorites-container');
+            container.innerHTML = '';
+            const favs = canalesData.filter(c => favoritos.includes(c.id));
+            if(favs.length === 0) { container.innerHTML = `<p class="col-span-full text-center text-slate-500 py-6 text-xs">Sin canales guardados.</p>`; return; }
+            favs.forEach(c => container.appendChild(createChannelCard(c)));
         }
+
+        function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
 
         function addToCart(id) {
             const chkPack = document.getElementById(`up-pack-${id}`);
             const chkFixed = document.getElementById(`up-fixed-${id}`);
             
-            const nuevoItem = {
-                idUnique: Date.now() + Math.floor(Math.random() * 500), 
+            carrito.push({
+                idUnique: Date.now() + Math.floor(Math.random() * 500),
                 idCanalOriginal: parseInt(id),
                 packExtra: chkPack ? chkPack.checked : false,
                 fixedExtra: chkFixed ? chkFixed.checked : false
-            };
+            });
 
-            carrito.push(nuevoItem);
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
+            updateRewardsPanel();
             
-            const baseCanal = canalesData.find(item => item.id === id);
-            triggerSuccessAnimation("Añadido", `"${baseCanal.nombre}" está en la cesta.`);
-
             if (chkPack) chkPack.checked = false;
             if (chkFixed) chkFixed.checked = false;
+            
+            const baseCanal = canalesData.find(item => item.id === id);
+            triggerSuccessAnimation("Añadido", `"${baseCanal.nombre}" listo en cesta.`);
         }
 
-        function updateCartBadge() {
-            document.getElementById('cart-count').innerText = carrito.length;
-        }
+        function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
 
         function openCartModal() {
-            const modal = document.getElementById('cart-modal');
             const container = document.getElementById('cart-items');
-            const clearCartBtn = document.getElementById('btn-clear-cart');
             container.innerHTML = '';
-            let total = 0;
-
-            modal.classList.remove('hidden');
+            document.getElementById('cart-modal').classList.remove('hidden');
 
             if(carrito.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Tu cesta está vacía.</p>`;
+                container.innerHTML = `<p class="text-center text-slate-500 py-6 text-xs">Cesta vacía.</p>`;
+                document.getElementById('cart-subtotal').innerText = "$0.00";
+                document.getElementById('row-discount').classList.add('hidden');
                 document.getElementById('cart-total').innerText = "$0.00 USD";
-                clearCartBtn.classList.add('hidden');
+                document.getElementById('btn-clear-cart').classList.add('hidden');
+                document.getElementById('coupon-display-area').classList.add('hidden');
                 return;
             }
 
-            clearCartBtn.classList.remove('hidden');
-
+            document.getElementById('btn-clear-cart').classList.remove('hidden');
+            let subtotal = calculateCartSubtotal();
+            
             carrito.forEach(item => {
-                const datosCanal = canalesData.find(c => c.id === item.idCanalOriginal);
-                if (!datosCanal) return;
-
-                let precioItem = getPrecio(datosCanal);
-                let detallesMejoras = [];
-                
-                if (item.packExtra) { precioItem += 25; detallesMejoras.push("Pack x3 (+$25)"); }
-                if (item.fixedExtra) { precioItem += 10; detallesMejoras.push("Fijado 24h (+$10)"); }
-                
-                total += precioItem;
+                const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                if(!canal) return;
+                let price = getPrecio(canal);
+                let textExtra = [];
+                if(item.packExtra) { price += 25; textExtra.push("Pack x3"); }
+                if(item.fixedExtra) { price += 10; textExtra.push("Fijado 24h"); }
 
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700/60 flex justify-between items-center";
+                div.className = "bg-slate-800 p-2.5 rounded-xl flex justify-between items-center text-xs border border-slate-700/40";
                 div.innerHTML = `
-                    <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-sm text-slate-200 truncate">${datosCanal.nombre}</h4>
-                        ${detallesMejoras.length > 0 ? `<p class="text-[10px] text-amber-400 font-medium">${detallesMejoras.join(' + ')}</p>` : `<p class="text-[10px] text-slate-400">Espacio estándar</p>`}
-                        <span class="text-xs font-bold text-emerald-400">$${precioItem.toFixed(2)}</span>
+                    <div>
+                        <h4 class="font-bold text-slate-200">${canal.nombre}</h4>
+                        <p class="text-[10px] text-slate-400">${textExtra.length > 0 ? textExtra.join(' + ') : 'Espacio estándar'}</p>
                     </div>
-                    <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400/70 hover:text-rose-400 p-2 text-sm"><i class="fa-solid fa-trash-can"></i></button>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-emerald-400">$${price.toFixed(2)}</span>
+                        <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 px-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
                 `;
                 container.appendChild(div);
             });
 
-            document.getElementById('cart-total').innerText = `$${total.toFixed(2)} USD`;
-        }
+            document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
 
-        function closeCartModal() {
-            document.getElementById('cart-modal').classList.add('hidden');
+            if(activeCoupon) {
+                let discountAmount = subtotal * (activeCouponPct / 100);
+                let netTotal = subtotal - discountAmount;
+                document.getElementById('row-discount').classList.remove('hidden');
+                document.getElementById('cart-discount').innerText = `-$${discountAmount.toFixed(2)}`;
+                document.getElementById('cart-total').innerText = `$${netTotal.toFixed(2)} USD`;
+                document.getElementById('coupon-display-area').classList.remove('hidden');
+                document.getElementById('active-coupon-name').innerText = `${activeCoupon} (-${activeCouponPct}%)`;
+            } else {
+                document.getElementById('row-discount').classList.add('hidden');
+                document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)} USD`;
+                document.getElementById('coupon-display-area').classList.add('hidden');
+            }
         }
 
         function removeFromCart(idUnique) {
             carrito = carrito.filter(item => item.idUnique !== idUnique);
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
+            updateRewardsPanel();
+            
+            // Si vacía la cesta por debajo del mínimo de cupón, se cae el cupón
+            if(activeCoupon) {
+                if((activeCoupon === 'GOLDEN5' && calculateCartSubtotal() < 30) ||
+                   (activeCoupon === 'GOLDEN10' && calculateCartSubtotal() < 70) ||
+                   (activeCoupon === 'GOLDEN15' && calculateCartSubtotal() < 120)) {
+                    activeCoupon = null; activeCouponPct = 0;
+                }
+            }
             openCartModal();
         }
 
-        function clearCart() {
-            if(confirm("¿Vaciar la cesta?")) {
-                carrito = [];
-                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-                updateCartBadge();
-                openCartModal();
-            }
-        }
+        function clearCart() { carrito = []; activeCoupon = null; activeCouponPct = 0; localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); updateRewardsPanel(); openCartModal(); }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
         function checkout() {
             if(carrito.length === 0) return;
 
+            const subtotal = calculateCartSubtotal();
+            const descuento = activeCoupon ? (subtotal * (activeCouponPct / 100)) : 0;
+            const neto = subtotal - descuento;
+
             let textoPedido = "¡Hola! Quiero contratar publicidad.\n\n";
             textoPedido += "📋 *RESUMEN DEL PEDIDO:*\n";
-            let totalAcumulado = 0;
+            
+            let resumenCanalesParaHistorial = [];
 
-            carrito.forEach((itemCarrito, i) => {
-                let canalAsociado = canalesData.find(c => c.id === itemCarrito.idCanalOriginal);
-                if (canalAsociado) {
-                    let subtotalCanal = getPrecio(canalAsociado);
-                    let mejorasAplicadas = [];
+            carrito.forEach((item, i) => {
+                const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                if(canal) {
+                    let p = getPrecio(canal);
+                    let extras = [];
+                    if(item.packExtra) { p += 25; extras.push("Pack x3"); }
+                    if(item.fixedExtra) { p += 10; extras.push("Fijado 24h"); }
+                    let stringEx = extras.length > 0 ? ` (${extras.join(', ')})` : "";
                     
-                    if (itemCarrito.packExtra) { subtotalCanal += 25; mejorasAplicadas.push("Pack x3"); }
-                    if (itemCarrito.fixedExtra) { subtotalCanal += 10; mejorasAplicadas.push("Fijado 24h"); }
-                    
-                    totalAcumulado += subtotalCanal;
-                    let num = i + 1;
-                    let stringMejoras = mejorasAplicadas.length > 0 ? " (" + mejorasAplicadas.join(', ') + ")" : "";
-                    
-                    textoPedido += `${num}. *${canalAsociado.nombre}* [Precio: $${subtotalCanal.toFixed(2)}]${stringMejoras}\n`;
+                    textoPedido += `${i+1}. *${canal.nombre}* - $${p.toFixed(2)}${stringEx}\n`;
+                    resumenCanalesParaHistorial.push(canal.nombre + stringEx);
                 }
             });
 
-            textoPedido += `\n💰 *TOTAL ESTIMADO:* $${totalAcumulado.toFixed(2)} USD\n`;
-            textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
+            if(activeCoupon) {
+                textoPedido += `\n🎟️ *CUPÓN PREMIO REDIMIDO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
+            }
 
-            let urlFinalTelegram = "https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido);
-            window.open(urlFinalTelegram, "_blank");
+            textoPedido += `\n💰 *TOTAL NETO A PAGAR:* $${neto.toFixed(2)} USD\n`;
+            textoPedido += "💳 Pagos vía PayPal, Estrellas o USDT.";
+
+            // --- GUARDAR EN EL HISTORIAL (FECHA Y HORA DE ENVÍO) ---
+            const ahora = new Date();
+            const fechaString = ahora.toLocaleDateString() + " | " + ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
-            carrito = [];
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
+            historialCampanas.unshift({
+                fecha: fechaString,
+                canales: resumenCanalesParaHistorial,
+                total: neto.toFixed(2)
+            });
+            localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+
+            // Abrir Telegram
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido), "_blank");
+            
+            // Reset
+            clearCart();
             closeCartModal();
+        }
+
+        function renderCampaigns() {
+            const container = document.getElementById('campaigns-container');
+            container.innerHTML = '';
+            if(historialCampanas.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500 text-xs py-8">Aún no has solicitado campañas.</p>`;
+                return;
+            }
+            historialCampanas.forEach(camp => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-800/50 p-4 rounded-2xl border border-slate-700/40 space-y-2";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="text-slate-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i>${camp.fecha}</span>
+                        <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-bold">Esperando Pago</span>
+                    </div>
+                    <ul class="text-xs text-slate-200 list-disc list-inside space-y-0.5 pl-1">
+                        ${camp.canales.map(name => `<li class="truncate">${name}</li>`).join('')}
+                    </ul>
+                    <div class="pt-1.5 border-t border-slate-800 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Importe:</span>
+                        <span class="font-black text-emerald-400">$${camp.total} USD</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // CONTROL EXCLUSIVO DEL FAQ ACORDEÓN SLIDE EFECT
+        function toggleFaqItem(button) {
+            const currentItem = button.parentElement;
+            const contentWrapper = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            // Cerrar otros que puedan estar abiertos
+            document.querySelectorAll('#faq-accordion-group > div').forEach(item => {
+                if(item !== currentItem) {
+                    item.classList.replace('bg-slate-800/80', 'bg-slate-800/40');
+                    item.querySelector('.grid').style.gridTemplateRows = "0fr";
+                    item.querySelector('i').classList.remove('rotate-180');
+                }
+            });
+
+            // Toggle del actual
+            if (contentWrapper.style.gridTemplateRows === "1fr") {
+                contentWrapper.style.gridTemplateRows = "0fr";
+                currentItem.classList.replace('bg-slate-800/80', 'bg-slate-800/40');
+                icon.classList.remove('rotate-180');
+            } else {
+                contentWrapper.style.gridTemplateRows = "1fr";
+                currentItem.classList.replace('bg-slate-800/40', 'bg-slate-800/80');
+                icon.add('rotate-180');
+            }
         }
     </script>
 </body>
