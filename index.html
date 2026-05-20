@@ -288,7 +288,7 @@
                 const loader = document.getElementById('global-loader');
                 loader.classList.add('opacity-0');
                 setTimeout(() => loader.remove(), 500);
-            }, 1200); // 1.2 segundos de carga elegante
+            }, 1200);
         });
 
         // DISPARADOR DEL CHECK ANIMADO PREMIUM
@@ -299,7 +299,6 @@
             const toast = document.getElementById('success-toast');
             const box = document.getElementById('toast-box');
             
-            // Fuerza reinicio de la animación eliminando y re-añadiendo el nodo del check icon
             const checkArea = box.querySelector('.success-checkmark');
             checkArea.innerHTML = `
                 <div class="check-icon">
@@ -317,7 +316,7 @@
                 toast.classList.add('opacity-0', 'pointer-events-none');
                 box.classList.remove('scale-100');
                 box.classList.add('scale-75');
-            }, 1800); // Se oculta tras la hermosa animación
+            }, 1800);
         }
 
         function switchView(view) {
@@ -474,16 +473,19 @@
             }
         }
 
+        // REPARADO EXTRAER DATOS DIRECTOS BASADOS EN EL ID DE MANERA IMPEDIBLE
         function addToCart(id) {
             const canal = canalesData.find(c => c.id === id);
+            if (!canal) return;
+
             const chkPack = document.getElementById(`up-pack-${id}`);
             const chkFixed = document.getElementById(`up-fixed-${id}`);
             
             const item = {
                 idUnique: Date.now() + Math.random(), 
-                id: canal.id,
-                nombre: canal.nombre,
-                precioBase: getPrecio(canal),
+                id: Number(canal.id),
+                nombre: String(canal.nombre), // Forzado de cadena estricta
+                precioBase: Number(getPrecio(canal)),
                 packExtra: chkPack ? chkPack.checked : false,
                 fixedExtra: chkFixed ? chkFixed.checked : false
             };
@@ -521,7 +523,7 @@
             clearCartBtn.classList.remove('hidden');
 
             carrito.forEach(item => {
-                let precioItem = item.precioBase;
+                let precioItem = Number(item.precioBase);
                 let detallesMejoras = [];
                 
                 if (item.packExtra) { precioItem += 25; detallesMejoras.push("Pack x3 Anuncios (+$25)"); }
@@ -567,39 +569,39 @@
         }
 
         function checkout() {
-    if(carrito.length === 0) return alert("Tu cesta está vacía.");
+            if(carrito.length === 0) return alert("Tu cesta está vacía.");
 
-    var textoPedido = "¡Hola! Quiero contratar publicidad.%0A%0A";
-    textoPedido += "📋 *RESUMEN DEL PEDIDO:*%0A";
-    var total = 0;
+            var textoPedido = "¡Hola! Quiero contratar publicidad.%0A%0A";
+            textoPedido += "📋 *RESUMEN DEL PEDIDO:*%0A";
+            var total = 0;
 
-    for (var i = 0; i < carrito.length; i++) {
-        var item = carrito[i];
-        var subtotal = Number(item.precioBase);
-        var mejoras = [];
-        
-        if (item.packExtra) { subtotal += 25; mejoras.push("Pack x3"); }
-        if (item.fixedExtra) { subtotal += 10; mejoras.push("Fijado 24h"); }
-        
-        total += subtotal;
+            for (var i = 0; i < carrito.length; i++) {
+                var item = carrito[i];
+                var subtotal = Number(item.precioBase);
+                var mejoras = [];
+                
+                if (item.packExtra) { subtotal += 25; mejoras.push("Pack x3"); }
+                if (item.fixedExtra) { subtotal += 10; mejoras.push("Fijado 24h"); }
+                
+                total += subtotal;
 
-        var numItem = i + 1;
-        var textoMejoras = mejoras.length > 0 ? " (" + mejoras.join(', ') + ")" : "";
-        
-        // CORRECCIÓN RADICAL: Sin comillas invertidas, concatenación pura y dura
-        textoPedido += numItem + ". *" + encodeURIComponent(item.nombre) + "* [Precio: $" + subtotal + "]" + textoMejoras + "%0A";
-    }
+                var numItem = i + 1;
+                var textoMejoras = mejoras.length > 0 ? " (" + mejoras.join(', ') + ")" : "";
+                
+                // Mapeo directo y codificación ultra segura por canal independiente
+                textoPedido += numItem + ". *" + encodeURIComponent(item.nombre) + "* [Precio: $" + subtotal + "]" + textoMejoras + "%0A";
+            }
 
-    textoPedido += "%0A💰 *TOTAL ESTIMADO:* $" + total.toFixed(2) + " USD%0A";
-    textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
+            textoPedido += "%0A💰 *TOTAL ESTIMADO:* $" + total.toFixed(2) + " USD%0A";
+            textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
 
-    window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + textoPedido, "_blank");
-    
-    carrito = [];
-    localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-    updateCartBadge();
-    closeCartModal();
-}
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + textoPedido, "_blank");
+            
+            carrito = [];
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            closeCartModal();
+        }
     </script>
 </body>
 </html>
