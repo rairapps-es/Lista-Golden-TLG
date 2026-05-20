@@ -97,7 +97,7 @@
 </head>
 <body>
 
-    <!-- PANTALLA DE CARGA INICIAL (SPINNER ATRACTIVO) -->
+    <!-- PANTALLA DE CARGA INICIAL -->
     <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative w-20 h-20">
             <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
@@ -135,7 +135,7 @@
         </button>
     </header>
 
-    <!-- VISTA 1: CATÁLOGO (Y OFERTAS) -->
+    <!-- VISTA 1: CATÁLOGO -->
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-6">
         <!-- FILTROS Y CATEGORÍAS -->
         <section class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 space-y-3">
@@ -184,7 +184,7 @@
         </button>
     </nav>
 
-    <!-- MODAL DEL CARRITO Y PASOS DE PAGO -->
+    <!-- MODAL DEL CARRITO -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
@@ -224,10 +224,10 @@
 
     <!-- CONFIGURACIÓN DE TU USUARIO DE TELEGRAM -->
     <script>
-        const MI_TELEGRAM_USER = "Airdayz"; // 👈 CAMBIA ESTO SIN EL '@'
+        const MI_TELEGRAM_USER = "Airdayz";
     </script>
 
-    <!-- SCRIPT DE LÓGICA Y RENDERIZADO -->
+    <!-- SCRIPT DE LÓGICA -->
     <script>
         const canalesData = [
             {
@@ -279,19 +279,17 @@
         let currentCategory = 'todos';
         let currentView = 'catalog';
 
-        // EFECTO DE CARGA INICIAL SIMULADO PARA FLUIDEZ
         document.addEventListener("DOMContentLoaded", () => {
             renderChannels();
             updateCartBadge();
             
             setTimeout(() => {
                 const loader = document.getElementById('global-loader');
-                loader.classList.add('opacity-0');
-                setTimeout(() => loader.remove(), 500);
+                if(loader) loader.classList.add('opacity-0');
+                setTimeout(() => { if(loader) loader.remove(); }, 500);
             }, 1200);
         });
 
-        // DISPARADOR DEL CHECK ANIMADO PREMIUM
         function triggerSuccessAnimation(title, desc) {
             document.getElementById('toast-title').innerText = title;
             document.getElementById('toast-desc').innerText = desc;
@@ -452,13 +450,13 @@
         }
 
         function toggleFav(id) {
-            const canal = canalesData.find(c => c.id === id);
+            const targetCanal = canalesData.find(item => item.id === id);
             if (favoritos.includes(id)) {
                 favoritos = favoritos.filter(fId => fId !== id);
                 triggerSuccessAnimation("Eliminado", "Quitado de favoritos correctamente.");
             } else {
                 favoritos.push(id);
-                triggerSuccessAnimation("¡Guardado!", `Añadiste "${canal.nombre}" a favoritos.`);
+                triggerSuccessAnimation("¡Guardado!", `Añadiste "${targetCanal.nombre}" a favoritos.`);
             }
             localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
             currentView === 'favorites' ? renderFavorites() : renderChannels();
@@ -473,28 +471,26 @@
             }
         }
 
-        // REPARADO EXTRAER DATOS DIRECTOS BASADOS EN EL ID DE MANERA IMPEDIBLE
+        // LÓGICA DE AGREGADO TOTALMENTE REDISEÑADA E INMUNIZADA
         function addToCart(id) {
-            const canal = canalesData.find(c => c.id === id);
-            if (!canal) return;
+            const baseCanal = canalesData.find(item => item.id === id);
+            if (!baseCanal) return;
 
             const chkPack = document.getElementById(`up-pack-${id}`);
             const chkFixed = document.getElementById(`up-fixed-${id}`);
             
-            const item = {
+            const nuevoItem = {
                 idUnique: Date.now() + Math.random(), 
-                id: Number(canal.id),
-                nombre: String(canal.nombre), // Forzado de cadena estricta
-                precioBase: Number(getPrecio(canal)),
+                idCanalOriginal: Number(baseCanal.id),
                 packExtra: chkPack ? chkPack.checked : false,
                 fixedExtra: chkFixed ? chkFixed.checked : false
             };
 
-            carrito.push(item);
+            carrito.push(nuevoItem);
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
             
-            triggerSuccessAnimation("Añadido", `"${canal.nombre}" está en la cesta.`);
+            triggerSuccessAnimation("Añadido", `"${baseCanal.nombre}" está en la cesta.`);
 
             if (chkPack) chkPack.checked = false;
             if (chkFixed) chkFixed.checked = false;
@@ -523,7 +519,11 @@
             clearCartBtn.classList.remove('hidden');
 
             carrito.forEach(item => {
-                let precioItem = Number(item.precioBase);
+                // Buscamos el canal original directamente usando su ID guardado en cada renderizado
+                const datosCanal = canalesData.find(c => c.id === item.idCanalOriginal);
+                if (!datosCanal) return;
+
+                let precioItem = Number(getPrecio(datosCanal));
                 let detallesMejoras = [];
                 
                 if (item.packExtra) { precioItem += 25; detallesMejoras.push("Pack x3 Anuncios (+$25)"); }
@@ -535,7 +535,7 @@
                 div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700/60 flex justify-between items-center";
                 div.innerHTML = `
                     <div class="min-w-0 flex-1">
-                        <h4 class="font-bold text-sm text-slate-200 truncate">${item.nombre}</h4>
+                        <h4 class="font-bold text-sm text-slate-200 truncate">${datosCanal.nombre}</h4>
                         ${detallesMejoras.length > 0 ? `<p class="text-[10px] text-amber-400 font-medium">${detallesMejoras.join(' + ')}</p>` : `<p class="text-[10px] text-slate-400">Espacio estándar contratado</p>`}
                         <span class="text-xs font-bold text-emerald-400">$${precioItem.toFixed(2)}</span>
                     </div>
@@ -568,35 +568,43 @@
             }
         }
 
+        // GENERADOR DE TEXTO ABSOLUTAMENTE INMUNE A CRUCES DE VARIABLES
         function checkout() {
             if(carrito.length === 0) return alert("Tu cesta está vacía.");
 
-            var textoPedido = "¡Hola! Quiero contratar publicidad.%0A%0A";
-            textoPedido += "📋 *RESUMEN DEL PEDIDO:*%0A";
-            var total = 0;
+            let textoPedido = "¡Hola! Quiero contratar publicidad.\n\n";
+            textoPedido += "📋 *RESUMEN DEL PEDIDO:*\n";
+            let totalAcumulado = 0;
 
-            for (var i = 0; i < carrito.length; i++) {
-                var item = carrito[i];
-                var subtotal = Number(item.precioBase);
-                var mejoras = [];
+            for (let i = 0; i < carrito.length; i++) {
+                let itemCarrito = carrito[i];
+                let canalAsociado = canalesData.find(c => c.id === itemCarrito.idCanalOriginal);
                 
-                if (item.packExtra) { subtotal += 25; mejoras.push("Pack x3"); }
-                if (item.fixedExtra) { subtotal += 10; mejoras.push("Fijado 24h"); }
-                
-                total += subtotal;
+                if (!canalAsociado) continue;
 
-                var numItem = i + 1;
-                var textoMejoras = mejoras.length > 0 ? " (" + mejoras.join(', ') + ")" : "";
+                let subtotalCanal = Number(getPrecio(canalAsociado));
+                let mejorasAplicadas = [];
                 
-                // Mapeo directo y codificación ultra segura por canal independiente
-                textoPedido += numItem + ". *" + encodeURIComponent(item.nombre) + "* [Precio: $" + subtotal + "]" + textoMejoras + "%0A";
+                if (itemCarrito.packExtra) { subtotalCanal += 25; mejorasAplicadas.push("Pack x3"); }
+                if (itemCarrito.fixedExtra) { subtotalCanal += 10; mejorasAplicadas.push("Fijado 24h"); }
+                
+                totalAcumulado += subtotalCanal;
+
+                let enumeracion = i + 1;
+                let stringMejoras = mejorasAplicadas.length > 0 ? " (" + mejorasAplicadas.join(', ') + ")" : "";
+                
+                textoPedido += `${enumeracion}. *${canalAsociado.nombre}* [Precio: $${subtotalCanal}]${stringMejoras}\n`;
             }
 
-            textoPedido += "%0A💰 *TOTAL ESTIMADO:* $" + total.toFixed(2) + " USD%0A";
+            textoPedido += `\n💰 *TOTAL ESTIMADO:* $${totalAcumulado.toFixed(2)} USD\n`;
             textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
 
-            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + textoPedido, "_blank");
+            // Codificación limpia para prevenir problemas de caracteres
+            let urlFinalTelegram = "https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido);
             
+            window.open(urlFinalTelegram, "_blank");
+            
+            // Limpieza absoluta tras el checkout exitoso
             carrito = [];
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
