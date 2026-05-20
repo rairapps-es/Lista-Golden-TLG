@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library para la animación del regalo -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --tg-theme-bg-color: #0f172a;
@@ -41,17 +43,32 @@
         .wheel-transition {
             transition: transform 4s cubic-bezier(0.25, 1, 0.2, 1);
         }
-        /* Partículas de Confeti Simuladas por CSS */
-        @keyframes confetiDrop {
-            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(250px) rotate(360deg); opacity: 0; }
+        /* Transición suave para las tarjetas colapsables */
+        .channel-details-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            opacity: 0;
         }
-        .confeti-piece {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #fbbf24;
-            animation: confetiDrop 1.8s linear infinite;
+        .channel-card-wrapper.expanded .channel-details-dropdown {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .channel-card-wrapper.expanded .arrow-icon {
+            transform: rotate(180deg);
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Regalo flotante animado */
+        @keyframes floatingGift {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        .gift-box-anim {
+            animation: floatingGift 2s ease-in-out infinite;
+            font-size: 4rem;
         }
     </style>
 </head>
@@ -74,6 +91,20 @@
             </div>
             <h3 id="toast-title" class="text-slate-100 font-bold text-base">¡Completado!</h3>
             <p id="toast-desc" class="text-slate-400 text-xs mt-1">Acción realizada con éxito.</p>
+        </div>
+    </div>
+
+    <!-- ANIMACIÓN DE REGALO FLOTANTE DESBLOQUEADO -->
+    <div id="gift-reward-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-6 rounded-3xl border border-amber-400/40 max-w-sm w-full text-center space-y-4 shadow-2xl animate-fade-in">
+            <div class="gift-box-anim">🎁</div>
+            <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
+            <p class="text-xs text-slate-300">Has desbloqueado con éxito el premio especial:</p>
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
+                Premio de Ejemplo
+            </div>
+            <p class="text-[10px] text-slate-400">El regalo se ha añadido a tu carrito de compras listo para enviar a Telegram.</p>
+            <button onclick="closeGiftModal()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/20 cursor-pointer">¡Genial!</button>
         </div>
     </div>
 
@@ -106,8 +137,8 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="openPremiosModal(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Mis Premios</span>
+                <button onclick="switchView('catalog'); scrollToRewards(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
                 <div class="border-t border-slate-800/60 my-1"></div>
@@ -127,19 +158,20 @@
     <!-- LANZADORES FLOTANTES: RULETA DIARIA COMPLETA -->
     <div id="roulette-triggers-container" class="fixed bottom-38 right-4 z-40">
         <!-- Botón Activo -->
-        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-12 h-12 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-xl font-bold border-2 border-slate-900 hidden cursor-pointer transition-transform hover:scale-110 animate-bounce">
+        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-14 h-14 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-xl font-bold border-2 border-slate-900 hidden cursor-pointer transition-transform hover:scale-110 animate-bounce">
             <i class="fa-solid fa-pie-chart"></i>
         </button>
         <!-- Botón Bloqueado Reemplazo -->
-        <button id="floating-roulette-blocked" class="w-12 h-12 bg-slate-800 border-2 border-slate-700 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 text-xs font-bold opacity-70 relative group">
+        <button id="floating-roulette-blocked" class="w-14 h-14 bg-slate-800 border-2 border-slate-700 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 font-bold opacity-70 relative group">
             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
-            <span class="text-[7px] text-slate-400 tracking-tighter mt-0.5 font-mono">MAÑANA</span>
+            <span class="text-[7px] text-slate-400 tracking-tighter mt-0.5 font-bold">RULETA</span>
+            <span class="text-[6px] text-slate-500 tracking-tighter font-mono">MAÑANA</span>
         </button>
     </div>
 
-    <!-- NOTIFICACIONES FOMO DE COMPRA SIMULADA -->
+    <!-- NOTIFICACIONES FOMO DE COMPRA (REALES / ALEATORIAS DE ESPAÑA CON BANDERA) -->
     <div id="fomo-notification" class="fixed bottom-24 left-4 z-40 bg-slate-900/95 border border-slate-800 px-3 py-2 rounded-xl shadow-2xl max-w-xs text-[10px] text-slate-300 flex items-center gap-2.5 translate-y-20 opacity-0 transition-all duration-500 pointer-events-none">
-        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+        <span id="fomo-flag" class="text-base">🇪🇸</span>
         <div>
             <p id="fomo-text" class="font-medium text-slate-200">Cargando venta...</p>
         </div>
@@ -162,38 +194,23 @@
             </div>
         </section>
 
-        <!-- SECCIÓN DE PROGRESO DE PREMIOS -->
-        <section class="bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
+        <!-- SECCIÓN DE PREMIOS POR PUNTOS (GAMIFICACIÓN / RANURAS ELEGANTES) -->
+        <section id="rewards-section" class="bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-1.5">
                     <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
-                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Progreso de Premios</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Premios para Desbloquear</h3>
                 </div>
-                <span id="rewards-current-spend" class="text-xs font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-md">$0.00 USD</span>
+                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i>Tus puntos: <span id="rewards-points-counter">0</span> pts</span>
             </div>
-            <div class="relative w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-                <div id="rewards-bar" class="h-full bg-gradient-to-r from-sky-400 via-indigo-500 to-emerald-400 w-0 transition-all duration-500"></div>
-            </div>
-            <div class="grid grid-cols-3 gap-2 pt-1 text-center">
-                <div id="tier-1" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
-                    <p class="font-bold text-slate-300">Nivel 1 ($30)</p>
-                    <p class="text-emerald-400 font-semibold mt-0.5">5% OFF</p>
-                    <button onclick="claimRewardToInventory('GOLDEN5', 5, 30, 1)" id="btn-tier-1" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400">Bloqueado</button>
-                </div>
-                <div id="tier-2" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
-                    <p class="font-bold text-slate-300">Nivel 2 ($70)</p>
-                    <p class="text-emerald-400 font-semibold mt-0.5">10% OFF</p>
-                    <button onclick="claimRewardToInventory('GOLDEN10', 10, 70, 2)" id="btn-tier-2" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400">Bloqueado</button>
-                </div>
-                <div id="tier-3" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
-                    <p class="font-bold text-slate-300">Nivel 3 ($120)</p>
-                    <p class="text-emerald-400 font-semibold mt-0.5">15% OFF</p>
-                    <button onclick="claimRewardToInventory('GOLDEN15', 15, 120, 3)" id="btn-tier-3" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400">Bloqueado</button>
-                </div>
+
+            <!-- Contenedor de Ranuras de Premios -->
+            <div id="rewards-slots-container" class="grid gap-2.5">
+                <!-- Se renderiza dinámicamente -->
             </div>
         </section>
 
-        <!-- BANNER AGREGA TU CANAL / POTENCIADOR DESTACADOS -->
+        <!-- BANNER AGREGA TU CANAL -->
         <section id="banner-add-channel" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl hidden relative">
             <button onclick="closeBannerPermanently(event)" class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/40 text-slate-300 flex items-center justify-center text-[10px] hover:bg-black/60 z-10 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             <button onclick="openAddChannelModal()" class="w-full bg-slate-900 hover:bg-slate-850 p-3.5 rounded-[15px] flex items-center justify-between cursor-pointer text-left pr-8">
@@ -377,17 +394,6 @@
         </button>
     </nav>
 
-    <!-- INVENTARIO DE PREMIOS MODAL -->
-    <div id="premios-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-4 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-box-open mr-1 text-indigo-400"></i> Mis Premios Guardados</h3>
-                <button onclick="closePremiosModal()" class="text-slate-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="rewards-inventory-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
-        </div>
-    </div>
-
     <!-- MODAL DE LA CESTA DE COMPRA -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
@@ -398,16 +404,45 @@
                 </div>
                 <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1 max-h-[35vh]"></div>
-            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-4">
+            
+            <!-- Productos en Cesta -->
+            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1 max-h-[30vh]"></div>
+
+            <!-- SECCIÓN: CAMPAÑA DE VENTA CRUZADA / CROSS-SELLING -->
+            <div id="cross-selling-area" class="px-4 py-2 border-t border-slate-800/60 bg-slate-950/40">
+                <p class="text-[9px] font-black uppercase text-amber-400 tracking-wider mb-2">🔥 ¡Agrega estos canales que lo están partiendo!</p>
+                <div id="cross-selling-container" class="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+                    <!-- Canales sugeridos inyectados dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Panel de Operaciones e Importes -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-3.5">
+                
+                <!-- SECCIÓN: SISTEMA DE DESPLIEGUE DE CUPÓN -->
+                <div class="coupon-wrapper text-xs">
+                    <button onclick="toggleCouponField()" class="text-sky-400 font-bold underline text-[11px] block cursor-pointer">
+                        ¿Tienes un cupón de descuento?
+                    </button>
+                    <div id="coupon-input-field" class="hidden mt-2 flex gap-2">
+                        <input type="text" id="coupon-code-input" placeholder="Introduce el código..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 focus:outline-none text-[11px]">
+                        <button onclick="validateCouponCode()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-xl text-[11px]">Validar</button>
+                    </div>
+                    <div id="coupon-error-box" class="hidden mt-2 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-rose-400 text-[10px]">
+                        <p class="font-bold">Código no válido.</p>
+                        <p class="mt-0.5">💡 Suscríbete a nuestro canal y <strong class="text-white">CONSIGUE CÓDIGO DESCUENTO EN @LISTAGOLDEN</strong></p>
+                        <a href="https://t.me/LISTAGOLDEN" target="_blank" class="mt-1.5 inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-2.5 py-1 rounded-md uppercase tracking-tight text-[9px]">Unirme ahora</a>
+                    </div>
+                </div>
+
                 <div id="coupon-display-area" class="hidden flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-xs text-emerald-400 font-medium">
                     <span><i class="fa-solid fa-ticket mr-1"></i> Cupón activo: <strong id="active-coupon-name">NINGUNO</strong></span>
                     <button onclick="removeCoupon()" class="text-rose-400 font-bold ml-2 underline text-[10px]">Quitar</button>
                 </div>
+
                 <div id="payment-method-section" class="space-y-2">
                     <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Selecciona Método de Pago:</p>
                     <div class="grid grid-cols-3 gap-2">
-                        <!-- Clases base cambiadas a borde e iconos estándar invisibles/opacos -->
                         <button type="button" onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
                             <i class="fa-brands fa-paypal text-sky-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">PayPal</span>
                         </button>
@@ -434,21 +469,28 @@
     <script>
         const MI_TELEGRAM_USER = "Airdayz";
         
-        // Base de datos de canales expandida con descripciones, mejoras de precio (duración/fijado) y marcas de Destacados/Recomendados.
+        // Base de datos expandida de canales
         const canalesData = [
             { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Alertas DeFi e inversiones cripto diarias en tiempo real.", destacado: true, recomendado: false },
-            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recommended: true },
+            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recomendado: true },
             { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recomendado: true },
             { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recomendado: false },
             { id: 5, nombre: "Cine & Series Streaming", username: "cine_streaming", tipo: "Público", categoria: "Entretenimiento", subs: 195000, precioBase: 65, descuento: 10, imagen: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=150", descripcion: "Reseñas de cine, trailers y novedades de plataformas top.", destacado: false, recomendado: false }
+        ];
+
+        // Base de datos fija de premios desbloqueables por puntos
+        const premiosData = [
+            { id: '4h_free', name: 'Anuncio 4 horas gratis', pointsRequired: 500 },
+            { id: '7d_free', name: 'Anuncio gratis x 7 días', pointsRequired: 2000 },
+            { id: '1m_free', name: 'Anuncio gratis por 1 mes', pointsRequired: 7000 }
         ];
 
         // Estado persistente
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
-        let inventarioPremios = JSON.parse(localStorage.getItem('ads_premios')) || []; 
-        let userPoints = parseInt(localStorage.getItem('ads_user_points')) || 0;
+        let claimedRewards = JSON.parse(localStorage.getItem('ads_claimed_rewards')) || []; 
+        let userPoints = parseInt(localStorage.getItem('ads_user_points')) || 2500; // Asignación inicial de 2500 puntos para demostración
         let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
         
         let totalSesionesHoy = parseInt(localStorage.getItem('ads_sesiones_contador')) || 0;
@@ -464,18 +506,20 @@
         let flashTimerInterval = null;
         let currentWheelRotation = 0;
 
+        // Caché de contadores aleatorios fijos por día
+        let dynamicAdCounts = {};
+
         // Estructura de opciones de configuración extra por canal seleccionado
         let mejorasSeleccionadas = {}; 
 
         document.addEventListener("DOMContentLoaded", () => {
             initTelegramUserData();
             trackSessionCount();
-            checkBannerFrequency();
+            generateDailySeedCounters();
             renderChannels();
+            renderRewardsSlots();
             renderCarousel();
             updateCartBadge();
-            updateRewardsPanel();
-            renderRewardsInventory();
             updatePointsDisplay();
             checkRouletteAvailability();
             initAiAssistant();
@@ -534,6 +578,19 @@
             }
         }
 
+        // Genera un contador aleatorio (0 a 3) diario constante para cada canal basado en la fecha de hoy
+        function generateDailySeedCounters() {
+            const seedDate = new Date().toDateString();
+            canalesData.forEach(c => {
+                let hash = 0;
+                const str = seedDate + c.id;
+                for (let i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                dynamicAdCounts[c.id] = Math.abs(hash) % 4; 
+            });
+        }
+
         function triggerFlashOfferModal() {
             document.getElementById('flash-offer-modal').classList.remove('hidden');
             const box = document.getElementById('confeti-box');
@@ -543,8 +600,6 @@
                 el.className = "confeti-piece";
                 el.style.left = Math.random() * 100 + "%";
                 el.style.top = Math.random() * -20 + "px";
-                el.style.backgroundColor = ['#fbbf24','#f43f5e','#3b82f6','#10b981'][Math.floor(Math.random()*4)];
-                el.style.animationDelay = Math.random() * 1.5 + "s";
                 box.appendChild(el);
             }
             let t = 3600;
@@ -569,31 +624,30 @@
         }
 
         function claimFlashOffer() {
-            carrito.push({ idUnique: Date.now(), idCanalOriginal: 999, promoPack: true, customPrice: 69.99, detallesMejora: "Mega Pack Especial Multi-Categoría" });
+            carrito.push({ idUnique: Date.now(), idCanalOriginal: 999, promoPack: true, customPrice: 69.99, detallesMejora: "Mega Pack Especial Multi-Categoría", duracion: 'Especial', fijado: 'no' });
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
-            updateRewardsPanel();
             closeFlashOffer(true);
             triggerSuccessAnimation("Pack Añadido", "Se aplicó el descuento especial en la cesta.");
         }
 
         function initFomoBot() {
-            const nombres = ["Mateo", "Lucas", "Sofia", "Emma", "Julien", "Marc", "Oliver", "Elena", "Arthur", "Chloe"];
-            const paises = ["Francia", "España", "Italia", "Alemania", "Bélgica", "Suiza", "Portugal"];
+            const nombres = ["Raúl", "Carlos", "Sofía", "Lucía", "Marta", "Andrés", "Mateo", "Emma", "Elena", "Oliver"];
+            const banderas = ["🇪🇸", "🇲🇽", "🇦🇷", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
             
             setInterval(() => {
                 if(Math.random() > 0.4) {
                     const n = nombres[Math.floor(Math.random() * nombres.length)];
-                    const p = paises[Math.floor(Math.random() * paises.length)];
+                    const b = banderas[Math.floor(Math.random() * banderas.length)];
                     const c = canalesData[Math.floor(Math.random() * canalesData.length)].nombre;
-                    const m = Math.floor(Math.random() * 14) + 1;
                     
-                    document.getElementById('fomo-text').innerHTML = `<strong class="text-amber-400 font-bold">${n.toUpperCase()} de ${p}</strong> contrató anuncio en el canal <span class="text-sky-400 font-bold">${c}</span> hace ${m} min.`;
+                    document.getElementById('fomo-flag').innerText = b;
+                    document.getElementById('fomo-text').innerHTML = `<strong class="text-amber-400 font-bold">${n} de el país ${b}</strong> contrató anuncios en el canal <span class="text-sky-400 font-bold">${c}</span> para simular compras de tráfico masivo.`;
                     const banner = document.getElementById('fomo-notification');
                     banner.classList.remove('translate-y-20', 'opacity-0');
-                    setTimeout(() => { banner.classList.add('translate-y-20', 'opacity-0'); }, 4500);
+                    setTimeout(() => { banner.classList.add('translate-y-20', 'opacity-0'); }, 5000);
                 }
-            }, 14000);
+            }, 16000);
         }
 
         function checkRouletteAvailability() {
@@ -639,6 +693,7 @@
                 updatePointsDisplay();
                 closeRouletteModal();
                 checkRouletteAvailability();
+                renderRewardsSlots(); 
                 triggerSuccessAnimation(`+${sel.pts} Puntos`, "Puntos guardados.");
                 btn.removeAttribute('disabled');
             }, 4000);
@@ -646,6 +701,99 @@
 
         function updatePointsDisplay() {
             document.getElementById('header-points-display').innerText = userPoints;
+            document.getElementById('rewards-points-counter').innerText = userPoints;
+        }
+
+        function scrollToRewards() {
+            const el = document.getElementById('rewards-section');
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* RENDEREADO DE RANURAS DE PREMIOS (GAMIFICACIÓN REQUERIDA) */
+        function renderRewardsSlots() {
+            const container = document.getElementById('rewards-slots-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            premiosData.forEach(reward => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs";
+                
+                let buttonHTML = '';
+                
+                if (claimedRewards.includes(reward.id)) {
+                    buttonHTML = `<button class="bg-slate-800 text-slate-500 font-bold px-3 py-1.5 rounded-lg border border-slate-700/50" disabled>Canjeado ✅</button>`;
+                } else if (userPoints >= reward.pointsRequired) {
+                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Usar 🛒</button>`;
+                } else {
+                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Faltan ${reward.pointsRequired - userPoints} pts 🔒</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg text-indigo-400 border border-indigo-500/20">🎁</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">${reward.name}</h4>
+                            <p class="text-[10px] text-amber-400 font-semibold mt-0.5"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>${reward.pointsRequired} Puntos acumulados</p>
+                        </div>
+                    </div>
+                    <div>${buttonHTML}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        /* ANIMACIÓN CONFETI Y REGALO FLOTANTE */
+        function fireRewardUnlock(rewardId) {
+            const reward = premiosData.find(r => r.id === rewardId);
+            if (!reward) return;
+
+            // Lanzamiento de Confeti oficial de canvas-confetti
+            confetti({
+                particleCount: 140,
+                spread: 75,
+                origin: { y: 0.6 }
+            });
+
+            // Configurar textos dinámicos del modal flotante
+            document.getElementById('gift-username').innerText = tgUserName;
+            document.getElementById('gift-reward-name').innerText = reward.name;
+            
+            // Mostrar modal
+            const giftModal = document.getElementById('gift-reward-modal');
+            giftModal.classList.remove('hidden');
+            
+            // Guardar ID activo temporal
+            giftModal.setAttribute('data-active-reward', rewardId);
+        }
+
+        function closeGiftModal() {
+            const giftModal = document.getElementById('gift-reward-modal');
+            const rewardId = giftModal.getAttribute('data-active-reward');
+            giftModal.classList.add('hidden');
+
+            if(rewardId) {
+                const reward = premiosData.find(r => r.id === rewardId);
+                // Marcar como canjeado
+                claimedRewards.push(rewardId);
+                localStorage.setItem('ads_claimed_rewards', JSON.stringify(claimedRewards));
+                
+                // Agregar directamente como regalo libre al carrito
+                carrito.push({
+                    idUnique: Date.now(),
+                    idCanalOriginal: 888, // Token especial para premios
+                    precioCalculado: 0,
+                    detallesMejora: `Premio Especial: ${reward.name}`,
+                    isReward: true,
+                    duracion: 'Gratis',
+                    fijado: 'no'
+                });
+                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+                
+                updateCartBadge();
+                renderRewardsSlots();
+                triggerSuccessAnimation("Añadido", "Tu regalo se sumó a la cesta sin costo.");
+            }
         }
 
         function renderCarousel() {
@@ -682,14 +830,39 @@
             }
         }
 
-        function calcularCosteExtra(canalId) {
-            const config = mejorasSeleccionadas[canalId];
+        function calcularCosteExtra(canalId, configObjeto = null) {
+            const config = configObjeto ? configObjeto : mejorasSeleccionadas[canalId];
             if (!config) return 0;
             let extra = 0;
             if (config.duracion === '48h') extra += 15;
             if (config.duracion === 'perm') extra += 35;
             if (config.fijado === 'si') extra += 10;
             return extra;
+        }
+
+        // Modifica dinámicamente las opciones del carrito en tiempo real antes del checkout
+        function updateCartItemOptions(uid, key, value) {
+            const idx = carrito.findIndex(item => item.idUnique === uid);
+            if(idx !== -1) {
+                carrito[idx][key] = value;
+                if(!carrito[idx].promoPack && !carrito[idx].isReward) {
+                    const original = canalesData.find(c => c.id === carrito[idx].idCanalOriginal);
+                    const configTemp = { duracion: carrito[idx].duracion, fijado: carrito[idx].fijado };
+                    carrito[idx].precioCalculado = getPrecio(original) + calcularCosteExtra(null, configTemp);
+                    
+                    let detStr = `Post ${carrito[idx].duracion === '24h' ? '24h' : (carrito[idx].duracion==='48h'?'48h':'Permanente')}`;
+                    if(carrito[idx].fijado === 'si') detStr += ' + Top Fijado';
+                    carrito[idx].detallesMejora = detStr;
+                }
+                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+                openCartModal(); // Re-renderizado del modal manteniendo importes correctos
+            }
+        }
+
+        /* EFECTO SLIDE DOWN ELEGANTE AL PULSAR TÍTULO O FECHA */
+        function toggleCardDropdownSlide(element) {
+            const wrapper = element.closest('.channel-card-wrapper');
+            wrapper.classList.toggle('expanded');
         }
 
         function buildChannelCardHTML(c, isFav) {
@@ -710,44 +883,57 @@
                 mejorasSeleccionadas[c.id] = { duracion: '24h', fijado: 'no' };
             }
             const currentConfig = mejorasSeleccionadas[c.id];
+            const adsToday = dynamicAdCounts[c.id] ?? 0;
 
             return `
-                <div class="${fondoResaltado} rounded-2xl p-4 border ${bordeResaltado} flex flex-col justify-between shadow-md transition-all">
-                    <div>
-                        <div class="flex gap-3 items-start">
+                <div class="channel-card-wrapper ${fondoResaltado} rounded-2xl border ${bordeResaltado} flex flex-col justify-between shadow-md overflow-hidden transition-all duration-300">
+                    <div class="p-4">
+                        <!-- HEADER DE LA TARJETA (PULSABLE PARA EXPANDIR) -->
+                        <div class="flex gap-3 items-start cursor-pointer" onclick="toggleCardDropdownSlide(this)">
                             <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover border border-slate-700">
                             <div class="flex-1 min-w-0">
                                 <div class="flex flex-wrap items-center gap-1.5">
                                     <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded-full">${c.tipo}</span>
                                     ${etiquetaHtml}
                                 </div>
-                                <h3 class="font-bold text-slate-200 text-xs mt-1 truncate leading-none">${c.nombre}</h3>
+                                <h3 class="font-bold text-slate-200 text-xs mt-1 truncate leading-none flex items-center gap-1.5">
+                                    ${c.nombre} 
+                                    <i class="fa-solid fa-chevron-down text-[8px] text-slate-500 arrow-icon"></i>
+                                </h3>
                                 <p class="text-[10px] text-sky-400/80 font-mono mt-0.5">@${c.username}</p>
                             </div>
-                            <button onclick="toggleFav(${c.id})" class="text-xs text-${isFav ? 'amber-400' : 'slate-600'} cursor-pointer"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
+                            <button onclick="event.stopPropagation(); toggleFav(${c.id})" class="text-xs text-${isFav ? 'amber-400' : 'slate-600'} cursor-pointer"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
                         </div>
                         
-                        <p class="text-[11px] text-slate-400 mt-2 line-clamp-2 italic">${c.descripcion}</p>
+                        <!-- MENSAJE DINÁMICO DE HOY SE ANUNCIARON X PERSONAS -->
+                        <div class="mt-2 text-[9px] font-bold text-orange-400/90 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-[8px]"></i> Hoy se anunciaron ${adsToday} personas
+                        </div>
 
-                        <div class="mt-2.5 pt-2 border-t border-slate-800/60 grid grid-cols-2 gap-2 text-[10px]">
-                            <div>
-                                <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
-                                <select onchange="updateMejora(${c.id}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
-                                    <option value="24h" ${currentConfig.duracion === '24h'?'selected':''}>24 Horas Estándar</option>
-                                    <option value="48h" ${currentConfig.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
-                                    <option value="perm" ${currentConfig.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
-                                <select onchange="updateMejora(${c.id}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
-                                    <option value="no" ${currentConfig.fijado === 'no'?'selected':''}>Sin Fijar</option>
-                                    <option value="si" ${currentConfig.fijado === 'si'?'selected':''}>Fijar 1 Hora (+ $10.00)</option>
-                                </select>
+                        <!-- CONTENEDOR DESLIZANTE CON EFECTO SUAVE (DESCRIPCIÓN Y SELECTORES) -->
+                        <div class="channel-details-dropdown">
+                            <p class="text-[11px] text-slate-300 mt-2 italic border-l-2 border-slate-700 pl-2 py-0.5">${c.descripcion}</p>
+
+                            <div class="mt-3 grid grid-cols-2 gap-2 text-[10px]">
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
+                                    <select onchange="updateMejora(${c.id}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
+                                        <option value="24h" ${currentConfig.duracion === '24h'?'selected':''}>24 Horas Estándar</option>
+                                        <option value="48h" ${currentConfig.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
+                                        <option value="perm" ${currentConfig.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
+                                    <select onchange="updateMejora(${c.id}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
+                                        <option value="no" ${currentConfig.fijado === 'no'?'selected':''}>Sin Fijar</option>
+                                        <option value="si" ${currentConfig.fijado === 'si'?'selected':''}>Fijar 1 Hora (+ $10.00)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-2.5 flex items-center justify-between bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
+                        <div class="mt-3 flex items-center justify-between bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
                             <div>
                                 <span class="text-[9px] text-slate-500 block uppercase font-bold"><i class="fa-solid fa-users text-[8px]"></i> Audiencia</span>
                                 <strong class="text-xs text-slate-300 font-mono">${c.subs.toLocaleString()} subs</strong>
@@ -758,7 +944,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-3.5 flex gap-1.5">
+                    <div class="px-4 pb-4 flex gap-1.5">
                         <a href="https://t.me/${c.username}" target="_blank" class="bg-sky-500/10 text-sky-400 border border-sky-500/20 w-9 h-9 rounded-xl flex items-center justify-center text-xs hover:bg-sky-500/20 transition-colors cursor-pointer"><i class="fa-brands fa-telegram-plane"></i></a>
                         <button onclick="addToCart(${c.id})" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer">+ Añadir a la Cesta</button>
                     </div>
@@ -795,68 +981,28 @@
             if(!document.getElementById('view-favorites').classList.contains('hidden')) renderFavorites();
         }
 
-        function updateRewardsPanel() {
-            const totalActual = calculateCartSubtotal();
-            document.getElementById('rewards-current-spend').innerText = `$${totalActual.toFixed(2)} USD`;
-            const pct = Math.min((totalActual / 120) * 100, 100);
-            document.getElementById('rewards-bar').style.width = `${pct}%`;
+        /* OPERACIONES DE DESPLIEGUE DEL CUPÓN */
+        function toggleCouponField() {
+            const f = document.getElementById('coupon-input-field');
+            f.classList.toggle('hidden');
+        }
+
+        function validateCouponCode() {
+            const val = document.getElementById('coupon-code-input').value.trim();
+            const errBox = document.getElementById('coupon-error-box');
             
-            evaluateTier(1, totalActual >= 30, 'GOLDEN5');
-            evaluateTier(2, totalActual >= 70, 'GOLDEN10');
-            evaluateTier(3, totalActual >= 120, 'GOLDEN15');
-
-            if(activeCoupon && activeCoupon !== 'FREE_AD_100') {
-                const reqMin = activeCoupon === 'GOLDEN5' ? 30 : (activeCoupon === 'GOLDEN10' ? 70 : 120);
-                if(totalActual < reqMin) { activeCoupon = null; activeCouponPct = 0; }
-            }
-        }
-
-        function evaluateTier(num, unlocked, code) {
-            const el = document.getElementById(`tier-${num}`);
-            const btn = document.getElementById(`btn-tier-${num}`);
-            if(!el || !btn) return;
-            const guardado = inventarioPremios.some(p => p.codigo === code);
-            if(guardado) {
-                el.classList.remove('opacity-50'); btn.setAttribute('disabled','true'); btn.innerText = "Guardado";
-                return;
-            }
-            if(unlocked) {
-                el.classList.remove('opacity-50'); btn.removeAttribute('disabled'); btn.innerText = "Guardar";
-                btn.className = "mt-1.5 w-full bg-emerald-600 text-white py-1 rounded-md text-[9px] font-bold cursor-pointer animate-pulse";
+            if(val === "LISTAGOLDEN20OFF") {
+                errBox.classList.add('hidden');
+                activeCoupon = "LISTAGOLDEN20OFF";
+                activeCouponPct = 20;
+                document.getElementById('coupon-input-field').classList.add('hidden');
+                triggerSuccessAnimation("¡Cupón Aplicado!", "20% de descuento asignado con éxito.");
+                openCartModal();
             } else {
-                el.classList.add('opacity-50'); btn.setAttribute('disabled','true'); btn.innerText = "Bloqueado";
-                btn.className = "mt-1.5 w-full bg-slate-800 text-slate-400 py-1 rounded-md text-[9px] font-bold";
+                errBox.classList.remove('hidden');
             }
         }
 
-        function claimRewardToInventory(code, pct, min, tier) {
-            inventarioPremios.push({ id: Date.now(), codigo: code, descuento: pct, minimo: min });
-            localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
-            triggerSuccessAnimation("Premio Guardado", "Canjéalo desde el menú superior.");
-            updateRewardsPanel();
-            renderRewardsInventory();
-        }
-
-        function renderRewardsInventory() {
-            const container = document.getElementById('rewards-inventory-container');
-            document.getElementById('menu-rewards-count').innerText = inventarioPremios.length;
-            if(!container) return;
-            container.innerHTML = '';
-            if(inventarioPremios.length === 0) { container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-2">Sin cupones.</p>`; return; }
-            inventarioPremios.forEach(p => {
-                const div = document.createElement('div');
-                div.className = "bg-slate-950 p-2 rounded-xl flex justify-between items-center text-xs border border-slate-800";
-                div.innerHTML = `<div><span class="font-mono font-black text-indigo-400 block">${p.codigo}</span><span class="text-[10px] text-slate-400">${p.descuento}% OFF</span></div><button onclick="applyCoupon('${p.codigo}', ${p.descuento})" class="bg-indigo-600 px-2.5 py-1 rounded text-[10px] text-white font-bold cursor-pointer">Usar</button>`;
-                container.appendChild(div);
-            });
-        }
-
-        function applyCoupon(code, pct) {
-            const subtotal = calculateCartSubtotal();
-            const minReq = code === 'GOLDEN5' ? 30 : (code === 'GOLDEN10' ? 70 : (code === 'GOLDEN15' ? 120 : 0));
-            if(subtotal < minReq) { alert(`Este cupón requiere un importe mínimo de $${minReq} USD.`); return; }
-            activeCoupon = code; activeCouponPct = pct; closePremiosModal(); openCartModal();
-        }
         function removeCoupon() { activeCoupon = null; activeCouponPct = 0; openCartModal(); }
 
         function calculateCartSubtotal() {
@@ -883,13 +1029,45 @@
                 idUnique: Date.now() + Math.floor(Math.random()*100), 
                 idCanalOriginal: parseInt(id),
                 precioCalculado: precioFinalItem,
-                detallesMejora: detalleStr
+                detallesMejora: detalleStr,
+                duracion: config.duracion,
+                fijado: config.fijado
             });
 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
-            updateRewardsPanel();
             triggerSuccessAnimation("Añadido", "Listo con mejoras en la cesta.");
+        }
+
+        /* APARTADO DE VENTA CRUZADA EN EL CARRITO */
+        function renderCrossSelling() {
+            const container = document.getElementById('cross-selling-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            // Filtrar canales que no estén ya metidos en la cesta actual
+            const currentIds = carrito.map(i => i.idCanalOriginal);
+            const sugeridos = canalesData.filter(c => !currentIds.includes(c.id));
+
+            if(sugeridos.length === 0) {
+                document.getElementById('cross-selling-area').classList.add('hidden');
+                return;
+            }
+            document.getElementById('cross-selling-area').classList.remove('hidden');
+
+            sugeridos.forEach(c => {
+                const item = document.createElement('div');
+                item.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center gap-2 min-w-[190px] text-[10px] flex-shrink-0";
+                item.innerHTML = `
+                    <img src="${c.imagen}" class="w-7 h-7 object-cover rounded-md">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-slate-200 truncate leading-tight">${c.nombre}</p>
+                        <p class="text-emerald-400 font-semibold mt-0.5">$${getPrecio(c).toFixed(2)}</p>
+                    </div>
+                    <button onclick="addToCart(${c.id}); openCartModal();" class="bg-sky-600 text-white font-bold p-1 px-2 rounded-md hover:bg-sky-500 cursor-pointer text-[9px]">+ Agregar</button>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function openCartModal() {
@@ -897,10 +1075,15 @@
             if(!container) return;
             container.innerHTML = '';
             document.getElementById('cart-modal').classList.remove('hidden');
+            
+            // Renderizado cruzado
+            renderCrossSelling();
+
             if(carrito.length === 0) {
                 document.getElementById('cart-subtotal').innerText = "$0.00"; document.getElementById('cart-total').innerText = "$0.00 USD";
                 document.getElementById('row-discount').classList.add('hidden'); document.getElementById('coupon-display-area').classList.add('hidden');
                 document.getElementById('btn-clear-cart').classList.add('hidden'); document.getElementById('payment-method-section').classList.add('hidden');
+                document.getElementById('cross-selling-area').classList.add('hidden');
                 return;
             }
             document.getElementById('btn-clear-cart').classList.remove('hidden');
@@ -909,12 +1092,48 @@
             
             carrito.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-2.5 rounded-xl flex justify-between items-center text-xs";
+                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs";
+                
                 if(item.promoPack) {
-                    div.innerHTML = `<div><h4 class="font-bold text-amber-400">Mega Pack Promocional</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div><div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$69.99</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div><h4 class="font-bold text-amber-400">Mega Pack Promocional</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$69.99</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                        </div>`;
+                } else if(item.isReward) {
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div><h4 class="font-bold text-indigo-400">🎁 Recompensa Reclamada</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">GRATIS</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                        </div>`;
                 } else {
                     const canal = canalesData.find(c => c.id === item.idCanalOriginal);
-                    if(canal) div.innerHTML = `<div><h4 class="font-bold text-slate-200">${canal.nombre}</h4><p class="text-[9px] text-sky-400 font-mono">${item.detallesMejora}</p></div><div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$${item.precioCalculado.toFixed(2)}</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                    if(canal) {
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <div><h4 class="font-bold text-slate-200">${canal.nombre}</h4><p class="text-[9px] text-sky-400 font-mono">${item.detallesMejora}</p></div>
+                                <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$${item.precioCalculado.toFixed(2)}</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                            </div>
+                            <!-- AJUSTES EXTRA DENTRO DEL PROPIO CARRITO -->
+                            <div class="pt-2 border-t border-slate-700/50 grid grid-cols-2 gap-2 text-[9px] bg-slate-900/40 p-1.5 rounded-lg">
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
+                                    <select onchange="updateCartItemOptions(${item.idUnique}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
+                                        <option value="24h" ${item.duracion === '24h'?'selected':''}>24 Horas</option>
+                                        <option value="48h" ${item.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
+                                        <option value="perm" ${item.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
+                                    <select onchange="updateCartItemOptions(${item.idUnique}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
+                                        <option value="no" ${item.fijado === 'no'?'selected':''}>Sin Fijar</option>
+                                        <option value="si" ${item.fijado === 'si'?'selected':''}>Fijar Top (+ $10.00)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                    }
                 }
                 container.appendChild(div);
             });
@@ -933,30 +1152,23 @@
                 document.getElementById('coupon-display-area').classList.add('hidden');
             }
             
-            // CORREGIDO: Fuerza el refresco visual de los botones cada vez que el modal se reconstruye
             selectPaymentMethod(selectedPayment);
         }
 
-        function removeFromCart(uid) { carrito = carrito.filter(i => i.idUnique !== uid); localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); updateRewardsPanel(); openCartModal(); }
-        function clearCart() { carrito = []; activeCoupon = null; activeCouponPct = 0; localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); updateRewardsPanel(); openCartModal(); }
+        function removeFromCart(uid) { carrito = carrito.filter(i => i.idUnique !== uid); localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); openCartModal(); }
+        function clearCart() { carrito = []; activeCoupon = null; activeCouponPct = 0; localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); openCartModal(); }
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
         
-        // CORRECCIÓN SELECCIÓN MÉTODO DE PAGO: Limpia los estados inactivos y añade correctamente el foco visual al seleccionado
         function selectPaymentMethod(m) { 
             selectedPayment = m; 
-            
-            // 1. Limpiamos las clases visuales activas volviendo todos los botones a su borde gris base (inactivo)
             document.querySelectorAll('.pay-btn').forEach(b => {
                 b.classList.remove('border-sky-400', 'bg-sky-500/10');
                 b.classList.add('border-slate-800', 'bg-slate-900');
             });
             
-            // 2. Buscamos el ID correcto del botón presionado
             const btnId = m === 'PayPal' ? 'pay-PayPal' : (m === 'Telegram Stars' ? 'pay-Stars' : 'pay-USDT');
             const targetBtn = document.getElementById(btnId);
-            
-            // 3. Reemplazamos las clases por las del borde activo (celeste brillante)
             if(targetBtn) {
                 targetBtn.classList.remove('border-slate-800', 'bg-slate-900');
                 targetBtn.classList.add('border-sky-400', 'bg-sky-500/10');
@@ -975,6 +1187,9 @@
                 if(item.promoPack) {
                     txt += `${index+1}. *Mega Pack Promocional* - $69.99 USD\n`;
                     hist.push("Mega Pack Especial");
+                } else if(item.isReward) {
+                    txt += `${index+1}. *🎁 RECOMPENSA:* ${item.detallesMejora} - ¡GRATIS!\n`;
+                    hist.push(item.detallesMejora);
                 } else {
                     const canal = canalesData.find(c => c.id === item.idCanalOriginal);
                     if(canal) {
@@ -986,8 +1201,6 @@
 
             if(activeCoupon) {
                 txt += `\n🎟️ *CUPÓN APLICADO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
-                inventarioPremios = inventarioPremios.filter(p => p.codigo !== activeCoupon);
-                localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
             }
             txt += `\n💳 *MÉTODO DE PAGO:* ${selectedPayment}\n💰 *TOTAL NETO A PAGAR:* $${net.toFixed(2)} USD`;
             
@@ -1005,7 +1218,7 @@
             document.getElementById('view-campaigns').classList.add('hidden');
             document.getElementById('view-faq').classList.add('hidden');
 
-            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); updateRewardsPanel(); }
+            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); }
             if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
             if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
             if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
@@ -1014,8 +1227,6 @@
         function filterCategory(cat, e) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); e.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
         function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); document.getElementById('menu-campaigns-count').innerText = historialCampanas.filter(c => c.estado === 'progreso').length; }
         function closeUserMenuOutside(e) { const d = document.getElementById('user-dropdown'); if(d && !d.classList.contains('hidden') && !d.contains(e.target)) d.classList.add('hidden'); }
-        function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
-        function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
         
         function renderFavorites() { 
             const container = document.getElementById('favorites-container'); 
