@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista Golden Ads</title>
+    <!-- SDK Oficial de Telegram WebApps -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome -->
@@ -19,27 +21,34 @@
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            padding-bottom: 90px;
+            padding-bottom: 95px;
             overflow-x: hidden;
         }
         .active-tab {
             color: var(--tg-theme-accent);
             border-top: 2px solid var(--tg-theme-accent);
         }
-        /* Ocultar barra de scroll en categorías */
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
     </style>
 </head>
-<body>
+<body onclick="closeUserMenuOutside(event)">
 
     <!-- PANTALLA DE CARGA INICIAL -->
     <div id="global-loader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative w-16 h-16">
+        <div class="relative w-14 h-14">
             <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
             <div class="absolute inset-0 rounded-full border-4 border-t-sky-400 border-r-indigo-500 animate-spin"></div>
         </div>
-        <h2 class="mt-6 font-bold text-sm text-slate-400 tracking-widest uppercase">Cargando SmartApp...</h2>
+        <h2 class="mt-6 font-bold text-xs text-slate-400 tracking-widest uppercase">Cargando SmartApp...</h2>
     </div>
 
     <!-- NOTIFICACIÓN POP-UP GLOBAL -->
@@ -59,11 +68,40 @@
             <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
             <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Golden Ads</h1>
         </div>
-        <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
-            <i class="fa-solid fa-basket-shopping"></i>
-            <span>Cesta</span>
-            <span id="cart-count" class="bg-white text-slate-950 text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-black">0</span>
-        </button>
+        
+        <div class="flex items-center gap-3 relative">
+            <!-- AVATAR DE USUARIO -->
+            <button id="user-avatar-btn" onclick="toggleUserMenu(event)" class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 p-[2px] shadow-md hover:scale-105 transition-transform cursor-pointer">
+                <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">
+                    --
+                </div>
+            </button>
+
+            <!-- MENÚ DESPLEGABLE DE USUARIO -->
+            <div id="user-dropdown" class="absolute right-0 top-12 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 hidden z-50 animate-fade-in">
+                <div class="px-4 py-2 border-b border-slate-800/60 mb-1">
+                    <p id="user-profile-name" class="text-xs font-black text-slate-200">Cargando...</p>
+                    <p id="user-profile-tag" class="text-[10px] text-slate-400">...</p>
+                </div>
+                <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas
+                </button>
+                <button onclick="openPremiosModal(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-gift text-amber-400 w-4"></i> Mis Premios <span id="menu-rewards-count" class="ml-auto text-[9px] bg-indigo-500/20 text-indigo-300 font-bold px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+                <div class="border-t border-slate-800/60 my-1"></div>
+                <a href="https://t.me/Airdayz" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
+                    <i class="fa-brands fa-telegram text-emerald-400 w-4"></i> Soporte Telegram
+                </a>
+            </div>
+
+            <!-- BOTÓN CESTA -->
+            <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <span>Cesta</span>
+                <span id="cart-count" class="bg-white text-slate-950 text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-black">0</span>
+            </button>
+        </div>
     </header>
 
     <!-- VISTA 1: CATÁLOGO -->
@@ -88,17 +126,17 @@
                 <div id="tier-1" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
                     <p class="font-bold text-slate-300">Nivel 1 ($30)</p>
                     <p class="text-emerald-400 font-semibold mt-0.5">5% OFF</p>
-                    <button onclick="applyRewardCoupon('GOLDEN5', 30)" id="btn-tier-1" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                    <button onclick="claimRewardToInventory('GOLDEN5', 5, 30, 1)" id="btn-tier-1" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
                 </div>
                 <div id="tier-2" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
                     <p class="font-bold text-slate-300">Nivel 2 ($70)</p>
                     <p class="text-emerald-400 font-semibold mt-0.5">10% OFF</p>
-                    <button onclick="applyRewardCoupon('GOLDEN10', 70)" id="btn-tier-2" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                    <button onclick="claimRewardToInventory('GOLDEN10', 10, 70, 2)" id="btn-tier-2" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
                 </div>
                 <div id="tier-3" class="bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-[10px] opacity-50 transition-all">
                     <p class="font-bold text-slate-300">Nivel 3 ($120)</p>
                     <p class="text-emerald-400 font-semibold mt-0.5">15% OFF</p>
-                    <button onclick="applyRewardCoupon('GOLDEN15', 120)" id="btn-tier-3" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
+                    <button onclick="claimRewardToInventory('GOLDEN15', 15, 120, 3)" id="btn-tier-3" disabled class="mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400 transition-colors">Bloqueado</button>
                 </div>
             </div>
         </section>
@@ -113,7 +151,7 @@
             </div>
             <select id="sort-filter" onchange="renderChannels()" class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 text-xs text-slate-300 focus:outline-none">
                 <option value="default">⇅</option>
-                <option value="subs-desc">Muestras más grandes</option>
+                <option value="subs-desc">Más Suscriptores</option>
                 <option value="price-asc">Precio más bajo</option>
             </select>
         </section>
@@ -133,11 +171,14 @@
 
     <!-- VISTA 3: HISTORIAL DE CAMPAÑAS -->
     <main id="view-campaigns" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
-        <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-sky-400 mr-2"></i>Tus Campañas Solicitadas</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-sky-400 mr-2"></i>Tus Campañas Solicitadas</h2>
+            <button onclick="clearCampaignHistory()" class="text-[10px] text-slate-500 font-bold underline">Limpiar Historial</button>
+        </div>
         <div id="campaigns-container" class="space-y-3"></div>
     </main>
 
-    <!-- VISTA 4: GARANTÍAS & FAQ ACCORDION -->
+    <!-- VISTA 4: GARANTÍAS -->
     <main id="view-faq" class="p-4 max-w-2xl mx-auto space-y-4 hidden">
         <div class="text-center max-w-md mx-auto pb-2">
             <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i>Garantía y Soporte Pro</h2>
@@ -145,7 +186,6 @@
         </div>
         
         <div class="space-y-2.5" id="faq-accordion-group">
-            <!-- FAQ ITEM 1 -->
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
                 <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
                     <span>¿Cuánto tiempo tarda en publicarse mi anuncio?</span>
@@ -158,7 +198,6 @@
                 </div>
             </div>
 
-            <!-- FAQ ITEM 2 -->
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
                 <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
                     <span>¿Qué métodos de pago aceptan actualmente?</span>
@@ -170,23 +209,10 @@
                     </div>
                 </div>
             </div>
-
-            <!-- FAQ ITEM 3 -->
-            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
-                <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
-                    <span>¿Existe garantía si eliminan el post antes de tiempo?</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
-                </button>
-                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
-                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
-                        Sí, 100% garantizado. Respetamos rigurosamente los tiempos contratados (24h, 48h o Permanente). Si por algún error del sistema el post se borra antes, te compensamos relanzando tu campaña con un <strong class="text-amber-400">fijado extra gratuito de 12 horas</strong>.
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
-    <!-- MENÚ INFERIOR FIJO (4 BOTONES PERFECTAMENTE EQUILIBRADOS) -->
+    <!-- MENÚ INFERIOR FIJO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
         <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold transition-colors active-tab">
             <i class="fa-solid fa-layer-group text-base"></i>Catálogo
@@ -202,9 +228,22 @@
         </button>
     </nav>
 
+    <!-- MODAL DE LOS PREMIOS GUARDADOS -->
+    <div id="premios-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 shadow-2xl p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-box-open mr-1 text-indigo-400"></i> Mis Premios Guardados</h3>
+                <button onclick="closePremiosModal()" class="text-slate-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="rewards-inventory-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <!-- Cupones cargados de forma dinámica -->
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DEL CARRITO -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
                 <div class="flex items-center gap-2">
                     <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
@@ -213,23 +252,43 @@
                 <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
+            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1 max-h-[35vh]"></div>
 
-            <!-- Zona de totales y cupones -->
-            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-3">
+            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-4">
+                <!-- ÁREA DE CUPÓN ACTIVO -->
                 <div id="coupon-display-area" class="hidden flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-xs text-emerald-400 font-medium">
                     <span><i class="fa-solid fa-ticket mr-1"></i> Cupón activo: <strong id="active-coupon-name">NINGUNO</strong></span>
                     <button onclick="removeCoupon()" class="text-rose-400 font-bold ml-2 underline text-[10px]">Quitar</button>
                 </div>
 
-                <div class="space-y-1">
+                <!-- NUEVA SECCIÓN SELECCIÓN DE MÉTODO DE PAGO -->
+                <div id="payment-method-section" class="space-y-2">
+                    <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider"><i class="fa-solid fa-credit-card mr-1 text-sky-400"></i> Selecciona Método de Pago:</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-brands fa-paypal text-sky-400 text-base"></i>
+                            <span class="text-[9px] font-bold text-slate-300">PayPal</span>
+                        </button>
+                        <button onclick="selectPaymentMethod('Telegram Stars')" id="pay-Stars" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-solid fa-star text-amber-400 text-base"></i>
+                            <span class="text-[9px] font-bold text-slate-300">Estrellas</span>
+                        </button>
+                        <button onclick="selectPaymentMethod('USDT (TRC20)')" id="pay-USDT" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-solid fa-coins text-emerald-400 text-base"></i>
+                            <span class="text-[9px] font-bold text-slate-300">USDT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DESGLOSE DE COSTES -->
+                <div class="space-y-1 pt-1">
                     <div class="flex justify-between text-xs text-slate-400">
                         <span>Subtotal Canales:</span>
                         <span id="cart-subtotal">$0.00</span>
                     </div>
                     <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium">
                         <span>Descuento Aplicado:</span>
-                        <span id="cart-discount">-$0.00</span>
+                        <span id="cart-total-discount">-$0.00</span>
                     </div>
                     <div class="flex justify-between items-center pt-1 border-t border-slate-800">
                         <span class="text-slate-200 font-bold text-sm">Total Neto:</span>
@@ -237,7 +296,8 @@
                     </div>
                 </div>
 
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-center text-xs uppercase tracking-wider flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/15">
+                <!-- BOTÓN DE CHECKOUT -->
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-center text-xs uppercase tracking-wider flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/15 cursor-pointer">
                     <i class="fa-brands fa-telegram text-sm"></i> Enviar Pedido a Telegram
                 </button>
             </div>
@@ -248,51 +308,105 @@
         const MI_TELEGRAM_USER = "Airdayz";
 
         const canalesData = [
-            {
-                id: 1,
-                nombre: "Crypto Alertas Pro",
-                username: "crypto_alertas_test",
-                categoria: "Finanzas",
-                subs: 45000,
-                precioBase: 50,
-                descuento: 15,
-                imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150"
-            },
-            {
-                id: 2,
-                nombre: "Tech & Gadgets Mundiales",
-                username: "tech_gadgets_test",
-                categoria: "Tecnología",
-                subs: 120000,
-                precioBase: 90,
-                descuento: 0,
-                imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150"
-            },
-            {
-                id: 3,
-                nombre: "Memes & Humor Viral",
-                username: "memes_humor_test",
-                categoria: "Entretenimiento",
-                subs: 85000,
-                precioBase: 30,
-                descuento: 30,
-                imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150"
-            }
+            { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Análisis técnico de Bitcoin, DeFi y gemas cripto a diario.", duracion: "24 horas arriba (1h en el top)", fijado: "Sí, las primeras 2 horas" },
+            { id: 2, nombre: "Tech & Gadgets Mundiales", username: "tech_gadgets_test", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings, reviews de smartphones y noticias tecnológicas de vanguardia.", duracion: "Permanente", fijado: "No" },
+            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico ultra masivo y activo. Ideal para captar público joven de forma rápida.", duracion: "48 horas totales", fijado: "Sí, 1 hora inicial" }
         ];
 
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
+        let inventarioPremios = JSON.parse(localStorage.getItem('ads_premios')) || []; 
+        
         let activeCoupon = null;
         let activeCouponPct = 0;
         let currentCategory = 'todos';
+        let selectedPayment = 'PayPal'; // Método de pago por defecto
 
         document.addEventListener("DOMContentLoaded", () => {
+            initUserData();
             renderChannels();
             updateCartBadge();
             updateRewardsPanel();
+            renderRewardsInventory();
             setTimeout(() => document.getElementById('global-loader').remove(), 500);
         });
+
+        /* EXTRAER Y RELLENAR DATOS DE TELEGRAM */
+        function initUserData() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            }
+
+            let nombreUsuario = "Anunciante Golden";
+            let aliasUsuario = "@usuario_telegram";
+            let iniciales = "GA";
+
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                nombreUsuario = user.first_name;
+                if (user.last_name) nombreUsuario += " " + user.last_name;
+                
+                if (user.username) {
+                    aliasUsuario = "@" + user.username;
+                } else {
+                    aliasUsuario = `ID: ${user.id}`;
+                }
+
+                const splitted = nombreUsuario.split(" ");
+                if (splitted.length > 1) {
+                    iniciales = (splitted[0][0] + splitted[1][0]).toUpperCase();
+                } else {
+                    iniciales = nombreUsuario.substring(0, 2).toUpperCase();
+                }
+            }
+
+            document.getElementById('user-profile-name').innerText = nombreUsuario;
+            document.getElementById('user-profile-tag').innerText = aliasUsuario;
+            document.getElementById('user-avatar-text').innerText = iniciales;
+        }
+
+        /* MANEJO SELECCIÓN DE MÉTODO DE PAGO */
+        function selectPaymentMethod(method) {
+            selectedPayment = method;
+            
+            // Resetear estilos de todos los botones de pago
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                btn.classList.remove('border-sky-400', 'bg-sky-500/10');
+                btn.classList.add('border-slate-800', 'bg-slate-900');
+            });
+
+            // Asignar estilo activo al seleccionado
+            let activeId = 'pay-PayPal';
+            if (method === 'Telegram Stars') activeId = 'pay-Stars';
+            if (method === 'USDT (TRC20)') activeId = 'pay-USDT';
+
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-slate-800', 'bg-slate-900');
+                activeBtn.classList.add('border-sky-400', 'bg-sky-500/10');
+            }
+        }
+
+        /* CONTROL DEL MENÚ DE USUARIO */
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function closeUserMenuOutside(event) {
+            const dropdown = document.getElementById('user-dropdown');
+            const avatarBtn = document.getElementById('user-avatar-btn');
+            if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && !avatarBtn.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
+        function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
 
         function triggerSuccessAnimation(title, desc) {
             document.getElementById('toast-title').innerText = title;
@@ -314,7 +428,7 @@
             document.getElementById('view-campaigns').classList.add('hidden');
             document.getElementById('view-faq').classList.add('hidden');
 
-            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); }
+            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); updateRewardsPanel(); }
             if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
             if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
             if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
@@ -352,51 +466,97 @@
         function updateRewardsPanel() {
             const currentSpend = calculateCartSubtotal();
             document.getElementById('rewards-current-spend').innerText = `$${currentSpend.toFixed(2)} USD`;
-            
-            // Lógica de porcentaje de la barra de progreso (máximo hito en $120)
             const pct = Math.min((currentSpend / 120) * 100, 100);
             document.getElementById('rewards-bar').style.width = `${pct}%`;
 
-            // Evaluar los hitos
-            evaluateTier(1, currentSpend >= 30);
-            evaluateTier(2, currentSpend >= 70);
-            evaluateTier(3, currentSpend >= 120);
+            evaluateTier(1, currentSpend >= 30, 'GOLDEN5');
+            evaluateTier(2, currentSpend >= 70, 'GOLDEN10');
+            evaluateTier(3, currentSpend >= 120, 'GOLDEN15');
         }
 
-        function evaluateTier(tierNumber, unlocked) {
+        function evaluateTier(tierNumber, unlocked, code) {
             const element = document.getElementById(`tier-${tierNumber}`);
             const btn = document.getElementById(`btn-tier-${tierNumber}`);
-            
+            const yaObtenido = inventarioPremios.some(p => p.codigo === code);
+
+            if(yaObtenido) {
+                element.classList.remove('opacity-50');
+                element.classList.add('border-indigo-500/20', 'bg-indigo-950/20');
+                btn.setAttribute('disabled', 'true');
+                btn.innerText = "Guardado";
+                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-indigo-400";
+                return;
+            }
+
             if(unlocked) {
                 element.classList.remove('opacity-50');
                 element.classList.add('border-emerald-500/40', 'bg-emerald-500/5');
                 btn.removeAttribute('disabled');
-                if (btn.innerText === "Bloqueado" || btn.innerText === "Aplicar") {
-                    btn.innerText = "Aplicar";
-                    btn.className = "mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 py-1 rounded-md text-[9px] font-bold text-white transition-colors cursor-pointer";
-                }
+                btn.innerText = "Guardar Premio";
+                btn.className = "mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 py-1 rounded-md text-[9px] font-bold text-white transition-colors cursor-pointer animate-pulse";
             } else {
                 element.classList.add('opacity-50');
-                element.classList.remove('border-emerald-500/40', 'bg-emerald-500/5');
+                element.classList.remove('border-emerald-500/40', 'bg-emerald-500/5', 'border-indigo-500/20', 'bg-indigo-950/20');
                 btn.setAttribute('disabled', 'true');
                 btn.innerText = "Bloqueado";
                 btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400";
             }
         }
 
-        function applyRewardCoupon(couponCode, minSpend) {
-            if(calculateCartSubtotal() < minSpend) return;
-            activeCoupon = couponCode;
-            activeCouponPct = couponCode === 'GOLDEN5' ? 5 : (couponCode === 'GOLDEN10' ? 10 : 15);
-            triggerSuccessAnimation("¡Cupón Aplicado!", `Código ${couponCode} añadido al pedido.`);
+        function claimRewardToInventory(couponCode, pct, minSpend, tier) {
+            if(inventarioPremios.some(p => p.codigo === couponCode)) return;
+
+            inventarioPremios.push({
+                id: Date.now(),
+                codigo: couponCode,
+                descuento: pct,
+                minimo: minSpend
+            });
+
+            localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
+            triggerSuccessAnimation("¡Premio Guardado!", `Usa el menú superior para ver tus premios.`);
+            updateRewardsPanel();
+            renderRewardsInventory();
+        }
+
+        function renderRewardsInventory() {
+            const container = document.getElementById('rewards-inventory-container');
+            const menuBadge = document.getElementById('menu-rewards-count');
+            container.innerHTML = '';
+
+            menuBadge.innerText = inventarioPremios.length;
+
+            if(inventarioPremios.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-4">No tienes premios guardados.</p>`;
+                return;
+            }
+
+            inventarioPremios.forEach(premio => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between items-center text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-mono font-black text-indigo-400 block">${premio.codigo}</span>
+                        <span class="text-slate-400 text-[10px]">${premio.descuento}% OFF</span>
+                    </div>
+                    <button onclick="applyCouponFromInventory('${premio.codigo}', ${premio.descuento})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-md font-bold text-[10px] transition-colors">
+                        Aplicar
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function applyCouponFromInventory(code, pct) {
+            activeCoupon = code;
+            activeCouponPct = pct;
+            closePremiosModal();
+            triggerSuccessAnimation("Cupón Aplicado", `Se descontará un ${pct}% en la cesta.`);
             openCartModal();
         }
 
-        function removeCoupon() {
-            activeCoupon = null;
-            activeCouponPct = 0;
-            openCartModal();
-        }
+        // Remueve cupón activo
+        function removeCoupon() { activeCoupon = null; activeCouponPct = 0; openCartModal(); }
 
         function renderChannels() {
             const container = document.getElementById('channels-container');
@@ -407,17 +567,21 @@
             if (document.getElementById('sort-filter').value === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
             if (document.getElementById('sort-filter').value === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
 
-            filtrados.forEach(c => container.appendChild(createChannelCard(c)));
+            filtrados.forEach((c, idx) => {
+                const card = createChannelCard(c);
+                card.style.animationDelay = `${idx * 60}ms`;
+                container.appendChild(card);
+            });
         }
 
         function createChannelCard(c) {
             const isFav = favoritos.includes(c.id);
             const card = document.createElement('div');
-            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between shadow-md";
+            card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between shadow-md hover:border-slate-600 transition-all animate-fade-in";
             card.innerHTML = `
                 <div>
                     <div class="flex gap-3 items-start">
-                        <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover" alt="">
+                        <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover border border-slate-700" alt="">
                         <div class="flex-1 min-w-0">
                             <span class="bg-slate-700 text-slate-300 text-[9px] uppercase font-bold px-2 py-0.5 rounded">${c.categoria}</span>
                             <h3 class="font-bold text-slate-200 text-xs mt-1 truncate">${c.nombre}</h3>
@@ -426,17 +590,55 @@
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                         </button>
                     </div>
-                    <div class="mt-2 text-xs font-black text-emerald-400 bg-slate-950/40 p-2 rounded-xl border border-slate-800">
+                    
+                    <div class="mt-2 text-xs font-black text-emerald-400 bg-slate-950/40 p-2 rounded-xl border border-slate-800/60">
                         $${getPrecio(c).toFixed(2)} USD
                     </div>
-                    <div class="mt-2 space-y-1 bg-slate-900/40 p-2 rounded-xl text-[11px] text-slate-400">
-                        <label class="flex justify-between cursor-pointer"><span class="flex items-center"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Pack x3 Posts Semanal</span> <span class="text-emerald-400">+$25</span></label>
-                        <label class="flex justify-between cursor-pointer"><span class="flex items-center"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Fijado 24 Horas</span> <span class="text-emerald-400">+$10</span></label>
+
+                    <div class="mt-3 border-t border-slate-800/80 pt-2">
+                        <button onclick="toggleExtrasSlider(this)" class="w-full flex justify-between items-center text-[11px] text-sky-400 font-bold select-none cursor-pointer">
+                            <span>Ver detalles e hiper-packs</span>
+                            <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-300"></i>
+                        </button>
+                        
+                        <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
+                            <div class="overflow-hidden">
+                                <div class="mt-2 space-y-2 text-[11px] text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/50">
+                                    <p><strong class="text-slate-400">Sobre el canal:</strong> ${c.descripcion}</p>
+                                    <p><strong class="text-slate-400">Duración:</strong> ${c.duracion}</p>
+                                    <p><strong class="text-slate-400">Fijado:</strong> ${c.fijado}</p>
+                                    
+                                    <div class="mt-2.5 border-t border-slate-800/80 pt-2 space-y-1">
+                                        <p class="font-bold text-amber-400 text-[10px] uppercase tracking-wider mb-0.5"><i class="fa-solid fa-bolt mr-1"></i>Añadir Mejoras:</p>
+                                        <label class="flex justify-between items-center p-1 hover:bg-slate-800 rounded cursor-pointer">
+                                            <span class="flex items-center text-slate-400"><input type="checkbox" id="up-pack-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Pack x3 Posts Semanal</span> 
+                                            <span class="text-emerald-400 font-bold">+$25</span>
+                                        </label>
+                                        <label class="flex justify-between items-center p-1 hover:bg-slate-800 rounded cursor-pointer">
+                                            <span class="flex items-center text-slate-400"><input type="checkbox" id="up-fixed-${c.id}" class="rounded mr-1.5 bg-slate-950 border-slate-800"> Fijado 24 Horas Completas</span> 
+                                            <span class="text-emerald-400 font-bold">+$10</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button onclick="addToCart(${c.id})" class="mt-3 w-full bg-sky-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-sky-500 transition-colors">+ Añadir a la Cesta</button>
+                <button onclick="addToCart(${c.id})" class="mt-3.5 w-full bg-sky-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-sky-500 transition-colors shadow-md shadow-sky-600/10">+ Añadir a la Cesta</button>
             `;
             return card;
+        }
+
+        function toggleExtrasSlider(button) {
+            const gridWrapper = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            if (gridWrapper.style.gridTemplateRows === "1fr") {
+                gridWrapper.style.gridTemplateRows = "0fr";
+                icon.classList.remove('rotate-180');
+            } else {
+                gridWrapper.style.gridTemplateRows = "1fr";
+                icon.classList.add('rotate-180');
+            }
         }
 
         function toggleFav(id) {
@@ -450,7 +652,11 @@
             container.innerHTML = '';
             const favs = canalesData.filter(c => favoritos.includes(c.id));
             if(favs.length === 0) { container.innerHTML = `<p class="col-span-full text-center text-slate-500 py-6 text-xs">Sin canales guardados.</p>`; return; }
-            favs.forEach(c => container.appendChild(createChannelCard(c)));
+            favs.forEach((c, idx) => {
+                const card = createChannelCard(c);
+                card.style.animationDelay = `${idx * 60}ms`;
+                container.appendChild(card);
+            });
         }
 
         function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
@@ -491,10 +697,13 @@
                 document.getElementById('cart-total').innerText = "$0.00 USD";
                 document.getElementById('btn-clear-cart').classList.add('hidden');
                 document.getElementById('coupon-display-area').classList.add('hidden');
+                document.getElementById('payment-method-section').classList.add('hidden'); // Ocultar pagos si está vacío
                 return;
             }
 
             document.getElementById('btn-clear-cart').classList.remove('hidden');
+            document.getElementById('payment-method-section').classList.remove('hidden'); // Mostrar pagos
+            
             let subtotal = calculateCartSubtotal();
             
             carrito.forEach(item => {
@@ -526,7 +735,7 @@
                 let discountAmount = subtotal * (activeCouponPct / 100);
                 let netTotal = subtotal - discountAmount;
                 document.getElementById('row-discount').classList.remove('hidden');
-                document.getElementById('cart-discount').innerText = `-$${discountAmount.toFixed(2)}`;
+                document.getElementById('cart-total-discount').innerText = `-$${discountAmount.toFixed(2)}`;
                 document.getElementById('cart-total').innerText = `$${netTotal.toFixed(2)} USD`;
                 document.getElementById('coupon-display-area').classList.remove('hidden');
                 document.getElementById('active-coupon-name').innerText = `${activeCoupon} (-${activeCouponPct}%)`;
@@ -535,6 +744,9 @@
                 document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)} USD`;
                 document.getElementById('coupon-display-area').classList.add('hidden');
             }
+
+            // Forzar refresco visual del método de pago que estuviera activo
+            selectPaymentMethod(selectedPayment);
         }
 
         function removeFromCart(idUnique) {
@@ -542,15 +754,6 @@
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
             updateRewardsPanel();
-            
-            // Si vacía la cesta por debajo del mínimo de cupón, se cae el cupón
-            if(activeCoupon) {
-                if((activeCoupon === 'GOLDEN5' && calculateCartSubtotal() < 30) ||
-                   (activeCoupon === 'GOLDEN10' && calculateCartSubtotal() < 70) ||
-                   (activeCoupon === 'GOLDEN15' && calculateCartSubtotal() < 120)) {
-                    activeCoupon = null; activeCouponPct = 0;
-                }
-            }
             openCartModal();
         }
 
@@ -584,27 +787,33 @@
             });
 
             if(activeCoupon) {
-                textoPedido += `\n🎟️ *CUPÓN PREMIO REDIMIDO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
+                textoPedido += `\n🎟️ *CUPÓN REDIMIDO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
+                // Eliminar el cupón usado de tu inventario
+                inventarioPremios = inventarioPremios.filter(p => p.codigo !== activeCoupon);
+                localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
+                renderRewardsInventory();
             }
 
-            textoPedido += `\n💰 *TOTAL NETO A PAGAR:* $${neto.toFixed(2)} USD\n`;
-            textoPedido += "💳 Pagos vía PayPal, Estrellas o USDT.";
+            // NUEVA LÍNEA: Inyección del método de pago preferido en el mensaje
+            textoPedido += `\n💳 *MÉTODO DE PAGO PREFERIDO:* ${selectedPayment}\n`;
+            textoPedido += `💰 *TOTAL NETO A PAGAR:* $${neto.toFixed(2)} USD\n\n`;
+            textoPedido += "Quedo a la espera de las instrucciones de pago.";
 
-            // --- GUARDAR EN EL HISTORIAL (FECHA Y HORA DE ENVÍO) ---
             const ahora = new Date();
             const fechaString = ahora.toLocaleDateString() + " | " + ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
+            // Guardar en el historial de campañas locales incluyendo la etiqueta del método de pago
             historialCampanas.unshift({
+                idCamp: Date.now(),
                 fecha: fechaString,
                 canales: resumenCanalesParaHistorial,
-                total: neto.toFixed(2)
+                total: neto.toFixed(2) + ` (${selectedPayment})`,
+                estado: 'progreso' 
             });
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
 
-            // Abrir Telegram
             window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido), "_blank");
             
-            // Reset
             clearCart();
             closeCartModal();
         }
@@ -616,33 +825,78 @@
                 container.innerHTML = `<p class="text-center text-slate-500 text-xs py-8">Aún no has solicitado campañas.</p>`;
                 return;
             }
-            historialCampanas.forEach(camp => {
+            historialCampanas.forEach((camp, idx) => {
+                const isProgreso = camp.estado === 'progreso';
                 const div = document.createElement('div');
-                div.className = "bg-slate-800/50 p-4 rounded-2xl border border-slate-700/40 space-y-2";
+                div.className = `p-4 rounded-2xl border transition-all duration-300 animate-fade-in ${
+                    isProgreso ? 'bg-slate-800/50 border-slate-700/40' : 'bg-emerald-950/20 border-emerald-500/30'
+                }`;
+                div.style.animationDelay = `${idx * 60}ms`;
                 div.innerHTML = `
                     <div class="flex justify-between items-center text-[11px]">
                         <span class="text-slate-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i>${camp.fecha}</span>
-                        <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-bold">Esperando Pago</span>
+                        <span class="px-2 py-0.5 rounded-full font-bold ${
+                            isProgreso ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/20 text-emerald-400'
+                        }">
+                            ${isProgreso ? '<i class="fa-solid fa-spinner animate-spin mr-1 text-[9px]"></i> Pedido en progreso' : '<i class="fa-solid fa-check mr-1"></i> Completado'}
+                        </span>
                     </div>
-                    <ul class="text-xs text-slate-200 list-disc list-inside space-y-0.5 pl-1">
-                        ${camp.canales.map(name => `<li class="truncate">${name}</li>`).join('')}
+                    <ul class="text-xs text-slate-200 list-disc list-inside space-y-0.5 pl-1 my-2">
+                        ${camp.canales.map(name => `<li class="truncate text-slate-300">${name}</li>`).join('')}
                     </ul>
-                    <div class="pt-1.5 border-t border-slate-800 flex justify-between items-center text-xs">
-                        <span class="text-slate-400">Importe:</span>
-                        <span class="font-black text-emerald-400">$${camp.total} USD</span>
+                    <div class="pt-2 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-slate-400">Importe:</span>
+                            <span class="font-black text-emerald-400 ml-1">$${camp.total} USD</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            ${isProgreso ? `
+                                <button onclick="confirmCampaign(${camp.idCamp})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition-colors">
+                                    Confirmar
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteCampaign(${camp.idCamp})" class="bg-slate-900 border border-slate-700 text-rose-400 hover:bg-rose-950/30 font-bold px-2 py-1 rounded-lg text-[10px] transition-colors">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // CONTROL EXCLUSIVO DEL FAQ ACORDEÓN SLIDE EFECT
+        function confirmCampaign(idCamp) {
+            const camp = historialCampanas.find(c => c.idCamp === idCamp);
+            if(camp) {
+                camp.estado = 'completado';
+                localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+                triggerSuccessAnimation("¡Pedido Completado!", "La campaña cambió de estado con éxito.");
+                renderCampaigns();
+            }
+        }
+
+        function deleteCampaign(idCamp) {
+            if(confirm("¿Seguro que quieres eliminar este registro del historial?")) {
+                historialCampanas = historialCampanas.filter(c => c.idCamp !== idCamp);
+                localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+                triggerSuccessAnimation("Eliminado", "Registro borrado correctamente.");
+                renderCampaigns();
+            }
+        }
+
+        function clearCampaignHistory() {
+            if(confirm("¿Eliminar todas las campañas solicitadas por completo?")) {
+                historialCampanas = [];
+                localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+                renderCampaigns();
+            }
+        }
+
         function toggleFaqItem(button) {
             const currentItem = button.parentElement;
             const contentWrapper = button.nextElementSibling;
             const icon = button.querySelector('i');
             
-            // Cerrar otros que puedan estar abiertos
             document.querySelectorAll('#faq-accordion-group > div').forEach(item => {
                 if(item !== currentItem) {
                     item.classList.replace('bg-slate-800/80', 'bg-slate-800/40');
@@ -651,7 +905,6 @@
                 }
             });
 
-            // Toggle del actual
             if (contentWrapper.style.gridTemplateRows === "1fr") {
                 contentWrapper.style.gridTemplateRows = "0fr";
                 currentItem.classList.replace('bg-slate-800/80', 'bg-slate-800/40');
@@ -659,7 +912,7 @@
             } else {
                 contentWrapper.style.gridTemplateRows = "1fr";
                 currentItem.classList.replace('bg-slate-800/40', 'bg-slate-800/80');
-                icon.add('rotate-180');
+                icon.classList.add('rotate-180');
             }
         }
     </script>
