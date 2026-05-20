@@ -146,6 +146,11 @@
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
                 <div class="border-t border-slate-800/60 my-1"></div>
+                <!-- BOTÓN INTEGRADO DE RESETEO DE PRUEBA -->
+                <button onclick="resetearTodoSistema(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-rotate text-rose-500 w-4"></i> Resetear Puntos y Datos
+                </button>
+                <div class="border-t border-slate-800/60 my-1"></div>
                 <a href="https://t.me/Airdayz" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
                     <i class="fa-brands fa-telegram text-emerald-400 w-4"></i> Soporte Telegram
                 </a>
@@ -465,7 +470,7 @@
         const canalesData = [
             { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Alertas DeFi e inversiones cripto diarias en tiempo real.", destacado: true, recomendado: false },
             { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recommended: true },
-            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recomendado: true },
+            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recommended: true },
             { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recommended: false },
             { id: 5, nombre: "Cine & Series Streaming", username: "cine_streaming", tipo: "Público", categoria: "Entretenimiento", subs: 195000, precioBase: 65, descuento: 10, imagen: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=150", descripcion: "Reseñas de cine, trailers y novedades de plataformas top.", destacado: false, recommended: false }
         ];
@@ -480,7 +485,7 @@
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
         let claimedRewards = JSON.parse(localStorage.getItem('ads_claimed_rewards')) || []; 
-        let userPoints = parseInt(localStorage.getItem('ads_user_points')) || 2500; 
+        let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 2500; 
         let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
         
         let totalSesionesHoy = parseInt(localStorage.getItem('ads_sesiones_contador')) || 0;
@@ -507,6 +512,7 @@
             renderCarousel();
             updateCartBadge();
             updatePointsDisplay();
+            updateRewardsMenuBadge(); // Sincronización inicial del menú
             checkRouletteAvailability();
             initAiAssistant();
             initFomoBot();
@@ -613,7 +619,9 @@
             const nombres = ["Raúl", "Carlos", "Sofía", "Lucía", "Marta", "Andrés", "Mateo", "Emma", "Elena", "Oliver"];
             const banderas = ["🇪🇸", "🇲🇽", "🇦🇷", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
             
-            setInterval(() => {
+            // Se limpian intervalos anteriores para prevenir fugas de memoria en reseteos
+            if(window.fomoIntervalID) clearInterval(window.fomoIntervalID);
+            window.fomoIntervalID = setInterval(() => {
                 if(Math.random() > 0.4) {
                     const n = nombres[Math.floor(Math.random() * nombres.length)];
                     const b = banderas[Math.floor(Math.random() * banderas.length)];
@@ -686,6 +694,17 @@
             document.getElementById('rewards-points-counter').innerText = userPoints;
         }
 
+        /* FUNCIÓN ARREGLADA: Cuenta los premios realmente desbloqueados o canjeados de la cesta */
+        function updateRewardsMenuBadge() {
+            const badge = document.getElementById('menu-rewards-count');
+            if (badge) {
+                // Sumamos los IDs en claimedRewards más los que están activos físicamente en la cesta
+                const rewardsEnCesta = carrito.filter(item => item.isReward).length;
+                const totalDesbloqueados = claimedRewards.length + rewardsEnCesta;
+                badge.innerText = totalDesbloqueados;
+            }
+        }
+
         function showAndScrollToRewards() {
             const el = document.getElementById('rewards-section');
             if(el) {
@@ -727,6 +746,7 @@
                 `;
                 container.appendChild(card);
             });
+            updateRewardsMenuBadge(); // Asegura actualización en cascada
         }
 
         function fireRewardUnlock(rewardId) {
@@ -776,8 +796,44 @@
                 
                 updateCartBadge();
                 renderRewardsSlots();
+                updateRewardsMenuBadge(); // Arreglado: Forzamos refresco del menú desplegable
                 triggerSuccessAnimation("Añadido", "Tu regalo se sumó a la cesta.");
             }
+        }
+
+        /* FUNCIÓN SOLICITADA: Resetea por completo los puntos y almacenes locales a cero */
+        function resetearTodoSistema() {
+            localStorage.clear(); // Limpia almacenamiento completo
+            
+            // Restablecimiento de variables de control en memoria
+            favoritos = [];
+            carrito = [];
+            historialCampanas = [];
+            claimedRewards = [];
+            userPoints = 0; 
+            lastSpinTime = null;
+            totalSesionesHoy = 0;
+            ultimaSesionFecha = "";
+            ofertaFlashCanceladaHoy = false;
+            activeCoupon = null;
+            activeCouponPct = 0;
+
+            // Guardado inicial a limpio
+            localStorage.setItem('ads_user_points', '0');
+            localStorage.setItem('ads_favoritos', JSON.stringify([]));
+            localStorage.setItem('ads_carrito', JSON.stringify([]));
+            localStorage.setItem('ads_historial', JSON.stringify([]));
+            localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
+
+            // Actualización integral de la UI
+            updatePointsDisplay();
+            updateCartBadge();
+            updateRewardsMenuBadge();
+            renderChannels();
+            renderRewardsSlots();
+            checkRouletteAvailability();
+            
+            triggerSuccessAnimation("Reset Completado", "Los puntos y regalos se han restablecido a 0.");
         }
 
         function renderCarousel() {
@@ -942,7 +998,7 @@
             if (filterSelect === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
             if (filterSelect === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
             if (filterSelect === 'offers') filtrados = filtrados.filter(c => c.descuento > 0);
-            if (filterSelect === 'recommended') filtrados = filtrados.filter(c => c.recomendado === true || c.destacado === true);
+            if (filterSelect === 'recommended') filtrados = filtrados.filter(c => c.recommended === true || c.destacado === true);
             
             filtrados.forEach((c) => {
                 const isFav = favoritos.includes(c.id);
@@ -1130,8 +1186,24 @@
             selectPaymentMethod(selectedPayment);
         }
 
-        function removeFromCart(uid) { carrito = carrito.filter(i => i.idUnique !== uid); localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); openCartModal(); }
-        function clearCart() { carrito = []; activeCoupon = null; activeCouponPct = 0; localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); openCartModal(); }
+        function removeFromCart(uid) { 
+            carrito = carrito.filter(i => i.idUnique !== uid); 
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
+            updateCartBadge(); 
+            updateRewardsMenuBadge(); // Asegura ajuste dinámico si eliminas regalos del carro
+            openCartModal(); 
+        }
+        
+        function clearCart() { 
+            carrito = []; 
+            activeCoupon = null; 
+            activeCouponPct = 0; 
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
+            updateCartBadge(); 
+            updateRewardsMenuBadge();
+            openCartModal(); 
+        }
+        
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
         
