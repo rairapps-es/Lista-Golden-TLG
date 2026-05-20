@@ -569,30 +569,32 @@
         function checkout() {
     if(carrito.length === 0) return alert("Tu cesta está vacía.");
 
-    let textoPedido = `¡Hola! Quiero contratar publicidad a través de tu Web App.%0A%0A`;
-    textoPedido += `📋 *RESUMEN DEL PEDIDO:*%0A`;
-    let total = 0;
+    var textoPedido = "¡Hola! Quiero contratar publicidad a través de tu Web App.%0A%0A";
+    textoPedido += "📋 *RESUMEN DEL PEDIDO:*%0A";
+    var total = 0;
 
-    // REPARADO: Ahora sí recorre y lee los datos reales de cada item en el carrito
-    carrito.forEach((item, i) => {
-        let subtotal = Number(item.precioBase);
-        let mejoras = [];
+    for (var i = 0; i < carrito.length; i++) {
+        var item = carrito[i];
+        var subtotal = Number(item.precioBase);
+        var mejoras = [];
         
         if (item.packExtra) { subtotal += 25; mejoras.push("Pack x3"); }
         if (item.fixedExtra) { subtotal += 10; mejoras.push("Fijado 24h"); }
         
         total += subtotal;
 
-        // Construye la línea con el nombre específico de ESTE canal y su subtotal real
-        textoPedido += `${i+1}. *${encodeURIComponent(item.nombre)}* [Precio: $${subtotal}] ${mejoras.length > 0 ? `(${mejoras.join(', ')})` : ''}%0A`;
-    });
+        var numItem = i + 1;
+        var textoMejoras = mejoras.length > 0 ? " (" + mejoras.join(', ') + ")" : "";
+        
+        // CORRECCIÓN RADICAL: Sin comillas invertidas, concatenación pura y dura
+        textoPedido += numItem + ". *" + encodeURIComponent(item.nombre) + "* [Precio: $" + subtotal + "]" + textoMejoras + "%0A";
+    }
 
-    textoPedido += `%0A💰 *TOTAL ESTIMADO:* $${total.toFixed(2)} USD%0A`;
-    textoPedido += `💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.`;
+    textoPedido += "%0A💰 *TOTAL ESTIMADO:* $" + total.toFixed(2) + " USD%0A";
+    textoPedido += "💳 *MÉTODOS DE PAGO DE PREFERENCIA:* PayPal, Estrellas o USDT.";
 
-    window.open(`https://t.me/${MI_TELEGRAM_USER}?text=${textoPedido}`, '_blank');
+    window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + textoPedido, "_blank");
     
-    // Opcional: Vaciar el carrito tras enviar el pedido
     carrito = [];
     localStorage.setItem('ads_carrito', JSON.stringify(carrito));
     updateCartBadge();
