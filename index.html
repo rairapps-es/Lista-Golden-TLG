@@ -70,6 +70,10 @@
             animation: floatingGift 2s ease-in-out infinite;
             font-size: 4rem;
         }
+        /* Ocultar sección de premios de forma prioritaria */
+        .hidden-rewards {
+            display: none !important;
+        }
     </style>
 </head>
 <body onclick="closeUserMenuOutside(event)">
@@ -119,6 +123,7 @@
         </div>
         
         <div class="flex items-center gap-3 relative">
+            <!-- Menú con Foto arriba -->
             <button id="user-avatar-btn" onclick="toggleUserMenu(event)" class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 p-[2px] shadow-md hover:scale-105 transition-transform cursor-pointer overflow-hidden flex items-center justify-center">
                 <img id="user-avatar-img" class="w-full h-full object-cover hidden rounded-full" src="" alt="Avatar">
                 <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">--</div>
@@ -137,7 +142,8 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="switchView('catalog'); scrollToRewards(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                <!-- Opción del Menú que activa el Módulo de Premios -->
+                <button onclick="switchView('catalog'); showAndScrollToRewards(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
@@ -194,8 +200,8 @@
             </div>
         </section>
 
-        <!-- SECCIÓN DE PREMIOS POR PUNTOS (GAMIFICACIÓN) -->
-        <section id="rewards-section" class="bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
+        <!-- SECCIÓN DE PREMIOS POR PUNTOS (Oculta al inicio usando la clase hidden-rewards) -->
+        <section id="rewards-section" class="hidden-rewards bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-1.5">
                     <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
@@ -474,7 +480,7 @@
             { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Alertas DeFi e inversiones cripto diarias en tiempo real.", destacado: true, recomendado: false },
             { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recommended: true },
             { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recomendado: true },
-            { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recomendado: false },
+            { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recommended: false },
             { id: 5, nombre: "Cine & Series Streaming", username: "cine_streaming", tipo: "Público", categoria: "Entretenimiento", subs: 195000, precioBase: 65, descuento: 10, imagen: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=150", descripcion: "Reseñas de cine, trailers y novedades de plataformas top.", destacado: false, recomendado: false }
         ];
 
@@ -696,9 +702,15 @@
             document.getElementById('rewards-points-counter').innerText = userPoints;
         }
 
-        function scrollToRewards() {
+        /* FUNCIÓN MEJORADA: Muestra el módulo de premios y hace scroll */
+        function showAndScrollToRewards() {
             const el = document.getElementById('rewards-section');
-            if(el) el.scrollIntoView({ behavior: 'smooth' });
+            if(el) {
+                el.classList.remove('hidden-rewards'); // Hace visible el módulo de premios
+                setTimeout(() => {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
         }
 
         function renderRewardsSlots() {
@@ -904,7 +916,6 @@
                                         <option value="48h" ${currentConfig.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
                                         <option value="perm" ${currentConfig.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
                                     </select>
-                                end
                                 </div>
                                 <div>
                                     <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
@@ -973,7 +984,7 @@
             const val = document.getElementById('coupon-code-input').value.trim();
             const errBox = document.getElementById('coupon-error-box');
             
-            if(val === "LISTAGOLDEN20OFF") {
+            if(val === "LISTAGGOLDEN20OFF" || val === "LISTAGOLDEN20OFF") {
                 errBox.classList.add('hidden');
                 activeCoupon = "LISTAGOLDEN20OFF";
                 activeCouponPct = 20;
