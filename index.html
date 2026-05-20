@@ -1,91 +1,467 @@
-<!-- SECCIÓN DEL CARRITO -->
-<div id="carrito-container" class="p-4 bg-white rounded-lg shadow">
-  <h2 class="text-xl font-bold mb-4">Tu Carrito de Compra</h2>
-  
-  <!-- Lista de Canales en el Carrito -->
-  <div id="lista-carrito" class="space-y-4 mb-6">
-    <!-- Ejemplo de tarjeta de canal con todas sus opciones restauradas -->
-    <div class="border p-4 rounded-md bg-gray-50" data-canal-id="123">
-      <div class="flex justify-between items-start">
-        <div>
-          <h3 class="font-bold text-lg">Canal de Tecnología Top</h3>
-          <!-- DESCRIPCIÓN RESTAURADA -->
-          <p class="text-sm text-gray-600 my-1">Canal especializado en reviews y reviews de gadgets con alta tasa de conversión.</p>
-        </div>
-        <span class="text-blue-600 font-bold" id="precio-total-canal">$50.00</span>
-      </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Canales - Corrección Completa</title>
+  <!-- Tailwind CSS para el diseño visual rápido y limpio -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .animate-spin-slow { animation: spin 8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen pb-12">
 
-      <!-- OPCIONES DE MEJORA RESTAURADAS -->
-      <div class="mt-3 pt-3 border-t border-gray-200">
-        <p class="text-xs font-semibold text-gray-500 uppercase">Opciones de Mejora (Aumenta el alcance):</p>
-        
-        <div class="flex flex-col sm:flex-row gap-4 mt-2">
-          <!-- Opción por Días -->
-          <label class="flex items-center space-x-2 text-sm bg-white p-2 border rounded cursor-pointer flex-1">
-            <input type="radio" name="mejora-123" value="dias" class="opcion-mejora" data-extra="15.00" checked>
-            <div>
-              <span class="font-medium">Plan por Días (+ $15.00)</span>
-              <p class="text-xs text-gray-400">Mantenlo activo por 3 días completos</p>
-            </div>
-          </label>
-
-          <!-- Opción por Horas Fijadas -->
-          <label class="flex items-center space-x-2 text-sm bg-white p-2 border rounded cursor-pointer flex-1">
-            <input type="radio" name="mejora-123" value="horas" class="opcion-mejora" data-extra="25.00">
-            <div>
-              <span class="font-medium">Fijado por X Horas (+ $25.00)</span>
-              <p class="text-xs text-gray-400">Fijado en el top durante 6 horas continuas</p>
-            </div>
-          </label>
-        </div>
-      </div>
+  <!-- ENCABEZADO -->
+  <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
+    <div class="container mx-auto flex flex-wrap justify-between items-center">
+      <h1 class="text-2xl font-black tracking-wider flex items-center gap-2">🚀 PLATAFORMA DE CANALES <span class="text-xs bg-yellow-400 text-blue-900 px-2 py-0.5 rounded font-bold">V2026.1</span></h1>
+      <nav class="flex gap-2 mt-2 sm:mt-0 overflow-x-auto w-full sm:w-auto">
+        <a href="#modulo-catalogo" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm font-bold transition whitespace-nowrap">📺 Catálogo</a>
+        <a href="#modulo-carrito" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm font-bold transition whitespace-nowrap">🛒 Carrito (<span id="badge-carrito">1</span>)</a>
+        <a href="#modulo-favoritos" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm font-bold transition whitespace-nowrap">❤️ Favoritos</a>
+        <a href="#modulo-campanas" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm font-bold transition whitespace-nowrap">📊 Campañas</a>
+        <a href="#modulo-ruleta" class="bg-yellow-400 text-gray-900 hover:bg-yellow-500 px-3 py-1.5 rounded text-sm font-extrabold transition whitespace-nowrap">🎁 Ruleta</a>
+      </nav>
     </div>
-  </div>
+  </header>
 
-  <!-- SELECTOR DE MÉTODO DE PAGO CORREGIDO -->
-  <div class="border-t pt-4">
-    <label for="metodo-pago" class="block text-sm font-medium text-gray-700 mb-2">Selecciona tu Método de Pago:</label>
-    <select id="metodo-pago" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 bg-white">
-      <option value="" disabled selected>-- Elige cómo quieres pagar --</option>
-      <option value="tarjeta">Tarjeta de Crédito / Débito</option>
-      <option value="paypal">PayPal</option>
-      <option value="crypto">Criptomonedas</option>
-      <option value="saldo">Saldo de la Cuenta</option>
-    </select>
-  </div>
+  <main class="container mx-auto px-4 mt-8 space-y-12">
 
-  <button id="btn-proceder-pago" class="w-full mt-4 bg-green-600 text-white p-3 rounded-md font-bold hover:bg-green-700 transition">
-    Proceder al Pago
-  </button>
-</div>
+    <!-- 5. CATÁLOGO DE CANALES (CON FILTROS Y TARJETAS PREMIUM) -->
+    <section id="modulo-catalogo" class="bg-white p-6 rounded-xl shadow-sm">
+      <div class="flex flex-col md:flex-row gap-4 items-center justify-between border-b pb-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-gray-800">📺 Catálogo General de Canales</h2>
+          <p class="text-sm text-gray-500">Encuentra los mejores canales para tus campañas publicitarias.</p>
+        </div>
+        
+        <!-- SELECTOR DE FILTROS ACTUALIZADO -->
+        <div class="w-full md:w-80">
+          <label for="filtro-catalogo" class="block text-xs font-bold text-gray-500 uppercase mb-1">Filtrar Canales:</label>
+          <select id="filtro-catalogo" onchange="filtrarCatalogo()" class="w-full p-2.5 border border-gray-300 rounded-lg bg-gray-50 text-sm font-medium focus:ring-2 focus:ring-blue-500">
+            <!-- Palabra "Filtrar" añadida en la primera opción -->
+            <option value="todos">Filtrar: Todos los canales</option>
+            <option value="oferta-activa">🔥 Filtrar: Con Oferta Activa</option>
+            <option value="recomendados">⭐ Filtrar: Canales Recomendados (Potenciador)</option>
+          </select>
+        </div>
+      </div>
 
-<script>
-  // Lógica para que el selector funcione y capte los cambios de precio de las mejoras
-  document.addEventListener('DOMContentLoaded', () => {
-    const selectorPago = document.getElementById('metodo-pago');
-    const btnPago = document.getElementById('btn-proceder-pago');
+      <!-- Aviso informativo del Potenciador para propietarios -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-900 p-4 rounded-lg text-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <strong class="text-blue-700 block sm:inline">⚡ Potenciador de Visibilidad:</strong>
+          ¿Eres propietario? Resalta tu anuncio por 7 días o 1 mes completo para vender más rápido.
+        </div>
+        <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded shadow-sm self-start sm:self-center">¡Disponible ya!</span>
+      </div>
 
-    // Listener del selector de pago corrigiendo el bloqueo anterior
-    selectorPago.addEventListener('change', (e) => {
-      console.log(`Método de pago seleccionado de forma efectiva: ${e.target.value}`);
-    });
+      <!-- Rejilla de tarjetas del catálogo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="lista-catalogo">
+        
+        <!-- TARJETA PREMIUM / DESTACADO -->
+        <div class="card-canal border-2 border-yellow-400 bg-gradient-to-b from-yellow-50/60 to-white rounded-xl p-5 shadow-sm relative flex flex-col justify-between transform hover:-translate-y-1 transition duration-200" data-tipo="recomendados oferta-activa">
+          <!-- Etiqueta llamativa solicitada -->
+          <div class="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-[11px] font-black px-3 py-1 rounded-bl-lg tracking-wider shadow flex items-center gap-1">
+            🚀 DESTACADO
+          </div>
+          <div class="mt-2">
+            <span class="text-[10px] bg-yellow-200 text-yellow-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">⭐ Recomendado por 1 Mes</span>
+            <h3 class="font-extrabold text-xl text-gray-900 mt-1">Crypto & Tech World</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Suscritos: 340K | Engagement: 9.2%</p>
+            <p class="text-sm text-gray-600 mt-2">Canal premium verificado enfocado en finanzas, desarrollo de software y noticias del ecosistema cripto.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-dashed flex justify-between items-center">
+            <div>
+              <span class="text-xs text-gray-400 line-through block">$120.00</span>
+              <span class="text-xl font-black text-green-600">$89.00 <span class="text-[10px] bg-red-100 text-red-600 font-bold px-1 py-0.5 rounded ml-1">¡OFERTA!</span></span>
+            </div>
+            <button onclick="simularAgregarCarrito('Crypto & Tech World', 89)" class="bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">Añadir</button>
+          </div>
+        </div>
 
-    // Listener para actualizar precios según las opciones de mejora seleccionadas
-    document.querySelectorAll('.opcion-mejora').forEach(radio => {
-      radio.addEventListener('change', function() {
-        const precioBase = 50.00; // Ejemplo dinámico
-        const extra = parseFloat(this.getAttribute('data-extra'));
-        const totalContenedor = this.closest('[data-canal-id]').querySelector('#precio-total-canal');
-        totalContenedor.textContent = `$${(precioBase + extra).toFixed(2)}`;
+        <!-- TARJETA CON OFERTA ACTIVA -->
+        <div class="card-canal border border-gray-200 bg-white rounded-xl p-5 shadow-sm flex flex-col justify-between transform hover:-translate-y-1 transition duration-200" data-tipo="oferta-activa">
+          <div>
+            <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">🔥 Oferta Temporal</span>
+            <h3 class="font-bold text-lg text-gray-800 mt-1">Cocina Express con Lucía</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Suscritos: 85K | Engagement: 5.4%</p>
+            <p class="text-sm text-gray-600 mt-2">Vídeos cortos y dinámicos de recetas para estudiantes y personas ocupadas con alta retención de audiencia.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t flex justify-between items-center">
+            <div>
+              <span class="text-xs text-gray-400 line-through block">$45.00</span>
+              <span class="text-xl font-bold text-green-600">$29.00</span>
+            </div>
+            <button onclick="simularAgregarCarrito('Cocina Express con Lucía', 29)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">Añadir</button>
+          </div>
+        </div>
+
+        <!-- TARJETA NORMAL COMPRADA POR PROPIETARIO CON POTENCIADOR 7 DÍAS -->
+        <div class="card-canal border-2 border-yellow-400 bg-white rounded-xl p-5 shadow-sm relative flex flex-col justify-between transform hover:-translate-y-1 transition duration-200" data-tipo="recomendados">
+          <!-- Etiqueta llamativa solicitada -->
+          <div class="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-[11px] font-black px-3 py-1 rounded-bl-lg tracking-wider shadow flex items-center gap-1">
+            🚀 DESTACADO
+          </div>
+          <div class="mt-2">
+            <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">⭐ Recomendado por 7 Días</span>
+            <h3 class="font-bold text-lg text-gray-800 mt-1">Moda & Estilo Minimalista</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Suscritos: 110K | Engagement: 7.1%</p>
+            <p class="text-sm text-gray-600 mt-2">Audiencia mayoritariamente femenina interesada en tendencias ecológicas y marcas de diseño independiente.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t flex justify-between items-center">
+            <span class="text-xl font-bold text-gray-800">$65.00</span>
+            <button onclick="simularAgregarCarrito('Moda & Estilo Minimalista', 65)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">Añadir</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- 1. MODULO CARRITO (SELECTOR DE PAGO CORREGIDO Y OPCIONES) -->
+      <section id="modulo-carrito" class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2 space-y-6">
+        <div>
+          <h2 class="text-2xl font-black text-gray-800">🛒 Tu Carrito de Compra</h2>
+          <p class="text-sm text-gray-500">Configura las mejoras y completa la transacción de forma segura.</p>
+        </div>
+
+        <!-- Tarjeta de Canal en Carrito -->
+        <div class="border border-gray-200 p-4 rounded-xl bg-gray-50/50" data-base-price="50.00">
+          <div class="flex flex-wrap justify-between items-start gap-2">
+            <div>
+              <h3 class="font-extrabold text-lg text-gray-800">Canal de Tecnología Avanzada</h3>
+              <!-- DESCRIPCIÓN RESTAURADA -->
+              <p class="text-sm text-gray-600 mt-1">Canal enfocado en reseñas de hardware informático, setups de productividad y comparativas minuciosas.</p>
+            </div>
+            <!-- TOTAL ACTUALIZADO DINÁMICAMENTE -->
+            <span class="text-xl font-black text-blue-600" id="precio-dinamico-canal">$50.00</span>
+          </div>
+
+          <!-- OPCIONES DE MEJORAS RESTAURADAS PARA INCREMENTAR PRECIO -->
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Mejoras de Posicionamiento Disponibles:</span>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Opción Base -->
+              <label class="flex items-center space-x-3 text-sm bg-white p-3 border rounded-xl cursor-pointer hover:border-blue-500 transition shadow-sm">
+                <input type="radio" name="mejora-canal" value="0" checked onchange="actualizarPrecioCarrito(0)" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                <div>
+                  <span class="font-bold text-gray-800">Estándar</span>
+                  <p class="text-[11px] text-gray-400">Publicación básica sin fijar</p>
+                </div>
+              </label>
+
+              <!-- Opción por Días -->
+              <label class="flex items-center space-x-3 text-sm bg-white p-3 border rounded-xl cursor-pointer hover:border-blue-500 transition shadow-sm">
+                <input type="radio" name="mejora-canal" value="15" onchange="actualizarPrecioCarrito(15)" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                <div>
+                  <span class="font-bold text-gray-800">Por Días (+ $15)</span>
+                  <p class="text-[11px] text-gray-400">Activo durante 3 días</p>
+                </div>
+              </label>
+
+              <!-- Opción Fijado por X Horas -->
+              <label class="flex items-center space-x-3 text-sm bg-white p-3 border rounded-xl cursor-pointer hover:border-blue-500 transition shadow-sm">
+                <input type="radio" name="mejora-canal" value="25" onchange="actualizarPrecioCarrito(25)" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                <div>
+                  <span class="font-bold text-gray-800">Fijado X Horas (+ $25)</span>
+                  <p class="text-[11px] text-gray-400">Destacado al inicio por 6h</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- CORRECCIÓN: SELECTOR DE MÉTODO DE PAGO TOTALMENTE FUNCIONAL -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <label for="metodo-pago-carrito" class="block text-sm font-bold text-gray-700 mb-2">💳 Selecciona tu Método de Pago de forma obligatoria:</label>
+          <select id="metodo-pago-carrito" class="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 shadow-sm">
+            <option value="" disabled selected>-- Por favor, elige cómo deseas abonar --</option>
+            <option value="tarjeta">💳 Tarjeta de Crédito o Débito Internacional</option>
+            <option value="paypal">🅿 PayPal Checkout</option>
+            <option value="crypto">🪙 Bitcoin / USDT Web3 Wallet</option>
+            <option value="saldo">💰 Fondo disponible del Saldo de Cuenta</option>
+          </select>
+        </div>
+
+        <button onclick="procesarPagoCarrito()" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-extrabold text-lg transition tracking-wide shadow-md">
+          Pagar y Procesar Pedido
+        </button>
+      </section>
+
+      <!-- 4. SISTEMA DE LA RULETA DIARIA INTERACTIVA -->
+      <section id="modulo-ruleta" class="bg-gray-900 text-white p-6 rounded-xl shadow-md text-center flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-center gap-1.5 mb-1">
+            <span class="text-xl">🎁</span>
+            <h2 class="text-xl font-black text-yellow-400 uppercase tracking-wide">Ruleta de Premios</h2>
+          </div>
+          <p class="text-xs text-gray-400">Tirada diaria gratuita disponible</p>
+          
+          <div class="bg-gray-800/80 rounded-lg py-2 px-4 inline-block mt-3 border border-gray-700">
+            <p class="text-[11px] uppercase font-bold text-gray-400 tracking-wider">Tu puntuación acumulada</p>
+            <p id="puntos-acumulados" class="text-2xl font-black text-yellow-400">1,250 <span class="text-xs text-white font-normal">pts</span></p>
+          </div>
+        </div>
+
+        <!-- CONTENEDOR DE LA RULETA ACTIVA -->
+        <div id="contenedor-ruleta-grafica" class="py-6 space-y-4">
+          <div class="w-40 h-40 border-4 border-yellow-400 rounded-full mx-auto flex items-center justify-center bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-500 animate-spin-slow relative shadow-lg shadow-indigo-500/20">
+            <div class="w-2 h-10 bg-yellow-400 absolute top-0 rounded-full origin-bottom"></div>
+            <span class="font-black text-sm tracking-widest text-white drop-shadow-md">SUERTE</span>
+          </div>
+          <button onclick="ejecutarTiradaRuleta()" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-gray-900 font-black py-3 px-6 rounded-xl transition shadow transform active:scale-95 uppercase tracking-wide text-sm">
+            🎯 ¡Girar Ruleta Ahora!
+          </button>
+        </div>
+
+        <!-- CONTENEDOR DEL BOTÓN LLAMATIVO BLOQUEADO (CUANDO YA SE USÓ) -->
+        <div id="contenedor-ruleta-bloqueada" class="hidden py-8 space-y-3">
+          <div class="text-4xl animate-bounce">🔒</div>
+          <button disabled class="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-black py-3.5 px-4 rounded-xl opacity-80 cursor-not-allowed uppercase tracking-wider text-xs shadow-inner">
+            Tirada Diaria Agotada
+          </button>
+          <p class="text-[11px] text-gray-400 italic bg-gray-800 p-2 rounded-md border border-gray-700">La ruleta volverá a activarse de forma automática mañana. Tus puntos están a salvo.</p>
+          <button onclick="simularSiguienteDia()" class="mt-2 text-xs text-blue-400 hover:underline block mx-auto pt-2">🔄 (Simular paso al día siguiente)</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 2. PÁGINA DE FAVORITOS (RESTAURADO CON CARDS COMPLETAS E INFORMACIÓN CLAVE) -->
+    <section id="modulo-favoritos" class="bg-white p-6 rounded-xl shadow-sm">
+      <div>
+        <h2 class="text-2xl font-black text-gray-800 mb-1">❤️ Tus Canales Guardados en Favoritos</h2>
+        <p class="text-sm text-gray-500 mb-6">Listado rápido de tus canales de interés con acceso a carrito directo.</p>
+      </div>
+
+      <div id="contenedor-favoritos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Tarjeta de Favorito Completa Restaurada -->
+        <div class="border border-gray-200 rounded-xl p-5 bg-white flex flex-col justify-between shadow-sm relative hover:border-blue-300 transition" id="tarjeta-fav-1">
+          <div>
+            <div class="flex justify-between items-start gap-2">
+              <h3 class="font-extrabold text-lg text-gray-900">Gaming Alpha Squad</h3>
+              <span class="text-[11px] font-bold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">Videojuegos</span>
+            </div>
+            <!-- INFORMACIÓN IMPORTANTE RESTAURADA -->
+            <p class="text-xs text-gray-400 mt-1">Suscriptores: 610K | Plataforma: YouTube</p>
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 my-3">
+              <p class="text-xs text-gray-600 font-medium"><strong>Información Clave:</strong> Audiencia centrada en streams nocturnos, un 80% de público hispanohablante entre 18 y 25 años.</p>
+            </div>
+            <p class="text-lg font-black text-gray-900">$75.00 <span class="text-xs font-normal text-gray-400">/ Post Integrado</span></p>
+          </div>
+          
+          <!-- BOTÓN AÑADIR AL CARRITO RESTAURADO -->
+          <div class="mt-4 flex gap-2 pt-3 border-t">
+            <button onclick="simularAgregarCarrito('Gaming Alpha Squad', 75)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+              🛒 Añadir al Carrito
+            </button>
+            <button onclick="quitarDeFavoritos('tarjeta-fav-1')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 border border-gray-200 rounded-lg transition" title="Remover de mi lista">
+              🗑
+            </button>
+          </div>
+        </div>
+
+        <!-- Segunda Tarjeta de Favorito Completa Restaurada -->
+        <div class="border border-gray-200 rounded-xl p-5 bg-white flex flex-col justify-between shadow-sm relative hover:border-blue-300 transition" id="tarjeta-fav-2">
+          <div>
+            <div class="flex justify-between items-start gap-2">
+              <h3 class="font-extrabold text-lg text-gray-900">Emprende y Viaja</h3>
+              <span class="text-[11px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">Negocios</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Suscriptores: 120K | Plataforma: Instagram</p>
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 my-3">
+              <p class="text-xs text-gray-600 font-medium"><strong>Información Clave:</strong> Publicaciones en formato reel diario enfocados en nómadas digitales y finanzas personales.</p>
+            </div>
+            <p class="text-lg font-black text-gray-900">$40.00 <span class="text-xs font-normal text-gray-400">/ Post Integrado</span></p>
+          </div>
+          
+          <!-- BOTÓN AÑADIR AL CARRITO RESTAURADO -->
+          <div class="mt-4 flex gap-2 pt-3 border-t">
+            <button onclick="simularAgregarCarrito('Emprende y Viaja', 40)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+              🛒 Añadir al Carrito
+            </button>
+            <button onclick="quitarDeFavoritos('tarjeta-fav-2')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 border border-gray-200 rounded-lg transition" title="Remover de mi lista">
+              🗑
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. APARTADO CAMPAÑAS (HISTORIAL CON ACCIONES CORREGIDAS) -->
+    <section id="modulo-campanas" class="bg-white p-6 rounded-xl shadow-sm">
+      <div class="mb-4">
+        <h2 class="text-2xl font-black text-gray-800">📊 Control e Historial de Campañas</h2>
+        <p class="text-sm text-gray-500">Mueve campañas finalizadas a completadas o realiza limpiezas de registro.</p>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-gray-200">
+        <table class="w-full text-left border-collapse bg-white">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-wider">
+              <th class="p-4">Detalles de Campaña</th>
+              <th class="p-4">Canal Asociado</th>
+              <th class="p-4">Estado Actual</th>
+              <th class="p-4 text-right">Acciones Disponibles</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            
+            <!-- CAMPAÑA 1 -->
+            <tr id="fila-campaña-101" class="hover:bg-gray-50/80 transition">
+              <td class="p-4">
+                <p class="font-bold text-gray-900">Black Friday Promoción</p>
+                <span class="text-xs text-gray-400 font-mono">ID: #CAMP-101</span>
+              </td>
+              <td class="p-4 font-medium text-gray-600">Crypto & Tech World</td>
+              <td class="p-4">
+                <span id="badge-estado-101" class="px-2.5 py-1 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                  Finalizada
+                </span>
+              </td>
+              <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                <!-- BOTÓN COMPLETAR RESTAURADO -->
+                <button onclick="cambiarCampañaACompletado('101')" id="btn-completar-101" class="bg-green-500 hover:bg-green-600 text-white text-xs font-extrabold py-2 px-3 rounded-lg transition shadow-sm">
+                  ✔ Confirmar y Completar
+                </button>
+                <!-- BOTÓN ELIMINAR RESTAURADO -->
+                <button onclick="eliminarCampañaHistorial('fila-campaña-101')" class="bg-gray-100 hover:bg-red-500 text-gray-700 hover:text-white text-xs font-bold py-2 px-3 rounded-lg transition border border-gray-200 hover:border-red-500">
+                  🗑 Eliminar del Historial
+                </button>
+              </td>
+            </tr>
+
+            <!-- CAMPAÑA 2 -->
+            <tr id="fila-campaña-102" class="hover:bg-gray-50/80 transition">
+              <td class="p-4">
+                <p class="font-bold text-gray-900">Campaña Branding Primavera</p>
+                <span class="text-xs text-gray-400 font-mono">ID: #CAMP-102</span>
+              </td>
+              <td class="p-4 font-medium text-gray-600">Cocina Express con Lucía</td>
+              <td class="p-4">
+                <span id="badge-estado-102" class="px-2.5 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
+                  Completado
+                </span>
+              </td>
+              <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                <!-- Botón completar ya no es necesario aquí debido a su estado primario -->
+                <button onclick="eliminarCampañaHistorial('fila-campaña-102')" class="bg-gray-100 hover:bg-red-500 text-gray-700 hover:text-white text-xs font-bold py-2 px-3 rounded-lg transition border border-gray-200 hover:border-red-500">
+                  🗑 Eliminar del Historial
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LÓGICA DE JAVASCRIPT GLOBAL UNIFICADA -->
+  <script>
+    // --- LÓGICA DEL CATÁLOGO Y FILTROS ---
+    function filtrarCatalogo() {
+      const filtroSeleccionado = document.getElementById('filtro-catalogo').value;
+      const tarjetas = document.querySelectorAll('.card-canal');
+
+      tarjetas.forEach(tarjeta => {
+        const tiposTarjeta = tarjeta.getAttribute('data-tipo') || '';
+        
+        if (filtroSeleccionado === 'todos') {
+          tarjeta.style.display = 'flex';
+        } else if (tiposTarjeta.includes(filtroSeleccionado)) {
+          tarjeta.style.display = 'flex';
+        } else {
+          tarjeta.style.display = 'none';
+        }
       });
-    });
+    }
 
-    btnPago.addEventListener('click', () => {
+    // --- LÓGICA DEL CARRITO, PRECIOS Y OPCIONES DE MEJORA ---
+    function actualizarPrecioCarrito(extraPrecio) {
+      const precioBase = 50.00;
+      const nuevoTotal = precioBase + parseFloat(extraPrecio);
+      document.getElementById('precio-dinamico-canal').textContent = `$${nuevoTotal.toFixed(2)}`;
+    }
+
+    function procesarPagoCarrito() {
+      const selectorPago = document.getElementById('metodo-pago-carrito');
+      
+      // Corrección del bloqueo de validación
       if (!selectorPago.value) {
-        alert('Por favor, selecciona un método de pago antes de continuar.');
+        alert('❌ ERROR: Debes seleccionar un método de pago en el listado para poder continuar.');
+        selectorPago.focus();
         return;
       }
-      alert(`Procesando compra con: ${selectorPago.value}`);
-    });
-  });
-</script>
+
+      alert(`✅ ¡PAGO EXITOSO! Procesado correctamente con el método: ${selectorPago.value.toUpperCase()}. Tus mejoras han sido aplicadas.`);
+    }
+
+    function simularAgregarCarrito(nombre, precio) {
+      alert(`🛒 "${nombre}" se simula añadido con éxito al carrito por un importe base de $${precio}.00`);
+      const badge = document.getElementById('badge-carrito');
+      badge.textContent = parseInt(badge.textContent) + 1;
+    }
+
+    // --- LÓGICA DE FAVORITOS ---
+    function quitarDeFavoritos(idComponente) {
+      if (confirm('¿Deseas quitar este canal de tu lista de favoritos?')) {
+        document.getElementById(idComponente).remove();
+      }
+    }
+
+    // --- LÓGICA DE GESTIÓN DE CAMPAÑAS ---
+    function cambiarCampañaACompletado(idCampaña) {
+      const badgeEstado = document.getElementById(`badge-estado-${idCampaña}`);
+      const botonCompletar = document.getElementById(`btn-completar-${idCampaña}`);
+
+      if (badgeEstado) {
+        badgeEstado.className = "px-2.5 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800 border border-green-200";
+        badgeEstado.textContent = "Completado";
+      }
+      
+      if (botonCompletar) {
+        botonCompletar.remove(); // Desaparece al procesar la acción
+      }
+
+      alert(`⚡ Registro actualizado: La campaña #CAMP-${idCampaña} pasó al estado COMPLETADO.`);
+    }
+
+    function eliminarCampañaHistorial(idFila) {
+      if (confirm('¿Seguro que deseas eliminar definitivamente esta campaña del registro de tu historial?')) {
+        document.getElementById(idFila).remove();
+      }
+    }
+
+    // --- LÓGICA INTERACTIVA DE LA RULETA DIARIA ---
+    let totalPuntos = 1250;
+
+    function ejecutarTiradaRuleta() {
+      alert("🎰 ¡La ruleta está girando...! Enhorabuena, has ganado +250 puntos de recompensa.");
+      
+      // Actualizar marcador
+      totalPuntos += 250;
+      document.getElementById('puntos-acumulados').innerHTML = `${totalPuntos} <span class="text-xs text-white font-normal">pts</span>`;
+      
+      // Intercambiar visibilidad de los contenedores solicitados
+      document.getElementById('contenedor-ruleta-grafica').classList.add('hidden');
+      document.getElementById('contenedor-ruleta-bloqueada').classList.remove('hidden');
+    }
+
+    function simularSiguienteDia() {
+      // Devuelve la ruleta al estado inicial pero manteniendo los puntos guardados
+      document.getElementById('contenedor-ruleta-grafica').classList.remove('hidden');
+      document.getElementById('contenedor-ruleta-bloqueada').classList.add('hidden');
+      alert("🔄 Simulación completada: Es un nuevo día, la ruleta se ha desbloqueado y conserva tus " + totalPuntos + " puntos.");
+    }
+  </script>
+</body>
+</html>
