@@ -336,7 +336,7 @@
         <h2 class="text-base font-black text-slate-200 text-center uppercase tracking-wide">Garantía y Soporte</h2>
         <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-xs text-slate-300 space-y-2">
             <p class="font-bold text-white">¿Cuánto tiempo tarda en publicarse mi anuncio?</p>
-            <p>Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 horas. Recibirás un enlace directo de confirmación cuando esté arriba.</p>
+            <p>Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 hours. Recibirás un enlace directo de confirmación cuando esté arriba.</p>
         </div>
     </main>
 
@@ -407,7 +407,7 @@
                 <div id="payment-method-section" class="space-y-2">
                     <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Selecciona Método de Pago:</p>
                     <div class="grid grid-cols-3 gap-2">
-                        <!-- Corregidos los selectores onclick y targets correctos -->
+                        <!-- Clases base cambiadas a borde e iconos estándar invisibles/opacos -->
                         <button type="button" onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
                             <i class="fa-brands fa-paypal text-sky-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">PayPal</span>
                         </button>
@@ -437,7 +437,7 @@
         // Base de datos de canales expandida con descripciones, mejoras de precio (duración/fijado) y marcas de Destacados/Recomendados.
         const canalesData = [
             { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Alertas DeFi e inversiones cripto diarias en tiempo real.", destacado: true, recomendado: false },
-            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recomendado: true },
+            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recommended: true },
             { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recomendado: true },
             { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recomendado: false },
             { id: 5, nombre: "Cine & Series Streaming", username: "cine_streaming", tipo: "Público", categoria: "Entretenimiento", subs: 195000, precioBase: 65, descuento: 10, imagen: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=150", descripcion: "Reseñas de cine, trailers y novedades de plataformas top.", destacado: false, recomendado: false }
@@ -596,7 +596,6 @@
             }, 14000);
         }
 
-        // CORRECCIÓN RULETA: Visibilidad Alternada Inteligente y Persistencia de Estado Sin Desaparecer la puntuación
         function checkRouletteAvailability() {
             const now = Date.now();
             const btnFlotante = document.getElementById('floating-roulette-trigger');
@@ -669,14 +668,12 @@
         function nextCarousel() { currentCarouselIndex = (currentCarouselIndex + 1) % canalesData.length; renderCarousel(); }
         function prevCarousel() { currentCarouselIndex = (currentCarouselIndex - 1 + canalesData.length) % canalesData.length; renderCarousel(); }
 
-        // GESTIÓN INTEGRAL DE CAMBIOS DE CONFIGURACIÓN DE PRECIO (DURACIÓN / FIJADO)
         function updateMejora(canalId, tipoMejora, valor) {
             if (!mejorasSeleccionadas[canalId]) {
                 mejorasSeleccionadas[canalId] = { duracion: '24h', fijado: 'no' };
             }
             mejorasSeleccionadas[canalId][tipoMejora] = valor;
             
-            // Recalcular dinámicamente etiquetas visuales de precios en la UI de forma local
             const contenedorPrecio = document.getElementById(`precio-display-${canalId}`);
             if (contenedorPrecio) {
                 const canal = canalesData.find(c => c.id === canalId);
@@ -695,9 +692,7 @@
             return extra;
         }
 
-        // MAQUETADOR COMPLETO DE TARJETAS (REUTILIZADO EN CATÁLOGO Y FAVORITOS)
         function buildChannelCardHTML(c, isFav) {
-            // Evaluador de Etiquetas Nuevas: Destacado (Cohete) o Recomendado
             let etiquetaHtml = '';
             let bordeResaltado = 'border-slate-700/60';
             let fondoResaltado = 'bg-slate-800/40';
@@ -711,7 +706,6 @@
                 bordeResaltado = 'border-sky-500/40';
             }
 
-            // Inicializar opciones si no existen
             if (!mejorasSeleccionadas[c.id]) {
                 mejorasSeleccionadas[c.id] = { duracion: '24h', fijado: 'no' };
             }
@@ -733,10 +727,8 @@
                             <button onclick="toggleFav(${c.id})" class="text-xs text-${isFav ? 'amber-400' : 'slate-600'} cursor-pointer"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
                         </div>
                         
-                        <!-- Descripción Solicitada Añadida -->
                         <p class="text-[11px] text-slate-400 mt-2 line-clamp-2 italic">${c.descripcion}</p>
 
-                        <!-- Panel de Mejoras Personalizadas de Campaña -->
                         <div class="mt-2.5 pt-2 border-t border-slate-800/60 grid grid-cols-2 gap-2 text-[10px]">
                             <div>
                                 <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
@@ -774,7 +766,6 @@
             `;
         }
 
-        // RENDER DE CANALES CON FILTROS ACTUALIZADOS
         function renderChannels() {
             const container = document.getElementById('channels-container');
             if(!container) return;
@@ -941,6 +932,8 @@
                 document.getElementById('cart-total').innerText = `$${sub.toFixed(2)} USD`;
                 document.getElementById('coupon-display-area').classList.add('hidden');
             }
+            
+            // CORREGIDO: Fuerza el refresco visual de los botones cada vez que el modal se reconstruye
             selectPaymentMethod(selectedPayment);
         }
 
@@ -949,15 +942,23 @@
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
         
-        // CORRECCIÓN SELECCIÓN MÉTODO DE PAGO: Habilitado cambio de estados visuales y selectores funcionales
+        // CORRECCIÓN SELECCIÓN MÉTODO DE PAGO: Limpia los estados inactivos y añade correctamente el foco visual al seleccionado
         function selectPaymentMethod(m) { 
             selectedPayment = m; 
+            
+            // 1. Limpiamos las clases visuales activas volviendo todos los botones a su borde gris base (inactivo)
             document.querySelectorAll('.pay-btn').forEach(b => {
                 b.classList.remove('border-sky-400', 'bg-sky-500/10');
+                b.classList.add('border-slate-800', 'bg-slate-900');
             });
+            
+            // 2. Buscamos el ID correcto del botón presionado
             const btnId = m === 'PayPal' ? 'pay-PayPal' : (m === 'Telegram Stars' ? 'pay-Stars' : 'pay-USDT');
             const targetBtn = document.getElementById(btnId);
+            
+            // 3. Reemplazamos las clases por las del borde activo (celeste brillante)
             if(targetBtn) {
+                targetBtn.classList.remove('border-slate-800', 'bg-slate-900');
                 targetBtn.classList.add('border-sky-400', 'bg-sky-500/10');
             }
         }
@@ -977,7 +978,7 @@
                 } else {
                     const canal = canalesData.find(c => c.id === item.idCanalOriginal);
                     if(canal) {
-                        txt += `${index+1}. *${canal.nombre}* (${item.detallesMejora}) - $${item.precioCalculated?.toFixed(2) || item.precioCalculado.toFixed(2)} USD\n`;
+                        txt += `${index+1}. *${canal.nombre}* (${item.detallesMejora}) - $${item.precioCalculado.toFixed(2)} USD\n`;
                         hist.push(`${canal.nombre} (${item.detallesMejora})`);
                     }
                 }
@@ -997,7 +998,6 @@
             clearCart(); closeCartModal();
         }
 
-        // CONTROLADORES DE NAVEGACIÓN GENERAL (PAGINACIÓN)
         function switchView(view) {
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
             document.getElementById('view-catalog').classList.add('hidden');
@@ -1017,7 +1017,6 @@
         function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
         function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
         
-        // CORRECCIÓN FAVORITOS: Tarjetas completas con descripciones, mejoras y adición directa al carro
         function renderFavorites() { 
             const container = document.getElementById('favorites-container'); 
             if(!container) return; 
@@ -1033,7 +1032,6 @@
         }
         function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
         
-        // CORRECCIÓN CAMPAÑAS: Botones interactivos para Completar campaña y Eliminar de forma individual
         function renderCampaigns() {
             const container = document.getElementById('campaigns-container'); if(!container) return; container.innerHTML = '';
             if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-slate-500 text-center py-4 text-xs">Sin registros de campañas activas o pasadas.</p>`; return; }
@@ -1069,7 +1067,7 @@
             historialCampanas = historialCampanas.map(c => c.idCamp === idCamp ? { ...c, estado: 'completado' } : c);
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
             renderCampaigns();
-            triggerSuccessAnimation("Campana Completada", "El estado ha sido actualizado con éxito.");
+            triggerSuccessAnimation("Campaña Completada", "El estado ha sido actualizado con éxito.");
         }
 
         function deleteCampaign(idCamp) {
