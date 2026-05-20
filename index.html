@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Golden Ads</title>
+    <title>Lista Golden Ads Pro</title>
     <!-- SDK Oficial de Telegram WebApps -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS -->
@@ -38,6 +38,10 @@
         .animate-fade-in {
             animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        /* Animación para la Ruleta */
+        .wheel-transition {
+            transition: transform 4s cubic-bezier(0.25, 1, 0.2, 1);
+        }
     </style>
 </head>
 <body onclick="closeUserMenuOutside(event)">
@@ -66,14 +70,15 @@
     <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800/80 shadow-xl">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
-            <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Golden Ads</h1>
+            <div class="flex flex-col">
+                <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent leading-none">Golden Ads</h1>
+                <span class="text-[10px] text-amber-400 font-bold mt-0.5"><i class="fa-solid fa-coins mr-1"></i><span id="header-points-display">0</span> Pts</span>
+            </div>
         </div>
         
         <div class="flex items-center gap-3 relative">
             <button id="user-avatar-btn" onclick="toggleUserMenu(event)" class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 p-[2px] shadow-md hover:scale-105 transition-transform cursor-pointer">
-                <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">
-                    --
-                </div>
+                <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">--</div>
             </button>
 
             <div id="user-dropdown" class="absolute right-0 top-12 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 hidden z-50 animate-fade-in">
@@ -136,19 +141,49 @@
             </div>
         </section>
 
-        <!-- ¡NUEVO! BOTÓN AGREGA TU CANAL Y GANA DINERO -->
-        <section class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl shadow-orange-500/10">
-            <button onclick="openAddChannelModal()" class="w-full bg-slate-900 hover:bg-slate-850/80 p-3.5 rounded-[15px] flex items-center justify-between transition-colors cursor-pointer text-left">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20 shadow-inner">
-                        💸
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Tienes un canal de Telegram?</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">¡Agrega tu espacio publicitario y gana dinero!</p>
+        <!-- SECCIÓN DE LA RULETA DIARIA INTERACTIVA -->
+        <section class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-center gap-6">
+            <div class="relative w-44 h-44 flex-shrink-0 flex items-center justify-center">
+                <!-- Flecha Marcadora Superior -->
+                <div class="absolute top-0 z-20 text-amber-400 text-xl -mt-2 drop-shadow-md"><i class="fa-solid fa-caret-down"></i></div>
+                <!-- Disco de la Ruleta Simulado de Forma Elegante -->
+                <div id="roulette-wheel" class="w-full h-full rounded-full border-4 border-slate-800 bg-gradient-to-tr from-indigo-900 via-slate-900 to-slate-850 relative overflow-hidden flex items-center justify-center wheel-transition">
+                    <div class="absolute inset-0 rounded-full opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-sky-400 via-transparent to-transparent"></div>
+                    <div class="text-center font-black text-[11px] tracking-tight space-y-1 select-none text-slate-400">
+                        <div class="text-slate-200">💎 LUCK WHEEL</div>
+                        <div class="text-[9px] text-amber-500">10, 25, 50, 100, 250 Pts</div>
                     </div>
                 </div>
-                <span class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-xl shadow-md">Empezar</span>
+                <!-- Botón de Giro Central -->
+                <button id="spin-btn" onclick="spinRoulette()" class="absolute w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full border-4 border-slate-950 flex items-center justify-center font-black text-[10px] text-slate-950 shadow-xl tracking-tighter uppercase cursor-pointer hover:scale-105 transition-transform z-10">GIRAR</button>
+            </div>
+            <div class="flex-1 space-y-2 text-center md:text-left">
+                <h4 class="text-xs font-black uppercase text-slate-200 tracking-wider flex items-center justify-center md:justify-start gap-1.5">
+                    <i class="fa-solid fa-circle-dot text-amber-400 text-[10px] animate-ping"></i> Ruleta de la Fortuna Diaria
+                </h4>
+                <p class="text-[11px] text-slate-400 leading-relaxed">¡Gira gratis cada 24h para acumular puntos! Consigue <strong class="text-amber-400">500 puntos</strong> y desbloquearás un <strong class="text-emerald-400">ANUNCIO 100% GRATIS</strong> canjeable en tu cesta en cualquier momento.</p>
+                <div class="pt-1 flex items-center justify-center md:justify-start gap-3">
+                    <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-[11px]">
+                        <span class="text-slate-400 font-medium">Tus Puntos:</span>
+                        <strong id="user-points-display" class="text-amber-400 font-black ml-1">0</strong> <span class="text-[9px] text-slate-500">/ 500</span>
+                    </div>
+                    <span id="spin-timer-display" class="text-[10px] text-slate-500 italic">Listo para girar</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTÓN AGREGA TU CANAL (CONTROLADO POR TIEMPO) -->
+        <section id="banner-add-channel" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl shadow-orange-500/10 hidden relative">
+            <button onclick="closeBannerPermanently(event)" class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/40 text-slate-300 flex items-center justify-center text-[10px] hover:bg-black/60 z-10 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="openAddChannelModal()" class="w-full bg-slate-900 hover:bg-slate-850/80 p-3.5 rounded-[15px] flex items-center justify-between transition-colors cursor-pointer text-left pr-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20 shadow-inner">💸</div>
+                    <div>
+                        <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Tienes un canal de Telegram?</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">¡Ofrece tu espacio publicitario y gana dinero regular!</p>
+                    </div>
+                </div>
+                <span class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-xl shadow-md hidden sm:inline-block">Empieza</span>
             </button>
         </section>
 
@@ -193,9 +228,7 @@
     <main id="view-faq" class="p-4 max-w-2xl mx-auto space-y-4 hidden">
         <div class="text-center max-w-md mx-auto pb-2">
             <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i>Garantía y Soporte Pro</h2>
-            <p class="text-xs text-slate-400 mt-1">Transparencia absoluta. Respuestas claras antes de realizar tu inversión publicitaria.</p>
         </div>
-        
         <div class="space-y-2.5" id="faq-accordion-group">
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
                 <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
@@ -203,25 +236,39 @@
                     <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
                 </button>
                 <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
-                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
-                        Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 horas. Recibirás un enlace directo de confirmación cuando esté arriba.
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300">
-                <button onclick="toggleFaqItem(this)" class="w-full p-4 flex justify-between items-center text-left text-xs font-bold text-slate-200 hover:bg-slate-800/40 transition-colors">
-                    <span>¿Qué métodos de pago aceptan actualmente?</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
-                </button>
-                <div class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out">
-                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed font-normal">
-                        Aceptamos pagos globales rápidos a través de <strong class="text-emerald-400">PayPal, Estrellas de Telegram</strong> y criptomonedas estables como <strong class="text-sky-400">USDT (Red TRC20)</strong>.
-                    </div>
+                    <div class="overflow-hidden text-slate-300 text-xs px-4 pb-4 leading-relaxed">Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 horas. Recibirás un enlace directo de confirmación cuando esté arriba.</div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
+    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-50 flex flex-col items-end">
+        <!-- Burbuja del Chat -->
+        <div id="ai-chat-window" class="w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col mb-3 animate-fade-in h-96">
+            <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
+                </div>
+                <button onclick="toggleAiChat()" class="text-slate-200 text-sm hover:text-white cursor-pointer"><i class="fa-solid fa-minus"></i></button>
+            </div>
+            <!-- Historial mensajes -->
+            <div id="ai-chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-[11px] scrollbar-none bg-slate-950/40">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+            <!-- Input del chat -->
+            <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5">
+                <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app o anuncios..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs hover:bg-sky-500 transition-colors cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <!-- Botón Lanzador Flotante -->
+        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl shadow-sky-600/20 flex items-center justify-center text-xl text-white cursor-pointer hover:scale-110 transition-transform relative">
+            <i class="fa-solid fa-headset"></i>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full animate-ping"></span>
+        </button>
+    </div>
 
     <!-- MENÚ INFERIOR FIJO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
@@ -239,7 +286,8 @@
         </button>
     </nav>
 
-    <!-- MODAL DE LOS PREMIOS GUARDADOS -->
+    <!-- MODALES ADICIONALES (PREMIOS, REGISTRO, CARRITO) -->
+    <!-- [Resto de modales se mantienen idénticos en estructura pero con la lógica extendida del cupón gratis] -->
     <div id="premios-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 shadow-2xl p-4 space-y-3">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -250,10 +298,9 @@
         </div>
     </div>
 
-    <!-- ¡NUEVO! MODAL: AGREGA TU CANAL Y MONETIZA -->
+    <!-- MODAL: AGREGA TU CANAL -->
     <div id="add-channel-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
-            <!-- Encabezado -->
             <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center">
                 <div class="flex items-center gap-2 text-slate-950">
                     <i class="fa-solid fa-wallet text-base"></i>
@@ -261,89 +308,74 @@
                 </div>
                 <button onclick="closeAddChannelModal()" class="text-slate-950 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none">
-                <!-- Ventajas -->
                 <div class="bg-amber-500/5 border border-amber-500/20 p-3 rounded-xl space-y-1.5">
-                    <p class="text-[11px] font-black uppercase text-amber-400 tracking-wider"><i class="fa-solid fa-star mr-1"></i> Ventajas de nuestra Red:</p>
+                    <p class="text-[11px] font-black uppercase text-amber-400 tracking-wider">🎯 Ventajas de nuestra Red:</p>
                     <ul class="text-[11px] text-slate-300 space-y-1 list-none pl-0">
-                        <li>🎯 <strong class="text-slate-100">Tráfico orgánico y constante:</strong> Recibe pedidos recurrentes.</li>
-                        <li>💰 <strong class="text-slate-100">Fija tus precios:</strong> Tú decides el costo por post publicitario.</li>
-                        <li>🔒 <strong class="text-slate-100">Pagos Seguros:</strong> Recibe tus ganancias de forma protegida.</li>
+                        <li>🎯 <strong class="text-slate-100">Tráfico constante:</strong> Recibe pedidos recurrentes de marcas.</li>
+                        <li>💰 <strong class="text-slate-100">Fija tus precios:</strong> Tú decides el costo de tus espacios publicitarios.</li>
                     </ul>
                 </div>
-
-                <!-- Tarifa de alta -->
                 <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-[10px] uppercase font-black tracking-wider text-slate-400">Precio de Alta Lifetime</p>
                         <p class="text-[9px] text-slate-500">Un único pago, listado para siempre</p>
                     </div>
-                    <div class="text-right">
-                        <span class="text-lg font-black text-amber-400">$19.99 USD</span>
-                    </div>
+                    <div class="text-right"><span class="text-lg font-black text-amber-400">$19.99 USD</span></div>
                 </div>
-
-                <!-- Formulario paso a paso -->
                 <div class="space-y-2.5">
-                    <p class="text-[10px] uppercase font-black tracking-wider text-slate-400"><i class="fa-solid fa-pen-to-square mr-1"></i> Datos de tu espacio:</p>
-                    
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-slate-400 block">Nombre del Canal</label>
-                        <input type="text" id="reg-channel-name" placeholder="Ej. Mundo Curioso Oficial" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+                        <input type="text" id="reg-channel-name" placeholder="Ej. Mundo Curioso" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none">
                     </div>
-
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-slate-400 block">Enlace o @Username del Canal</label>
-                        <input type="text" id="reg-channel-user" placeholder="Ej. @mundocurioso" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+                        <input type="text" id="reg-channel-user" placeholder="Ej. @mundocurioso" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none">
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-slate-400 block">Categoría Principal</label>
-                            <select id="reg-channel-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
-                                <option value="Tecnología">Tecnología</option>
-                                <option value="Finanzas">Finanzas</option>
-                                <option value="Entretenimiento">Entretenimiento</option>
-                                <option value="Otros">Otros / Variado</option>
+                            <label class="text-[10px] font-bold text-slate-400 block">Tipo de Acceso</label>
+                            <select id="reg-channel-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                                <option value="Público">Público</option>
+                                <option value="Privado">Privado</option>
                             </select>
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-bold text-slate-400 block">Total Suscriptores</label>
-                            <input type="number" id="reg-channel-subs" placeholder="Ej. 14500" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+                            <input type="number" id="reg-channel-subs" placeholder="Ej. 14500" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none">
                         </div>
                     </div>
-
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold text-slate-400 block">Precio que propones cobrar por tu Post ($ USD)</label>
-                        <input type="number" id="reg-channel-price" placeholder="Ej. 25" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+                        <label class="text-[10px] font-bold text-slate-400 block">Categoría Principal</label>
+                        <select id="reg-channel-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-300 focus:outline-none">
+                            <option value="Tecnología">Tecnología</option>
+                            <option value="Finanzas">Finanzas</option>
+                            <option value="Entretenimiento">Entretenimiento</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-slate-400 block">Precio por Post ($ USD)</label>
+                        <input type="number" id="reg-channel-price" placeholder="Ej. 25" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none">
                     </div>
                 </div>
-
-                <!-- Selector de método de pago del registro -->
                 <div class="space-y-2">
-                    <p class="text-[10px] uppercase font-black tracking-wider text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Método para pagar tu alta:</p>
+                    <p class="text-[10px] uppercase font-black tracking-wider text-slate-400">Método para pagar tu alta:</p>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="selectRegPayment('PayPal')" id="reg-pay-PayPal" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-brands fa-paypal text-sky-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">PayPal</span>
+                        <button onclick="selectRegPayment('PayPal')" id="reg-pay-PayPal" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-brands fa-paypal text-sky-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">PayPal</span>
                         </button>
-                        <button onclick="selectRegPayment('Telegram Stars')" id="reg-pay-Stars" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-solid fa-star text-amber-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">Estrellas</span>
+                        <button onclick="selectRegPayment('Telegram Stars')" id="reg-pay-Stars" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-star text-amber-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">Estrellas</span>
                         </button>
-                        <button onclick="selectRegPayment('USDT (TRC20)')" id="reg-pay-USDT" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-solid fa-coins text-emerald-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">USDT</span>
+                        <button onclick="selectRegPayment('USDT (TRC20)')" id="reg-pay-USDT" class="reg-pay-btn p-2 rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-coins text-emerald-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">USDT</span>
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Botón de acción final -->
             <div class="p-4 bg-slate-950 border-t border-slate-800">
-                <button onclick="submitChannelRegistration()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 p-3 rounded-xl font-black text-slate-950 text-xs uppercase tracking-wider flex justify-center items-center gap-2 shadow-lg shadow-orange-500/15 cursor-pointer">
-                    <i class="fa-solid fa-paper-plane text-sm"></i> Solicitar Registro en Telegram
+                <button onclick="submitChannelRegistration()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 p-3 rounded-xl font-black text-slate-950 text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i> Solicitar Registro en Telegram
                 </button>
             </div>
         </div>
@@ -359,50 +391,33 @@
                 </div>
                 <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
             <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1 max-h-[35vh]"></div>
-
             <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-4">
                 <div id="coupon-display-area" class="hidden flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-xs text-emerald-400 font-medium">
                     <span><i class="fa-solid fa-ticket mr-1"></i> Cupón activo: <strong id="active-coupon-name">NINGUNO</strong></span>
                     <button onclick="removeCoupon()" class="text-rose-400 font-bold ml-2 underline text-[10px]">Quitar</button>
                 </div>
-
                 <div id="payment-method-section" class="space-y-2">
-                    <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider"><i class="fa-solid fa-credit-card mr-1 text-sky-400"></i> Selecciona Método de Pago:</p>
+                    <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Selecciona Método de Pago:</p>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-brands fa-paypal text-sky-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">PayPal</span>
+                        <button onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-brands fa-paypal text-sky-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">PayPal</span>
                         </button>
-                        <button onclick="selectPaymentMethod('Telegram Stars')" id="pay-Stars" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-solid fa-star text-amber-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">Estrellas</span>
+                        <button onclick="selectPaymentMethod('Telegram Stars')" id="pay-Stars" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-star text-amber-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">Estrellas</span>
                         </button>
-                        <button onclick="selectPaymentMethod('USDT (TRC20)')" id="pay-USDT" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
-                            <i class="fa-solid fa-coins text-emerald-400 text-base"></i>
-                            <span class="text-[9px] font-bold text-slate-300">USDT</span>
+                        <button onclick="selectPaymentMethod('USDT (TRC20)')" id="pay-USDT" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-coins text-emerald-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">USDT</span>
                         </button>
                     </div>
                 </div>
-
                 <div class="space-y-1 pt-1">
-                    <div class="flex justify-between text-xs text-slate-400">
-                        <span>Subtotal Canales:</span>
-                        <span id="cart-subtotal">$0.00</span>
-                    </div>
-                    <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium">
-                        <span>Descuento Aplicado:</span>
-                        <span id="cart-total-discount">-$0.00</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-1 border-t border-slate-800">
-                        <span class="text-slate-200 font-bold text-sm">Total Neto:</span>
-                        <span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span>
-                    </div>
+                    <div class="flex justify-between text-xs text-slate-400"><span>Subtotal:</span><span id="cart-subtotal">$0.00</span></div>
+                    <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium"><span>Descuento:</span><span id="cart-total-discount">-$0.00</span></div>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-800"><span class="text-slate-200 font-bold text-sm">Total Neto:</span><span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span></div>
                 </div>
-
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-center text-xs uppercase tracking-wider flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/15 cursor-pointer">
-                    <i class="fa-brands fa-telegram text-sm"></i> Enviar Pedido a Telegram
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer">
+                    <i class="fa-brands fa-telegram"></i> Enviar Pedido a Telegram
                 </button>
             </div>
         </div>
@@ -412,28 +427,42 @@
         const MI_TELEGRAM_USER = "Airdayz";
 
         const canalesData = [
-            { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Análisis técnico de Bitcoin, DeFi y gemas cripto a diario.", duracion: "24 horas arriba (1h en el top)", fijado: "Sí, las primeras 2 horas" },
-            { id: 2, nombre: "Tech & Gadgets Mundiales", username: "tech_gadgets_test", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings, reviews de smartphones y noticias tecnológicas de vanguardia.", duracion: "Permanente", fijado: "No" },
-            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico ultra masivo y activo. Ideal para captar público joven de forma rápida.", duracion: "48 horas totales", fijado: "Sí, 1 hora inicial" }
+            { id: 1, nombre: "Crypto Alertas Pro", username: "@crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Análisis técnico de Bitcoin y alertas DeFi diarias.", duracion: "24 horas arriba (1h top)", fijado: "Sí, primeras 2 horas" },
+            { id: 2, nombre: "Tech & Gadgets Privé", username: "@tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews filtradas en primicia.", duracion: "Permanente", fijado: "No" },
+            { id: 3, nombre: "Memes & Humor Viral", username: "@memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico ultra masivo y activo. Ideal para público joven.", duracion: "48 horas totales", fijado: "Sí, 1 hora inicial" }
         ];
 
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
         let inventarioPremios = JSON.parse(localStorage.getItem('ads_premios')) || []; 
+        let userPoints = parseInt(localStorage.getItem('ads_user_points')) || 0;
+        let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
         
         let activeCoupon = null;
         let activeCouponPct = 0;
         let currentCategory = 'todos';
         let selectedPayment = 'PayPal'; 
-        let selectedRegPayment = 'PayPal'; // Estado método de pago para altas de canal
+        let selectedRegPayment = 'PayPal';
+
+        // Frases motivacionales del Asistente Virtual
+        const frasesAsistente = [
+            "👋 ¡Hola! ¿Sabías que un anuncio en nuestros canales financieros tiene un ROI promedio de un 200%? ¡Aprovecha la oferta!",
+            "🔥 ¡El canal de Tecnología hoy está rompiendo récords de clicks orgánicos! Un espacio allí volará tu negocio.",
+            "💡 Consejo rápido: Si añades el pack de x3 posts semanales a tu cesta, la retención de marca sube un 80%.",
+            "🚀 ¡Hola! Estoy aquí para resolver cualquier duda que tengas sobre la Lista Golden. Solo escríbeme abajo 👇"
+        ];
 
         document.addEventListener("DOMContentLoaded", () => {
             initUserData();
+            checkBannerFrequency();
             renderChannels();
             updateCartBadge();
             updateRewardsPanel();
             renderRewardsInventory();
+            updatePointsDisplay();
+            updateSpinTimer();
+            initAiAssistant();
             setTimeout(() => document.getElementById('global-loader').remove(), 500);
         });
 
@@ -442,232 +471,175 @@
                 window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.expand();
             }
-            let nombreUsuario = "Anunciante";
+            let nombreUsuario = "Anunciante Golden";
             let aliasUsuario = "@usuario_telegram";
-            let iniciales = "A";
+            let iniciales = "GA";
             const tg = window.Telegram?.WebApp;
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
-                nombreUsuario = user.first_name;
-                if (user.last_name) nombreUsuario += " " + user.last_name;
-                if (user.username) aliasUsuario = "@" + user.username;
-                else aliasUsuario = `ID: ${user.id}`;
-                const splitted = nombreUsuario.split(" ");
-                if (splitted.length > 1) iniciales = (splitted[0][0] + splitted[1][0]).toUpperCase();
-                else iniciales = nombreUsuario.substring(0, 2).toUpperCase();
+                nombreUsuario = user.first_name + (user.last_name ? " " + user.last_name : "");
+                aliasUsuario = user.username ? "@" + user.username : `ID: ${user.id}`;
+                iniciales = nombreUsuario.substring(0, 2).toUpperCase();
             }
             document.getElementById('user-profile-name').innerText = nombreUsuario;
             document.getElementById('user-profile-tag').innerText = aliasUsuario;
             document.getElementById('user-avatar-text').innerText = iniciales;
         }
 
-        /* MANEJO DE SELECCIÓN MÉTODOS DE PAGO (CESTA) */
-        function selectPaymentMethod(method) {
-            selectedPayment = method;
-            document.querySelectorAll('.pay-btn').forEach(btn => {
-                btn.classList.remove('border-sky-400', 'bg-sky-500/10');
-                btn.classList.add('border-slate-800', 'bg-slate-900');
-            });
-            let activeId = 'pay-PayPal';
-            if (method === 'Telegram Stars') activeId = 'pay-Stars';
-            if (method === 'USDT (TRC20)') activeId = 'pay-USDT';
-            const activeBtn = document.getElementById(activeId);
-            if (activeBtn) {
-                activeBtn.classList.remove('border-slate-800', 'bg-slate-900');
-                activeBtn.classList.add('border-sky-400', 'bg-sky-500/10');
+        // CONTROL FRECUENCIA TEMPORAL DEL BANNER (1 vez cada 24 horas)
+        function checkBannerFrequency() {
+            const lastHidden = localStorage.getItem('ads_banner_hidden_time');
+            const now = Date.now();
+            if (!lastHidden || (now - parseInt(lastHidden)) > 24 * 60 * 60 * 1000) {
+                document.getElementById('banner-add-channel').classList.remove('hidden');
             }
         }
-
-        /* ¡NUEVO! MANEJO DE SELECCIÓN MÉTODOS DE PAGO (REGISTRO CANAL) */
-        function selectRegPayment(method) {
-            selectedRegPayment = method;
-            document.querySelectorAll('.reg-pay-btn').forEach(btn => {
-                btn.classList.remove('border-amber-500', 'bg-amber-500/10');
-                btn.classList.add('border-slate-800', 'bg-slate-950');
-            });
-            let activeId = 'reg-pay-PayPal';
-            if (method === 'Telegram Stars') activeId = 'reg-pay-Stars';
-            if (method === 'USDT (TRC20)') activeId = 'reg-pay-USDT';
-            const activeBtn = document.getElementById(activeId);
-            if (activeBtn) {
-                activeBtn.classList.remove('border-slate-800', 'bg-slate-950');
-                activeBtn.classList.add('border-amber-500', 'bg-amber-500/10');
-            }
+        function closeBannerPermanently(event) {
+            event.stopPropagation();
+            document.getElementById('banner-add-channel').classList.add('hidden');
+            localStorage.setItem('ads_banner_hidden_time', Date.now().toString());
         }
 
-        /* CONTROL MODAL REGISTRO DE CANAL */
-        function openAddChannelModal() {
-            document.getElementById('add-channel-modal').classList.remove('hidden');
-            selectRegPayment('PayPal'); // Forzar selección por defecto
-        }
-        function closeAddChannelModal() { document.getElementById('add-channel-modal').classList.add('hidden'); }
-
-        /* ENVÍO DEL FORMULARIO DE ALTA DE CANAL */
-        function submitChannelRegistration() {
-            const name = document.getElementById('reg-channel-name').value.trim();
-            const user = document.getElementById('reg-channel-user').value.trim();
-            const cat = document.getElementById('reg-channel-cat').value;
-            const subs = document.getElementById('reg-channel-subs').value.trim();
-            const price = document.getElementById('reg-channel-price').value.trim();
-
-            if(!name || !user || !subs || !price) {
-                alert("Por favor, rellene todos los campos del formulario antes de continuar.");
-                return;
-            }
-
-            let textoTelegram = "🚀 *NUEVA SOLICITUD DE ALTA DE CANAL*\n\n";
-            textoTelegram += `📢 *Nombre:* ${name}\n`;
-            textoTelegram += `🔗 *User/Enlace:* ${user}\n`;
-            textoTelegram += `🗂️ *Categoría:* ${cat}\n`;
-            textoTelegram += `👥 *Suscriptores:* ${parseInt(subs).toLocaleString()}\n`;
-            textoTelegram += `💲 *Precio por Post propuesto:* $${price} USD\n\n`;
-            textoTelegram += `💳 *MÉTODO DE PAGO DEL ALTA:* ${selectedRegPayment}\n`;
-            textoTelegram += `💰 *TOTAL A PAGAR (LIFETIME):* $19.99 USD\n\n`;
-            textoTelegram += "Deseo dar de alta mi canal para empezar a recibir anunciantes.";
-
-            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoTelegram), "_blank");
-            closeAddChannelModal();
-            triggerSuccessAnimation("Solicitud Enviada", "Procesando alta en el chat del Administrador.");
-            
-            // Limpieza básica del formulario
-            document.getElementById('reg-channel-name').value = "";
-            document.getElementById('reg-channel-user').value = "";
-            document.getElementById('reg-channel-subs').value = "";
-            document.getElementById('reg-channel-price').value = "";
+        // CONTROL DE PUNTOS Y RULETA DIARIA
+        function updatePointsDisplay() {
+            document.getElementById('header-points-display').innerText = userPoints;
+            document.getElementById('user-points-display').innerText = userPoints;
         }
 
-        function toggleUserMenu(event) { event.stopPropagation(); const dropdown = document.getElementById('user-dropdown'); dropdown.classList.toggle('hidden'); }
-        function closeUserMenuOutside(event) { const dropdown = document.getElementById('user-dropdown'); const avatarBtn = document.getElementById('user-avatar-btn'); if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && !avatarBtn.contains(event.target)) { dropdown.classList.add('hidden'); } }
-        function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
-        function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
-
-        function triggerSuccessAnimation(title, desc) {
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-desc').innerText = desc;
-            const toast = document.getElementById('success-toast');
-            const box = document.getElementById('toast-box');
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.replace('scale-75', 'scale-100');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-                box.classList.replace('scale-100', 'scale-75');
-            }, 1500);
-        }
-
-        function switchView(view) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById('view-catalog').classList.add('hidden');
-            document.getElementById('view-favorites').classList.add('hidden');
-            document.getElementById('view-campaigns').classList.add('hidden');
-            document.getElementById('view-faq').classList.add('hidden');
-
-            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); updateRewardsPanel(); }
-            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
-            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
-            if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
-        }
-
-        function filterCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.replace('bg-sky-500/20', 'bg-slate-800');
-                btn.classList.replace('text-sky-300', 'text-slate-400');
-            });
-            event.target.classList.replace('bg-slate-800', 'bg-sky-500/20');
-            event.target.classList.replace('text-slate-400', 'text-sky-300');
-            renderChannels();
-        }
-
-        function getPrecio(canal) { return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase; }
-
-        function calculateCartSubtotal() {
-            let subtotal = 0;
-            carrito.forEach(item => {
-                const canal = canalesData.find(c => c.id === item.idCanalOriginal);
-                if(canal) {
-                    let p = getPrecio(canal);
-                    if(item.packExtra) p += 25;
-                    if(item.fixedExtra) p += 10;
-                    subtotal += p;
-                }
-            });
-            return subtotal;
-        }
-
-        function updateRewardsPanel() {
-            const currentSpend = calculateCartSubtotal();
-            document.getElementById('rewards-current-spend').innerText = `$${currentSpend.toFixed(2)} USD`;
-            const pct = Math.min((currentSpend / 120) * 100, 100);
-            document.getElementById('rewards-bar').style.width = `${pct}%`;
-            evaluateTier(1, currentSpend >= 30, 'GOLDEN5');
-            evaluateTier(2, currentSpend >= 70, 'GOLDEN10');
-            evaluateTier(3, currentSpend >= 120, 'GOLDEN15');
-        }
-
-        function evaluateTier(tierNumber, unlocked, code) {
-            const element = document.getElementById(`tier-${tierNumber}`);
-            const btn = document.getElementById(`btn-tier-${tierNumber}`);
-            const yaObtenido = inventarioPremios.some(p => p.codigo === code);
-            if(yaObtenido) {
-                element.classList.remove('opacity-50');
-                element.classList.add('border-indigo-500/20', 'bg-indigo-950/20');
+        function updateSpinTimer() {
+            const now = Date.now();
+            const btn = document.getElementById('spin-btn');
+            const timerText = document.getElementById('spin-timer-display');
+            if (lastSpinTime && (now - parseInt(lastSpinTime)) < 24 * 60 * 60 * 1000) {
                 btn.setAttribute('disabled', 'true');
-                btn.innerText = "Guardado";
-                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-indigo-400";
-                return;
-            }
-            if(unlocked) {
-                element.classList.remove('opacity-50');
-                element.classList.add('border-emerald-500/40', 'bg-emerald-500/5');
-                btn.removeAttribute('disabled');
-                btn.innerText = "Guardar Premio";
-                btn.className = "mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 py-1 rounded-md text-[9px] font-bold text-white transition-colors cursor-pointer animate-pulse";
+                btn.style.opacity = "0.5";
+                const diff = (24 * 60 * 60 * 1000) - (now - parseInt(lastSpinTime));
+                const horas = Math.floor(diff / (1000 * 60 * 60));
+                const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                timerText.innerText = `Próximo giro en ${horas}h ${minutos}m`;
             } else {
-                element.classList.add('opacity-50');
-                element.classList.remove('border-emerald-500/40', 'bg-emerald-500/5', 'border-indigo-500/20', 'bg-indigo-950/20');
-                btn.setAttribute('disabled', 'true');
-                btn.innerText = "Bloqueado";
-                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400";
+                btn.removeAttribute('disabled');
+                btn.style.opacity = "1";
+                timerText.innerText = "¡Listo para girar!";
             }
         }
 
-        function claimRewardToInventory(couponCode, pct, minSpend, tier) {
-            if(inventarioPremios.some(p => p.codigo === couponCode)) return;
-            inventarioPremios.push({ id: Date.now(), codigo: couponCode, descuento: pct, minimo: minSpend });
-            localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
-            triggerSuccessAnimation("¡Premio Guardado!", `Usa el menú superior para ver tus premios.`);
-            updateRewardsPanel();
-            renderRewardsInventory();
+        function spinRoulette() {
+            const now = Date.now();
+            if (lastSpinTime && (now - parseInt(lastSpinTime)) < 24 * 60 * 60 * 1000) return;
+
+            const btn = document.getElementById('spin-btn');
+            btn.setAttribute('disabled', 'true');
+
+            // Probabilidades: 10 Pts (50%), 25 Pts (30%), 50 Pts (13%), 100 Pts (6%), 250 Pts (1%)
+            const opciones = [
+                { pts: 10, deg: 72 },
+                { pts: 25, deg: 144 },
+                { pts: 50, deg: 216 },
+                { pts: 100, deg: 288 },
+                { pts: 250, deg: 360 }
+            ];
+            
+            const r = Math.random() * 100;
+            let seleccion = opciones[0];
+            if (r > 50 && r <= 80) seleccion = opciones[1];
+            else if (r > 80 && r <= 93) seleccion = opciones[2];
+            else if (r > 93 && r <= 99) seleccion = opciones[3];
+            else if (r > 99) seleccion = opciones[4];
+
+            const wheel = document.getElementById('roulette-wheel');
+            const vueltasGiro = 5 * 360; 
+            const totalDeg = vueltasGiro + seleccion.deg;
+
+            wheel.style.transform = `rotate(${totalDeg}deg)`;
+
+            setTimeout(() => {
+                userPoints += seleccion.pts;
+                localStorage.setItem('ads_user_points', userPoints.toString());
+                lastSpinTime = Date.now().toString();
+                localStorage.setItem('ads_last_spin_time', lastSpinTime);
+                
+                updatePointsDisplay();
+                updateSpinTimer();
+                triggerSuccessAnimation(`+${seleccion.pts} Puntos`, "¡Acumulados con éxito!");
+
+                // Verificar si desbloqueó Anuncio Gratis
+                if (userPoints >= 500) {
+                    userPoints -= 500;
+                    localStorage.setItem('ads_user_points', userPoints.toString());
+                    updatePointsDisplay();
+                    claimRewardToInventory('FREE_AD_100', 100, 0, 'FREE');
+                }
+            }, 4000);
         }
 
-        function renderRewardsInventory() {
-            const container = document.getElementById('rewards-inventory-container');
-            const menuBadge = document.getElementById('menu-rewards-count');
-            container.innerHTML = '';
-            menuBadge.innerText = inventarioPremios.length;
-            if(inventarioPremios.length === 0) {
-                container.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-4">No tienes premios guardados.</p>`;
-                return;
-            }
-            inventarioPremios.forEach(premio => {
-                const div = document.createElement('div');
-                div.className = "bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between items-center text-xs";
-                div.innerHTML = `
-                    <div>
-                        <span class="font-mono font-black text-indigo-400 block">${premio.codigo}</span>
-                        <span class="text-slate-400 text-[10px]">${premio.descuento}% OFF</span>
+        // LÓGICA DE ASISTENTE VIRTUAL E INTELIGENCIA ARTIFICIAL (POLLINATIONS)
+        function initAiAssistant() {
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            const randomGreeting = frasesAsistente[Math.floor(Math.random() * frasesAsistente.length)];
+            messagesContainer.innerHTML = `
+                <div class="bg-slate-800 border border-slate-700/50 p-2.5 rounded-xl text-slate-300 max-w-[85%] self-start rounded-tl-none leading-relaxed">
+                    ${randomGreeting}
+                </div>
+            `;
+        }
+
+        function toggleAiChat() {
+            const windowChat = document.getElementById('ai-chat-window');
+            windowChat.classList.toggle('hidden');
+            windowChat.classList.toggle('flex');
+        }
+
+        async function sendAiMessage() {
+            const input = document.getElementById('ai-user-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const container = document.getElementById('ai-chat-messages');
+            
+            // Inyectar mensaje usuario
+            container.innerHTML += `
+                <div class="bg-sky-600/20 border border-sky-500/30 p-2.5 rounded-xl text-sky-200 max-w-[85%] ml-auto rounded-tr-none text-right leading-relaxed">
+                    ${text}
+                </div>
+            `;
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+
+            // Inyectar burbuja de carga / pensando
+            const loaderId = "ai-loader-" + Date.now();
+            container.innerHTML += `
+                <div id="${loaderId}" class="bg-slate-800 border border-slate-700/50 p-2 rounded-xl text-slate-400 max-w-[40px] text-center rounded-tl-none">
+                    <i class="fa-solid fa-circle-notch animate-spin text-[10px]"></i>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+
+            // System Prompt para delimitar las respuestas sobre la App
+            const systemPrompt = "Eres el Asistente Virtual IA oficial de Lista Golden Ads. Eres alegre, directo y conciso. Vendes espacios publicitarios en canales de Telegram. Información de la app: 1) Ofrecemos canales segmentados (Finanzas, Tecnología, Entretenimiento). 2) Los clientes añaden canales al carrito, seleccionan método de pago (PayPal, Estrellas de Telegram o USDT) y envían el pedido estructurado al administrador @Airdayz. 3) Los dueños de canales pueden registrar su canal para siempre pagando una cuota Lifetime única de $19.99. 4) Contamos con una ruleta diaria y recompensas automatizadas de descuento. Responde siempre de forma breve (máximo 2-3 frases por respuesta) e invita a comprar.";
+
+            try {
+                const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?system=${encodeURIComponent(systemPrompt)}&private=true`);
+                const replyText = await response.text();
+                
+                document.getElementById(loaderId).remove();
+                container.innerHTML += `
+                    <div class="bg-slate-800 border border-slate-700/50 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none leading-relaxed">
+                        ${replyText}
                     </div>
-                    <button onclick="applyCouponFromInventory('${premio.codigo}', ${premio.descuento})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-md font-bold text-[10px] transition-colors">
-                        Aplicar
-                    </button>
                 `;
-                container.appendChild(div);
-            });
+            } catch (err) {
+                document.getElementById(loaderId).remove();
+                container.innerHTML += `
+                    <div class="bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none">
+                        Ups, tengo problemas para conectarme. Por favor, escribe directamente al soporte técnico: @Airdayz.
+                    </div>
+                `;
+            }
+            container.scrollTop = container.scrollHeight;
         }
 
-        function applyCouponFromInventory(code, pct) { activeCoupon = code; activeCouponPct = pct; closePremiosModal(); triggerSuccessAnimation("Cupón Aplicado", `Se descontará un ${pct}% en la cesta.`); openCartModal(); }
-        function removeCoupon() { activeCoupon = null; activeCouponPct = 0; openCartModal(); }
-
+        // RENDERIZADO DE TARJETAS (CON IDENTIFICADORES @USER Y PRECIO REBAJADO TACHADO)
         function renderChannels() {
             const container = document.getElementById('channels-container');
             container.innerHTML = '';
@@ -675,6 +647,7 @@
             if (currentCategory !== 'todos') filtrados = filtrados.filter(c => c.categoria === currentCategory);
             if (document.getElementById('sort-filter').value === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
             if (document.getElementById('sort-filter').value === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
+            
             filtrados.forEach((c, idx) => {
                 const card = createChannelCard(c);
                 card.style.animationDelay = `${idx * 60}ms`;
@@ -682,25 +655,47 @@
             });
         }
 
+        function getPrecio(canal) { return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase; }
+
         function createChannelCard(c) {
             const isFav = favoritos.includes(c.id);
+            const tieneDescuento = c.descuento > 0;
             const card = document.createElement('div');
             card.className = "bg-slate-800/40 rounded-2xl p-4 border border-slate-700/60 flex flex-col justify-between shadow-md hover:border-slate-600 transition-all animate-fade-in";
+            
+            // Renderizado optimizado del bloque de precios (Simulación de Bajada Llamativa)
+            let bloquePrecio = `<div class="text-base font-black text-emerald-400">$${getPrecio(c).toFixed(2)} USD</div>`;
+            if (tieneDescuento) {
+                bloquePrecio = `
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-xs font-bold text-rose-500 line-through opacity-80">$${c.precioBase.toFixed(2)}</span>
+                        <span class="text-base font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20 shadow-sm animate-pulse">$${getPrecio(c).toFixed(2)} USD</span>
+                        <span class="text-[9px] font-black text-slate-950 uppercase bg-amber-400 rounded px-1 ml-auto">-${c.descuento}% OFF</span>
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
                 <div>
                     <div class="flex gap-3 items-start">
-                        <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover border border-slate-700" alt="">
+                        <img src="${c.imagen}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="">
                         <div class="flex-1 min-w-0">
-                            <span class="bg-slate-700 text-slate-300 text-[9px] uppercase font-bold px-2 py-0.5 rounded">${c.categoria}</span>
-                            <h3 class="font-bold text-slate-200 text-xs mt-1 truncate">${c.nombre}</h3>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="bg-slate-700 text-slate-300 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded">${c.categoria}</span>
+                                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[9px] font-semibold px-1.5 py-0.5 rounded-full">${c.tipo}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-200 text-xs mt-1.5 truncate leading-none">${c.nombre}</h3>
+                            <p class="text-[10px] font-mono text-sky-400/80 mt-0.5 truncate">${c.username}</p>
                         </div>
-                        <button onclick="toggleFav(${c.id})" class="text-sm text-${isFav ? 'amber-400' : 'slate-600'}">
+                        <button onclick="toggleFav(${c.id})" class="text-sm text-${isFav ? 'amber-400' : 'slate-600'} cursor-pointer">
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
                         </button>
                     </div>
-                    <div class="mt-2 text-xs font-black text-emerald-400 bg-slate-950/40 p-2 rounded-xl border border-slate-800/60">
-                        $${getPrecio(c).toFixed(2)} USD
+                    
+                    <div class="mt-3 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60 min-h-[42px] flex flex-col justify-center">
+                        ${bloquePrecio}
                     </div>
+
                     <div class="mt-3 border-t border-slate-800/80 pt-2">
                         <button onclick="toggleExtrasSlider(this)" class="w-full flex justify-between items-center text-[11px] text-sky-400 font-bold select-none cursor-pointer">
                             <span>Ver detalles e hiper-packs</span>
@@ -710,6 +705,7 @@
                             <div class="overflow-hidden">
                                 <div class="mt-2 space-y-2 text-[11px] text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/50">
                                     <p><strong class="text-slate-400">Sobre el canal:</strong> ${c.descripcion}</p>
+                                    <p><strong class="text-slate-400">Suscriptores:</strong> ${c.subs.toLocaleString()}</p>
                                     <p><strong class="text-slate-400">Duración:</strong> ${c.duracion}</p>
                                     <p><strong class="text-slate-400">Fijado:</strong> ${c.fijado}</p>
                                     <div class="mt-2.5 border-t border-slate-800/80 pt-2 space-y-1">
@@ -728,7 +724,7 @@
                         </div>
                     </div>
                 </div>
-                <button onclick="addToCart(${c.id})" class="mt-3.5 w-full bg-sky-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-sky-500 transition-colors shadow-md shadow-sky-600/10">+ Añadir a la Cesta</button>
+                <button onclick="addToCart(${c.id})" class="mt-3.5 w-full bg-sky-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-sky-500 transition-colors shadow-md shadow-sky-600/10 cursor-pointer">+ Añadir a la Cesta</button>
             `;
             return card;
         }
@@ -740,20 +736,114 @@
             else { gridWrapper.style.gridTemplateRows = "1fr"; icon.classList.add('rotate-180'); }
         }
 
+        // MANEJO SECCIÓN DE FAVORITOS (CORREGIDO DE FORMA ROBUSTA)
         function toggleFav(id) {
-    // Corregido: Ahora usa la variable 'favoritos' de forma consistente en español
-    favoritos = favoritos.includes(id) 
-        ? favoritos.filter(fId => fId !== id) 
-        : [...favoritos, id]; 
-        
-    localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
-    
-    // Determina en qué pestaña estás para refrescar la vista correcta sin romper el flujo
-    const enCatalogo = !document.getElementById('view-catalog').classList.contains('hidden');
-    switchView(enCatalogo ? 'catalog' : 'favorites');
-}
-        function renderFavorites() { const container = document.getElementById('favorites-container'); container.innerHTML = ''; const favs = canalesData.filter(c => favoritos.includes(c.id)); if(favs.length === 0) { container.innerHTML = `<p class="col-span-full text-center text-slate-500 py-6 text-xs">Sin canales guardados.</p>`; return; } favs.forEach((c, idx) => { const card = createChannelCard(c); card.style.animationDelay = `${idx * 60}ms`; container.appendChild(card); }); }
+            favoritos = favoritos.includes(id) ? favoritos.filter(fId => fId !== id) : [...favoritos, id]; 
+            localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
+            const enCatalogo = !document.getElementById('view-catalog').classList.contains('hidden');
+            switchView(enCatalogo ? 'catalog' : 'favorites');
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favorites-container');
+            container.innerHTML = '';
+            const favs = canalesData.filter(c => favoritos.includes(c.id));
+            if(favs.length === 0) { container.innerHTML = `<p class="col-span-full text-center text-slate-500 py-6 text-xs">Sin canales guardados.</p>`; return; }
+            favs.forEach((c, idx) => {
+                const card = createChannelCard(c);
+                card.style.animationDelay = `${idx * 60}ms`;
+                container.appendChild(card);
+            });
+        }
         function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
+
+        // GESTIÓN DEL CARRITO, CUPONES Y PREMIOS
+        function calculateCartSubtotal() {
+            let subtotal = 0;
+            carrito.forEach(item => {
+                const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                if(canal) {
+                    let p = getPrecio(canal);
+                    if(item.packExtra) p += 25;
+                    if(item.fixedExtra) p += 10;
+                    subtotal += p;
+                }
+            });
+            return subtotal;
+        }
+
+        function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
+        function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
+        function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
+
+        function updateRewardsPanel() {
+            const currentSpend = calculateCartSubtotal();
+            document.getElementById('rewards-current-spend').innerText = `$${currentSpend.toFixed(2)} USD`;
+            const pct = Math.min((currentSpend / 120) * 100, 100);
+            document.getElementById('rewards-bar').style.width = `${pct}%`;
+            evaluateTier(1, currentSpend >= 30, 'GOLDEN5');
+            evaluateTier(2, currentSpend >= 70, 'GOLDEN10');
+            evaluateTier(3, currentSpend >= 120, 'GOLDEN15');
+        }
+
+        function evaluateTier(tierNumber, unlocked, code) {
+            const element = document.getElementById(`tier-${tierNumber}`);
+            const btn = document.getElementById(`btn-tier-${tierNumber}`);
+            const yaObtenido = inventarioPremios.some(p => p.codigo === code);
+            if(yaObtenido) {
+                element.classList.remove('opacity-50');
+                btn.setAttribute('disabled', 'true');
+                btn.innerText = "Guardado";
+                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-indigo-400";
+                return;
+            }
+            if(unlocked) {
+                element.classList.remove('opacity-50');
+                btn.removeAttribute('disabled');
+                btn.innerText = "Guardar Premio";
+                btn.className = "mt-1.5 w-full bg-emerald-600 py-1 rounded-md text-[9px] font-bold text-white cursor-pointer animate-pulse";
+            } else {
+                element.classList.add('opacity-50');
+                btn.setAttribute('disabled', 'true');
+                btn.innerText = "Bloqueado";
+                btn.className = "mt-1.5 w-full bg-slate-800 py-1 rounded-md text-[9px] font-bold text-slate-400";
+            }
+        }
+
+        function claimRewardToInventory(couponCode, pct, minSpend, tier) {
+            if(inventarioPremios.some(p => p.codigo === couponCode)) return;
+            inventarioPremios.push({ id: Date.now(), codigo: couponCode, descuento: pct, minimo: minSpend });
+            localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
+            triggerSuccessAnimation(tier === 'FREE' ? "¡ANUNCIO GRATIS!" : "¡Premio Guardado!", `Usa el menú superior para gestionarlo.`);
+            updateRewardsPanel();
+            renderRewardsInventory();
+        }
+
+        function renderRewardsInventory() {
+            const container = document.getElementById('rewards-inventory-container');
+            document.getElementById('menu-rewards-count').innerText = inventarioPremios.length;
+            container.innerHTML = '';
+            if(inventarioPremios.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-4">No tienes premios guardados.</p>`;
+                return;
+            }
+            inventarioPremios.forEach(premio => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between items-center text-xs";
+                const isFree = premio.descuento === 100;
+                div.innerHTML = `
+                    <div>
+                        <span class="font-mono font-black ${isFree ? 'text-emerald-400' : 'text-indigo-400'} block">${premio.codigo}</span>
+                        <span class="text-slate-400 text-[10px]">${isFree ? '100% GRATIS (Anuncio Canjeable)' : premio.descuento + '% OFF'}</span>
+                    </div>
+                    <button onclick="applyCouponFromInventory('${premio.codigo}', ${premio.descuento})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-md font-bold text-[10px] cursor-pointer">Aplicar</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function applyCouponFromInventory(code, pct) { activeCoupon = code; activeCouponPct = pct; closePremiosModal(); triggerSuccessAnimation("Cupón Aplicado", `Descuento de ${pct}% activo.`); openCartModal(); }
+        function removeCoupon() { activeCoupon = null; activeCouponPct = 0; openCartModal(); }
 
         function addToCart(id) {
             const chkPack = document.getElementById(`up-pack-${id}`);
@@ -764,11 +854,8 @@
             updateRewardsPanel();
             if (chkPack) chkPack.checked = false;
             if (chkFixed) chkFixed.checked = false;
-            const baseCanal = canalesData.find(item => item.id === id);
-            triggerSuccessAnimation("Añadido", `"${baseCanal.nombre}" listo en cesta.`);
+            triggerSuccessAnimation("Añadido", "Listo en la cesta de compra.");
         }
-
-        function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
 
         function openCartModal() {
             const container = document.getElementById('cart-items');
@@ -803,7 +890,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-emerald-400">$${price.toFixed(2)}</span>
-                        <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 px-1"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 px-1 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -811,7 +898,7 @@
             document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
             if(activeCoupon) {
                 let discountAmount = subtotal * (activeCouponPct / 100);
-                let netTotal = subtotal - discountAmount;
+                let netTotal = Math.max(subtotal - discountAmount, 0);
                 document.getElementById('row-discount').classList.remove('hidden');
                 document.getElementById('cart-total-discount').innerText = `-$${discountAmount.toFixed(2)}`;
                 document.getElementById('cart-total').innerText = `$${netTotal.toFixed(2)} USD`;
@@ -829,95 +916,124 @@
         function clearCart() { carrito = []; activeCoupon = null; activeCouponPct = 0; localStorage.setItem('ads_carrito', JSON.stringify(carrito)); updateCartBadge(); updateRewardsPanel(); openCartModal(); }
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
+        function selectPaymentMethod(method) {
+            selectedPayment = method;
+            document.querySelectorAll('.pay-btn').forEach(btn => btn.classList.remove('border-sky-400', 'bg-sky-500/10'));
+            const activeId = method === 'PayPal' ? 'pay-PayPal' : (method === 'Telegram Stars' ? 'pay-Stars' : 'pay-USDT');
+            document.getElementById(activeId)?.classList.add('border-sky-400', 'bg-sky-500/10');
+        }
+
+        function selectRegPayment(method) {
+            selectedRegPayment = method;
+            document.querySelectorAll('.reg-pay-btn').forEach(btn => btn.classList.remove('border-amber-500', 'bg-amber-500/10'));
+            const activeId = method === 'PayPal' ? 'reg-pay-PayPal' : (method === 'Telegram Stars' ? 'reg-pay-Stars' : 'reg-pay-USDT');
+            document.getElementById(activeId)?.classList.add('border-amber-500', 'bg-amber-500/10');
+        }
+
+        function openAddChannelModal() { document.getElementById('add-channel-modal').classList.remove('hidden'); selectRegPayment('PayPal'); }
+        function closeAddChannelModal() { document.getElementById('add-channel-modal').classList.add('hidden'); }
+
+        function submitChannelRegistration() {
+            const name = document.getElementById('reg-channel-name').value.trim();
+            const user = document.getElementById('reg-channel-user').value.trim();
+            const type = document.getElementById('reg-channel-type').value;
+            const subs = document.getElementById('reg-channel-subs').value.trim();
+            const cat = document.getElementById('reg-channel-cat').value;
+            const price = document.getElementById('reg-channel-price').value.trim();
+
+            if(!name || !user || !subs || !price) { alert("Rellene todos los campos."); return; }
+
+            let txt = `🚀 *NUEVA SOLICITUD DE ALTA*\n\n📢 *Canal:* ${name}\n🔗 *User:* ${user}\n🔒 *Tipo:* ${type}\n👥 *Subs:* ${parseInt(subs).toLocaleString()}\n🗂️ *Cat:* ${cat}\n💲 *Costo:* $${price} USD\n\n💳 *Método Pago:* ${selectedRegPayment}\n💰 *Total:* $19.99 USD`;
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(txt), "_blank");
+            closeAddChannelModal();
+            triggerSuccessAnimation("Enviado", "Procesando alta.");
+        }
+
         function checkout() {
             if(carrito.length === 0) return;
             const subtotal = calculateCartSubtotal();
             const descuento = activeCoupon ? (subtotal * (activeCouponPct / 100)) : 0;
-            const neto = subtotal - descuento;
+            const neto = Math.max(subtotal - descuento, 0);
 
-            let textoPedido = "¡Hola! Quiero contratar publicidad.\n\n";
-            textoPedido += "📋 *RESUMEN DEL PEDIDO:*\n";
-            let resumenCanalesParaHistorial = [];
-
+            let txt = "¡Hola! Quiero contratar publicidad.\n\n📋 *RESUMEN:*\n";
+            let hist = [];
             carrito.forEach((item, i) => {
                 const canal = canalesData.find(c => c.id === item.idCanalOriginal);
                 if(canal) {
                     let p = getPrecio(canal);
-                    let extras = [];
-                    if(item.packExtra) { p += 25; extras.push("Pack x3"); }
-                    if(item.fixedExtra) { p += 10; extras.push("Fijado 24h"); }
-                    let stringEx = extras.length > 0 ? ` (${extras.join(', ')})` : "";
-                    textoPedido += `${i+1}. *${canal.nombre}* - $${p.toFixed(2)}${stringEx}\n`;
-                    resumenCanalesParaHistorial.push(canal.nombre + stringEx);
+                    let ex = [];
+                    if(item.packExtra) { p += 25; ex.push("Pack x3"); }
+                    if(item.fixedExtra) { p += 10; ex.push("Fijado 24h"); }
+                    let str = ex.length > 0 ? ` (${ex.join(', ')})` : "";
+                    txt += `${i+1}. *${canal.nombre}* - $${p.toFixed(2)}${str}\n`;
+                    hist.push(canal.nombre + str);
                 }
             });
 
             if(activeCoupon) {
-                textoPedido += `\n🎟️ *CUPÓN REDIMIDO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
+                txt += `\n🎟️ *CUPÓN:* ${activeCoupon} (-${activeCouponPct}%)\n`;
                 inventarioPremios = inventarioPremios.filter(p => p.codigo !== activeCoupon);
                 localStorage.setItem('ads_premios', JSON.stringify(inventarioPremios));
                 renderRewardsInventory();
             }
 
-            textoPedido += `\n💳 *MÉTODO DE PAGO PREFERIDO:* ${selectedPayment}\n`;
-            textoPedido += `💰 *TOTAL NETO A PAGAR:* $${neto.toFixed(2)} USD\n\n`;
-            textoPedido += "Quedo a la espera de las instrucciones de pago.";
-
-            const ahora = new Date();
-            const fechaString = ahora.toLocaleDateString() + " | " + ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            txt += `\n💳 *PAGO:* ${selectedPayment}\n💰 *TOTAL:* $${neto.toFixed(2)} USD`;
             
-            historialCampanas.unshift({ idCamp: Date.now(), fecha: fechaString, canales: resumenCanalesParaHistorial, total: neto.toFixed(2) + ` (${selectedPayment})`, estado: 'progreso' });
+            historialCampanas.unshift({ idCamp: Date.now(), fecha: new Date().toLocaleString(), canales: hist, total: neto.toFixed(2) + ` (${selectedPayment})`, estado: 'progreso' });
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
 
-            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(textoPedido), "_blank");
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(txt), "_blank");
             clearCart();
             closeCartModal();
         }
 
+        function switchView(view) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
+            document.getElementById('view-catalog').classList.add('hidden');
+            document.getElementById('view-favorites').classList.add('hidden');
+            document.getElementById('view-campaigns').classList.add('hidden');
+            document.getElementById('view-faq').classList.add('hidden');
+
+            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); updateRewardsPanel(); }
+            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
+            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
+            if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.replace('bg-sky-500/20', 'bg-slate-800'));
+            event.target.classList.replace('bg-slate-800', 'bg-sky-500/20');
+            renderChannels();
+        }
+
+        function toggleUserMenu(event) { event.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); }
+        function closeUserMenuOutside(event) { const d = document.getElementById('user-dropdown'); if (d && !d.classList.contains('hidden') && !d.contains(event.target) && !document.getElementById('user-avatar-btn').contains(event.target)) d.classList.add('hidden'); }
+
+        function triggerSuccessAnimation(title, desc) {
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-desc').innerText = desc;
+            const t = document.getElementById('success-toast'); const b = document.getElementById('toast-box');
+            t.classList.remove('opacity-0', 'pointer-events-none'); b.classList.replace('scale-75', 'scale-100');
+            setTimeout(() => { t.classList.add('opacity-0', 'pointer-events-none'); b.classList.replace('scale-100', 'scale-75'); }, 1500);
+        }
+
         function renderCampaigns() {
-            const container = document.getElementById('campaigns-container');
-            container.innerHTML = '';
-            if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 text-xs py-8">Aún no has solicitado campañas.</p>`; return; }
-            historialCampanas.forEach((camp, idx) => {
-                const isProgreso = camp.estado === 'progreso';
+            const container = document.getElementById('campaigns-container'); container.innerHTML = '';
+            if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 text-xs py-8">Aún no hay campañas.</p>`; return; }
+            historialCampanas.forEach(camp => {
+                const isP = camp.estado === 'progreso';
                 const div = document.createElement('div');
-                div.className = `p-4 rounded-2xl border transition-all duration-300 animate-fade-in ${isProgreso ? 'bg-slate-800/50 border-slate-700/40' : 'bg-emerald-950/20 border-emerald-500/30'}`;
-                div.style.animationDelay = `${idx * 60}ms`;
-                div.innerHTML = `
-                    <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i>${camp.fecha}</span>
-                        <span class="px-2 py-0.5 rounded-full font-bold ${isProgreso ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/20 text-emerald-400'}">
-                            ${isProgreso ? '<i class="fa-solid fa-spinner animate-spin mr-1 text-[9px]"></i> Pedido en progreso' : '<i class="fa-solid fa-check mr-1"></i> Completado'}
-                        </span>
-                    </div>
-                    <ul class="text-xs text-slate-200 list-disc list-inside space-y-0.5 pl-1 my-2">
-                        ${camp.canales.map(name => `<li class="truncate text-slate-300">${name}</li>`).join('')}
-                    </ul>
-                    <div class="pt-2 border-t border-slate-800/80 flex justify-between items-center text-xs">
-                        <div><span class="text-slate-400">Importe:</span><span class="font-black text-emerald-400 ml-1">$${camp.total} USD</span></div>
-                        <div class="flex gap-1.5">
-                            ${isProgreso ? `<button onclick="confirmCampaign(${camp.idCamp})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition-colors">Confirmar</button>` : ''}
-                            <button onclick="deleteCampaign(${camp.idCamp})" class="bg-slate-900 border border-slate-700 text-rose-400 hover:bg-rose-950/30 font-bold px-2 py-1 rounded-lg text-[10px] transition-colors"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </div>
-                `;
+                div.className = `p-4 rounded-2xl border bg-slate-800/50 border-slate-700/40`;
+                div.innerHTML = `<div class="flex justify-between items-center text-[11px]"><span class="text-slate-400 font-mono">${camp.fecha}</span><span class="font-bold ${isP?'text-indigo-400':'text-emerald-400'}">${isP?'En progreso':'Completado'}</span></div><ul class="text-xs text-slate-300 list-disc list-inside my-2">${camp.canales.map(n => `<li>${n}</li>`).join('')}</ul><div class="pt-2 border-t border-slate-800 flex justify-between items-center text-xs"><div><span class="text-slate-400">Total:</span><span class="font-black text-emerald-400 ml-1">$${camp.total}</span></div></div>`;
                 container.appendChild(div);
             });
         }
 
-        function confirmCampaign(idCamp) { const camp = historialCampanas.find(c => c.idCamp === idCamp); if(camp) { camp.estado = 'completado'; localStorage.setItem('ads_historial', JSON.stringify(historialCampanas)); triggerSuccessAnimation("¡Pedido Completado!", "La campaña cambió de estado con éxito."); renderCampaigns(); } }
-        function deleteCampaign(idCamp) { if(confirm("¿Seguro que quieres eliminar este registro del historial?")) { historialCampanas = historialCampanas.filter(c => c.idCamp !== idCamp); localStorage.setItem('ads_historial', JSON.stringify(historialCampanas)); triggerSuccessAnimation("Eliminado", "Registro borrado correctamente."); renderCampaigns(); } }
-        function clearCampaignHistory() { if(confirm("¿Eliminar todas las campañas solicitadas por completo?")) { historialCampanas = []; localStorage.setItem('ads_historial', JSON.stringify(historialCampanas)); renderCampaigns(); } }
-
         function toggleFaqItem(button) {
-            const currentItem = button.parentElement;
-            const contentWrapper = button.nextElementSibling;
-            const icon = button.querySelector('i');
-            document.querySelectorAll('#faq-accordion-group > div').forEach(item => {
-                if(item !== currentItem) { item.classList.replace('bg-slate-800/80', 'bg-slate-800/40'); item.querySelector('.grid').style.gridTemplateRows = "0fr"; item.querySelector('i').classList.remove('rotate-180'); }
-            });
-            if (contentWrapper.style.gridTemplateRows === "1fr") { contentWrapper.style.gridTemplateRows = "0fr"; currentItem.classList.replace('bg-slate-800/80', 'bg-slate-800/40'); icon.classList.remove('rotate-180'); }
-            else { contentWrapper.style.gridTemplateRows = "1fr"; currentItem.classList.replace('bg-slate-800/40', 'bg-slate-800/80'); icon.classList.add('rotate-180'); }
+            const wrapper = button.nextElementSibling;
+            if (wrapper.style.gridTemplateRows === "1fr") wrapper.style.gridTemplateRows = "0fr";
+            else wrapper.style.gridTemplateRows = "1fr";
         }
     </script>
 </body>
