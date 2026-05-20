@@ -740,7 +740,18 @@
             else { gridWrapper.style.gridTemplateRows = "1fr"; icon.classList.add('rotate-180'); }
         }
 
-        function toggleFav(id) { favoritos = favoritos.includes(id) ? favoritos.filter(fId => fId !== id) : [...favorites, id]; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); switchView(document.getElementById('view-catalog').classList.contains('hidden') ? 'favorites' : 'catalog'); }
+        function toggleFav(id) {
+    // Corregido: Ahora usa la variable 'favoritos' de forma consistente en español
+    favoritos = favoritos.includes(id) 
+        ? favoritos.filter(fId => fId !== id) 
+        : [...favoritos, id]; 
+        
+    localStorage.setItem('ads_favoritos', JSON.stringify(favoritos));
+    
+    // Determina en qué pestaña estás para refrescar la vista correcta sin romper el flujo
+    const enCatalogo = !document.getElementById('view-catalog').classList.contains('hidden');
+    switchView(enCatalogo ? 'catalog' : 'favorites');
+}
         function renderFavorites() { const container = document.getElementById('favorites-container'); container.innerHTML = ''; const favs = canalesData.filter(c => favoritos.includes(c.id)); if(favs.length === 0) { container.innerHTML = `<p class="col-span-full text-center text-slate-500 py-6 text-xs">Sin canales guardados.</p>`; return; } favs.forEach((c, idx) => { const card = createChannelCard(c); card.style.animationDelay = `${idx * 60}ms`; container.appendChild(card); }); }
         function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
 
