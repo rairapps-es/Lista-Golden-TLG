@@ -110,7 +110,7 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Mis Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <div class="border-t border-slate-800/60 my-1} "></div>
+                <div class="border-t border-slate-800/60 my-1"></div>
                 <a href="https://t.me/Airdayz" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
                     <i class="fa-brands fa-telegram text-emerald-400 w-4"></i> Soporte Telegram
                 </a>
@@ -204,10 +204,10 @@
         <!-- FILTROS Y CATEGORÍAS -->
         <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
             <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
-                <button onclick="filterCategory('todos')" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30">Todos</button>
-                <button onclick="filterCategory('Tecnología')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Tecnología</button>
-                <button onclick="filterCategory('Finanzas')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Finanzas</button>
-                <button onclick="filterCategory('Entretenimiento')" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Entretenimiento</button>
+                <button onclick="filterCategory('todos', event)" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30">Todos</button>
+                <button onclick="filterCategory('Tecnología', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Tecnología</button>
+                <button onclick="filterCategory('Finanzas', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Finanzas</button>
+                <button onclick="filterCategory('Entretenimiento', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700">Entretenimiento</button>
             </div>
             <select id="sort-filter" onchange="renderChannels()" class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 text-xs text-slate-300 focus:outline-none">
                 <option value="default">⇅</option>
@@ -245,6 +245,22 @@
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="closeFlashOffer(false)" class="bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 cursor-pointer">Rechazar</button>
                 <button onclick="claimFlashOffer()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/10 cursor-pointer">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRO DE NUEVO CANAL (MONETIZACIÓN) -->
+    <div id="add-channel-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
+            <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center"><span class="font-black text-xs text-slate-950 uppercase">Formulario de Monetización</span><button onclick="closeAddChannelModal()" class="text-slate-950 text-xl"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none text-xs">
+                <input type="text" id="reg-channel-name" placeholder="Nombre del Canal" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                <input type="text" id="reg-channel-user" placeholder="Enlace o @Username" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                <input type="number" id="reg-channel-subs" placeholder="Total Suscriptores" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                <select id="reg-channel-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Público">Público</option><option value="Privado">Privado</option></select>
+                <select id="reg-channel-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Tecnología">Tecnología</option><option value="Finanzas">Finanzas</option><option value="Entretenimiento">Entretenimiento</option></select>
+                <input type="number" id="reg-channel-price" placeholder="Precio por Post ($ USD)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                <button onclick="submitChannelRegistration()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 p-3 rounded-xl font-black text-slate-950 uppercase tracking-wider">Solicitar Alta ($19.99 Lifetime)</button>
             </div>
         </div>
     </div>
@@ -385,22 +401,6 @@
         </div>
     </div>
 
-    <!-- MODAL: REGISTRO DE NUEVO CANAL (MONETIZACIÓN) -->
-    <div id="add-channel-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
-            <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center"><span class="font-black text-xs text-slate-950 uppercase">Formulario de Monetización</span><button onclick="closeAddChannelModal()" class="text-slate-950 text-xl"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none text-xs">
-                <input type="text" id="reg-channel-name" placeholder="Nombre del Canal" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
-                <input type="text" id="reg-channel-user" placeholder="Enlace o @Username" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
-                <input type="number" id="reg-channel-subs" placeholder="Total Suscriptores" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
-                <select id="reg-channel-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Público">Público</option><option value="Privado">Privado</option></select>
-                <select id="reg-channel-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Tecnología">Tecnología</option><option value="Finanzas">Finanzas</option><option value="Entretenimiento">Entretenimiento</option></select>
-                <input type="number" id="reg-channel-price" placeholder="Precio por Post ($ USD)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
-                <button onclick="submitChannelRegistration()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 p-3 rounded-xl font-black text-slate-950 uppercase tracking-wider">Solicitar Alta ($19.99 Lifetime)</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const MI_TELEGRAM_USER = "Airdayz";
         
@@ -432,6 +432,7 @@
         let currentCarouselIndex = 0;
         let tgUserName = "Anunciante Golden"; 
         let flashTimerInterval = null;
+        let currentWheelRotation = 0; // Evita saltos locos en la animación de la ruleta
 
         document.addEventListener("DOMContentLoaded", () => {
             initTelegramUserData();
@@ -447,7 +448,10 @@
             initAiAssistant();
             initFomoBot();
             setInterval(nextCarousel, 4000); // Rotación automática carrusel
-            setTimeout(() => document.getElementById('global-loader').remove(), 500);
+            setTimeout(() => {
+                const loader = document.getElementById('global-loader');
+                if(loader) loader.remove();
+            }, 500);
         });
 
         // OBTENCIÓN COMPLETA DE DATOS CON LA API NATIVA DE TELEGRAM
@@ -472,6 +476,9 @@
                         avatarImg.src = u.photo_url;
                         avatarImg.classList.remove('hidden');
                         document.getElementById('user-avatar-text').classList.add('hidden');
+                    } else {
+                        // Respaldo por si photo_url no está disponible por privacidad
+                        document.getElementById('user-avatar-text').classList.remove('hidden');
                     }
                 }
             }
@@ -589,7 +596,10 @@
             else if (r > 93 && r <= 99) sel = opciones[3];
             else if (r > 99) sel = opciones[4];
 
-            document.getElementById('roulette-wheel').style.transform = `rotate(${3600 + sel.deg}deg)`;
+            // Acumulación incremental para evitar saltos locos en reversa
+            currentWheelRotation += 3600 + sel.deg;
+            document.getElementById('roulette-wheel').style.transform = `rotate(${currentWheelRotation}deg)`;
+            
             setTimeout(() => {
                 userPoints += sel.pts;
                 localStorage.setItem('ads_user_points', userPoints.toString());
@@ -599,6 +609,7 @@
                 closeRouletteModal();
                 checkRouletteAvailability();
                 triggerSuccessAnimation(`+${sel.pts} Puntos`, "Puntos guardados.");
+                btn.removeAttribute('disabled');
                 if (userPoints >= 500) {
                     userPoints -= 500;
                     localStorage.setItem('ads_user_points', userPoints.toString());
@@ -615,6 +626,7 @@
         // RENDERIZADO DEL CARRUSEL DE DESTACADOS AUTOMÁTICO
         function renderCarousel() {
             const track = document.getElementById('carousel-track');
+            if(!track || canalesData.length === 0) return;
             const c = canalesData[currentCarouselIndex];
             track.innerHTML = `
                 <div class="flex items-center justify-between gap-4 animate-fade-in text-xs w-full">
@@ -635,6 +647,7 @@
         // RENDERIZADO DE TARJETAS DEL CATÁLOGO ORIGINAL
         function renderChannels() {
             const container = document.getElementById('channels-container');
+            if(!container) return;
             container.innerHTML = '';
             let filtrados = [...canalesData];
             if (currentCategory !== 'todos') filtrados = filtrados.filter(c => c.categoria === currentCategory);
@@ -708,6 +721,7 @@
         function evaluateTier(num, unlocked, code) {
             const el = document.getElementById(`tier-${num}`);
             const btn = document.getElementById(`btn-tier-${num}`);
+            if(!el || !btn) return;
             const guardado = inventarioPremios.some(p => p.codigo === code);
             if(guardado) {
                 el.classList.remove('opacity-50'); btn.setAttribute('disabled','true'); btn.innerText = "Guardado";
@@ -733,6 +747,7 @@
         function renderRewardsInventory() {
             const container = document.getElementById('rewards-inventory-container');
             document.getElementById('menu-rewards-count').innerText = inventarioPremios.length;
+            if(!container) return;
             container.innerHTML = '';
             if(inventarioPremios.length === 0) { container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-2">Sin cupones.</p>`; return; }
             inventarioPremios.forEach(p => {
@@ -773,7 +788,9 @@
         }
 
         function openCartModal() {
-            const container = document.getElementById('cart-items'); container.innerHTML = '';
+            const container = document.getElementById('cart-items'); 
+            if(!container) return;
+            container.innerHTML = '';
             document.getElementById('cart-modal').classList.remove('hidden');
             if(carrito.length === 0) {
                 document.getElementById('cart-subtotal').innerText = "$0.00"; document.getElementById('cart-total').innerText = "$0.00 USD";
@@ -874,10 +891,12 @@
             try {
                 const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?system=${encodeURIComponent(sysPrompt)}&private=true`);
                 const reply = await res.text();
-                document.getElementById(loaderId).remove();
+                const loaderEl = document.getElementById(loaderId);
+                if(loaderEl) loaderEl.remove();
                 container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">${reply}</div>`;
             } catch {
-                document.getElementById(loaderId).remove();
+                const loaderEl = document.getElementById(loaderId);
+                if(loaderEl) loaderEl.remove();
                 container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none">Hubo un error de conexión. Escribe directamente a @Airdayz.</div>`;
             }
             container.scrollTop = container.scrollHeight;
@@ -897,14 +916,17 @@
             if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
         }
 
-        function filterCategory(cat) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); event.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
+        function filterCategory(cat, e) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); e.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
         function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); document.getElementById('menu-campaigns-count').innerText = historialCampanas.filter(c => c.estado === 'progreso').length; }
         function closeUserMenuOutside(e) { const d = document.getElementById('user-dropdown'); if(d && !d.classList.contains('hidden') && !d.contains(e.target)) d.classList.add('hidden'); }
-        function renderFavorites() { const container = document.getElementById('favorites-container'); container.innerHTML = ''; const favs = canalesData.filter(c => favoritos.includes(c.id)); if(favs.length===0){container.innerHTML=`<p class="text-slate-500 text-xs py-4 text-center col-span-full">Sin favoritos.</p>`;return;} favs.forEach(c => { /* Clonación simplificada de tarjeta para favoritos */ const d = document.createElement('div'); d.className="bg-slate-800 p-3 rounded-xl text-xs flex justify-between items-center"; d.innerHTML=`<span>${c.nombre}</span><button onclick="toggleFav(${c.id}); renderFavorites();" class="text-amber-400"><i class="fa-solid fa-star"></i></button>`; container.appendChild(d); }); }
+        function openPremiosModal() { document.getElementById('premios-modal').classList.remove('hidden'); }
+        function closePremiosModal() { document.getElementById('premios-modal').classList.add('hidden'); }
+        
+        function renderFavorites() { const container = document.getElementById('favorites-container'); if(!container) return; container.innerHTML = ''; const favs = canalesData.filter(c => favoritos.includes(c.id)); if(favs.length===0){container.innerHTML=`<p class="text-slate-500 text-xs py-4 text-center col-span-full">Sin favoritos.</p>`;return;} favs.forEach(c => { const d = document.createElement('div'); d.className="bg-slate-800 p-3 rounded-xl text-xs flex justify-between items-center"; d.innerHTML=`<span>${c.nombre}</span><button onclick="toggleFav(${c.id}); renderFavorites();" class="text-amber-400"><i class="fa-solid fa-star"></i></button>`; container.appendChild(d); }); }
         function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
         
         function renderCampaigns() {
-            const container = document.getElementById('campaigns-container'); container.innerHTML = '';
+            const container = document.getElementById('campaigns-container'); if(!container) return; container.innerHTML = '';
             if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-slate-500 text-center py-4 text-xs">Sin registros.</p>`; return; }
             historialCampanas.forEach(c => {
                 const div = document.createElement('div'); div.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-800 text-xs";
