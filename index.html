@@ -1571,7 +1571,7 @@
             if (selectedBtn) selectedBtn.classList.add('border-sky-400', 'bg-sky-500/10');
         }
 
-        function checkout() {
+                function checkout() {
             if(carrito.length === 0) return;
             let sub = calculateCartSubtotal();
             let total = activeCoupon ? sub * (1 - activeCouponPct/100) : sub;
@@ -1588,7 +1588,15 @@
                 }
             });
 
-            historialCampanas.push({ idCampaign: Date.now(), fecha: new Date().toLocaleDateString(), total: total.toFixed(2), metodo: selectedPayment, itemSuma: carrito.length, itemsSnapshot: [...carrito] });
+            historialCampanas.push({ 
+                idCampaign: Date.now(), 
+                fecha: new Date().toLocaleDateString(), 
+                total: total.toFixed(2), 
+                metodo: selectedPayment, 
+                itemSuma: carrito.length, 
+                itemsSnapshot: [...carrito] 
+            });
+            
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
             document.getElementById('menu-campaigns-count').innerText = historialCampanas.length;
 
@@ -1596,6 +1604,7 @@
             activeCoupon = null;
             activeCouponPct = 0;
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            
             updateCartBadge();
             closeCartModal();
 
@@ -1607,7 +1616,8 @@
             }
             triggerSuccessAnimation("Pedido Enviado", "Tu carrito se ha procesado con éxito.");
         }
-
+    </script>
+    
         function filterCategory(cat, e) {
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => {
