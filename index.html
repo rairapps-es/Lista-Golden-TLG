@@ -70,7 +70,7 @@
             animation: floatingGift 2s ease-in-out infinite;
             font-size: 4rem;
         }
-        /* Ocultar sección de premios de forma prioritaria si es necesario */
+        /* Ocultar sección de premios de forma prioritaria */
         .hidden-rewards {
             display: none !important;
         }
@@ -112,6 +112,96 @@
         </div>
     </div>
 
+    <!-- TARJETA FLOTANTE DE REPRODUCTOR DE VÍDEO (MISIONES) -->
+    <div id="video-mission-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm p-5 rounded-2xl text-center space-y-4 shadow-2xl relative">
+            <h3 class="text-xs font-black uppercase tracking-wider text-amber-400"><i class="fa-solid fa-circle-play mr-1.5"></i> Reproductor de Misión</h3>
+            <div class="w-full aspect-video bg-black rounded-xl border border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
+                <i class="fa-solid fa-clapperboard text-slate-800 text-5xl absolute"></i>
+                <div class="z-10 p-4 text-center">
+                    <p class="text-xs font-bold text-slate-200">Visualizando vídeo promocional...</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Mantén esta ventana abierta para validar</p>
+                </div>
+            </div>
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span>Progreso de visualización</span>
+                    <span id="video-timer-txt">60s / 60s</span>
+                </div>
+                <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800 overflow-hidden">
+                    <div id="video-progress-bar" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-1000"></div>
+                </div>
+            </div>
+            <div id="video-action-container">
+                <button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando...</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VENTANA FLOTANTE: COMUNIDAD SOCIAL GOLDEN -->
+    <div id="social-golden-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-sm rounded-3xl border border-amber-400/40 p-5 space-y-4 shadow-2xl relative animate-fade-in">
+            <button onclick="toggleSocialModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 bg-amber-400/10 border border-amber-400/30 rounded-full flex items-center justify-center text-xl text-amber-400 mx-auto mb-1"><i class="fa-solid fa-crown"></i></div>
+                <h3 class="text-sm font-black text-slate-200 uppercase tracking-wide">Únete a la comunidad Dorada</h3>
+                <p class="text-[11px] text-slate-400">Envíanos tus consultas o solicita soporte con nuestro asistente IA o con un administrador humano.</p>
+            </div>
+            <div class="grid gap-2.5 pt-1 text-xs">
+                <button onclick="openAiFromSocial()" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer group">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-200 group-hover:text-sky-400 transition-colors">Soporte Asistente IA</p>
+                            <p class="text-[9px] text-slate-400">Consultas automatizadas inmediatas</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+                </button>
+                <a href="https://t.me/Airdayz" target="_blank" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer group">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-user-tie"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">Soporte Humano</p>
+                            <p class="text-[9px] text-slate-400">Chat privado directo en Telegram</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+                </a>
+                <a href="https://t.me/ListaGolden" target="_blank" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-left transition-all group">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors">Canal Comunidad @ListaGolden</p>
+                            <p class="text-[9px] text-slate-400">Entérate de todas las novedades</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+                </a>
+                <a href="https://lista-golden.com" target="_blank" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-left transition-all group">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-globe"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-200 group-hover:text-amber-400 transition-colors">Web Oficial lista-golden.com</p>
+                            <p class="text-[9px] text-slate-400">Visita nuestro portal internacional</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+                </a>
+                <a href="https://t.me/GoldenPlusBot" target="_blank" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-left transition-all group">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <p class="font-bold text-slate-200 group-hover:text-rose-400 transition-colors">Bot Oficial @GoldenPlusBot</p>
+                            <p class="text-[9px] text-slate-400">Automatizaciones directas</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800/80 shadow-xl">
         <div class="flex items-center gap-2">
@@ -141,14 +231,9 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="openRewardsModalFlotante(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                <button onclick="switchView('catalog'); showAndScrollToRewards(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
-                </button>
-                <!-- NUEVO APARTADO SOCIAL INTEGRADO -->
-                <button id="menu-social-btn" onclick="openSocialModalFlotante(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-share-nodes text-emerald-400 w-4"></i> Tareas Sociales</span>
-                    <span id="menu-social-count" class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
                 </button>
                 <div class="border-t border-slate-800/60 my-1"></div>
                 <!-- BOTÓN INTEGRADO DE RESETEO DE PRUEBA -->
@@ -170,7 +255,13 @@
     </header>
 
     <!-- LANZADORES FLOTANTES: RULETA DIARIA COMPLETA -->
-    <div id="roulette-triggers-container" class="fixed bottom-38 right-4 z-40">
+    <div id="roulette-triggers-container" class="fixed bottom-54 right-4 z-40 flex flex-col gap-2.5">
+        <!-- BOTÓN DE ACCESO SOCIAL GLOBAL -->
+        <button onclick="toggleSocialModal()" class="w-14 h-14 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full shadow-2xl flex flex-col items-center justify-center text-white text-lg font-bold border-2 border-slate-900 cursor-pointer transition-transform hover:scale-110">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span class="text-[6px] uppercase tracking-tighter mt-0.5 font-black">Social</span>
+        </button>
+        
         <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-14 h-14 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-xl font-bold border-2 border-slate-900 hidden cursor-pointer transition-transform hover:scale-110 animate-bounce">
             <i class="fa-solid fa-pie-chart"></i>
         </button>
@@ -189,55 +280,6 @@
         </div>
     </div>
 
-    <!-- NUEVO VENTANA MODAL FLOTANTE DE PREMIOS (MEJORA SOLICITADA) -->
-    <div id="rewards-floating-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-md rounded-3xl border border-indigo-500/30 p-5 space-y-4 shadow-2xl relative animate-fade-in max-h-[85vh] flex flex-col">
-            <button onclick="closeRewardsModalFlotante()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            <div class="flex justify-between items-center pr-8 flex-shrink-0">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-gift text-amber-400 text-lg"></i>
-                    <h3 class="text-sm font-black uppercase text-slate-100 tracking-wider">Premios Disponibles</h3>
-                </div>
-                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i><span id="rewards-points-counter">0</span> pts</span>
-            </div>
-            <div id="rewards-slots-container" class="grid gap-2.5 overflow-y-auto flex-1 pr-1 scrollbar-none"></div>
-        </div>
-    </div>
-
-    <!-- NUEVO VENTANA MODAL FLOTANTE APARTADO SOCIAL (MEJORA SOLICITADA) -->
-    <div id="social-floating-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-md rounded-3xl border border-emerald-500/30 p-5 space-y-4 shadow-2xl relative animate-fade-in">
-            <button onclick="closeSocialModalFlotante()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-share-nodes text-emerald-400 text-lg"></i>
-                <h3 class="text-sm font-black uppercase text-slate-100 tracking-wider">Comunidad y Redes</h3>
-            </div>
-            <p class="text-[11px] text-slate-400">Únete a nuestros canales para ganar puntos extra al instante.</p>
-            <div class="space-y-2.5 text-xs">
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 text-base"><i class="fa-brands fa-telegram"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-200">Canal Oficial Lista Golden</h4>
-                            <p class="text-[10px] text-emerald-400 font-semibold mt-0.5">+150 Puntos</p>
-                        </div>
-                    </div>
-                    <button id="btn-social-task-1" onclick="completeSocialTask(1, 'https://t.me/LISTAGOLDEN', 150)" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider cursor-pointer">Unirse</button>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-base"><i class="fa-solid fa-bullhorn"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-200">Canal de Reseñas Golden</h4>
-                            <p class="text-[10px] text-emerald-400 font-semibold mt-0.5">+100 Puntos</p>
-                        </div>
-                    </div>
-                    <button id="btn-social-task-2" onclick="completeSocialTask(2, 'https://t.me/Airdayz', 100)" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider cursor-pointer">Unirse</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- VISTA 1: CATÁLOGO -->
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
         
@@ -253,6 +295,18 @@
             </div>
         </section>
 
+        <!-- SECCIÓN DE PREMIOS POR PUNTOS -->
+        <section id="rewards-section" class="hidden-rewards bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
+                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Premios para Desbloquear</h3>
+                </div>
+                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i>Tus puntos: <span id="rewards-points-counter">0</span> pts</span>
+            </div>
+            <div id="rewards-slots-container" class="grid gap-2.5"></div>
+        </section>
+
         <!-- BANNER AGREGA TU CANAL -->
         <section id="banner-add-channel" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl hidden relative">
             <button onclick="closeBannerPermanently(event)" class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/40 text-slate-300 flex items-center justify-center text-[10px] hover:bg-black/60 z-10 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -261,7 +315,7 @@
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20">🚀</div>
                     <div>
                         <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Quieres monetizar o destacar tu canal?</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu espacio o adquiere el Potenciador Recomendado de 7 días o 1 mes.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu space o adquiere el Potenciador Recomendado de 7 días o 1 mes.</p>
                     </div>
                 </div>
             </button>
@@ -286,6 +340,90 @@
 
         <!-- CONTENEDOR DE TARJETAS -->
         <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
+    </main>
+
+    <!-- VISTA: MISIONES RECOMPENSADAS -->
+    <main id="view-missions" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-list-check text-sky-400 mr-2"></i>Misiones Disponibles</h2>
+            <span class="text-[10px] bg-sky-500/10 text-sky-300 px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-clock mr-1"></i>Reset cada 24h</span>
+        </div>
+        <div id="missions-container" class="grid gap-3 sm:grid-cols-2"></div>
+    </main>
+
+    <!-- VISTA: CONTRATAR ANUNCIOS PATROCINADOS -->
+    <main id="view-sponsor-ads" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
+        <div class="text-center max-w-md mx-auto space-y-1">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-amber-400 mr-2"></i>Anuncios Patrocinados</h2>
+            <p class="text-[11px] text-slate-400">Publicaciones directas masivas en la red global de +100 canales y +100k suscriptores de @ListaGolden durante 4 horas.</p>
+        </div>
+        
+        <div class="grid gap-4 sm:grid-cols-3 pt-2">
+            <!-- OPCIÓN 1: MICRO-ANUNCIO -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3.5 relative shadow-xl">
+                <span class="absolute top-3 right-3 bg-sky-500/10 text-sky-400 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase">Económico</span>
+                <div class="space-y-1.5">
+                    <h3 class="text-xs font-black text-slate-200 uppercase">Micro-Anuncio</h3>
+                    <p class="text-[10px] text-slate-400 leading-relaxed">Texto con 1 enlace y 1 emoji en la publicación post ANUNCIO de @ListaGolden.</p>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-850 space-y-2 text-[10px]">
+                    <p class="font-bold text-slate-400 uppercase tracking-tighter text-[9px]">Mejoras Suplementarias:</p>
+                    <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                        <input type="checkbox" id="micro-opt-img" onchange="calculateSponsorPrice('micro')" class="rounded border-slate-800 text-sky-500 bg-slate-950 focus:ring-0">
+                        <span>Añadir Imagen (+ $15.00)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                        <input type="checkbox" id="micro-opt-vid" onchange="calculateSponsorPrice('micro')" class="rounded border-slate-800 text-sky-500 bg-slate-950 focus:ring-0">
+                        <span>Añadir Vídeo (+ $25.00)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                        <input type="checkbox" id="micro-opt-suprem" onchange="calculateSponsorPrice('micro')" class="rounded border-slate-800 text-sky-500 bg-slate-950 focus:ring-0">
+                        <span class="text-amber-400 font-bold">Pack Supremo (+ $40.00)</span>
+                    </label>
+                    <p class="text-[8px] text-slate-500 pt-0.5 leading-none">*Pack Supremo permite 3 enlaces, 7 emojis y 2 imágenes.</p>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <span id="price-micro" class="text-sm font-black text-emerald-400">$29.99 USD</span>
+                    <button onclick="addSponsorToCart('micro')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] px-3 py-2 rounded-xl transition-all cursor-pointer shadow-md">+ Cesta</button>
+                </div>
+            </div>
+
+            <!-- OPCIÓN 2: COMPACTO INDIVIDUAL -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3.5 relative shadow-xl">
+                <span class="absolute top-3 right-3 bg-indigo-500/10 text-indigo-400 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase">Equilibrado</span>
+                <div class="space-y-1.5">
+                    <h3 class="text-xs font-black text-slate-200 uppercase">Anuncio Compacto</h3>
+                    <p class="text-[10px] text-slate-400 leading-relaxed">Post completo SOLO texto (hasta 200 caracteres), hasta 2 enlaces y múltiples emojis personalizados.</p>
+                </div>
+                <div class="bg-slate-950/40 border border-slate-850 p-2.5 rounded-xl text-[9px] text-slate-500 leading-relaxed">
+                    <p class="font-bold text-slate-400 uppercase mb-0.5">Ventajas:</p>
+                    <p><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Sin publicidad compartida en la misma celda de post.</p>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-sm font-black text-emerald-400">$49.99 USD</span>
+                    <button onclick="addSponsorToCart('compacto')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] px-3 py-2 rounded-xl transition-all cursor-pointer shadow-md">+ Cesta</button>
+                </div>
+            </div>
+
+            <!-- OPCIÓN 3: ANUNCIO COMPLETO -->
+            <div class="bg-gradient-to-b from-slate-900 to-amber-950/20 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between space-y-3.5 relative shadow-xl">
+                <span class="absolute top-3 right-3 bg-amber-400 text-slate-950 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tight">Premium</span>
+                <div class="space-y-1.5">
+                    <h3 class="text-xs font-black text-amber-400 uppercase">Anuncio Completo</h3>
+                    <p class="text-[10px] text-slate-300 leading-relaxed">Hasta 500 palabras. Incluye hasta 3 enlaces, emojis ilimitados y 1 archivo multimedia (imagen o vídeo).</p>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-850 text-[10px] space-y-1.5">
+                    <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                        <input type="checkbox" id="full-opt-spoiler" class="rounded border-slate-800 text-amber-500 bg-slate-950 focus:ring-0">
+                        <span class="font-semibold">Agregar efecto Spoiler opcional</span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-sm font-black text-emerald-400">$79.99 USD</span>
+                    <button onclick="addSponsorToCart('completo')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[10px] px-3 py-2 rounded-xl transition-all cursor-pointer shadow-md">+ Cesta</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- MODAL POPUP: OFERTA FLASH -->
@@ -403,7 +541,7 @@
     </main>
 
     <!-- ASISTENTE CHAT FLOTANTE CON IA -->
-    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-40 flex flex-col items-end">
+    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-50 flex flex-col items-end">
         <div id="ai-chat-window" class="w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col mb-3 animate-fade-in h-96">
             <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -423,19 +561,22 @@
         </button>
     </div>
 
-    <!-- MENÚ INFERIOR FIJO -->
+    <!-- MENÚ INFERIOR FIJO EXTENDIDO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
-        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold active-tab cursor-pointer">
+        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold active-tab cursor-pointer">
             <i class="fa-solid fa-layer-group text-base"></i>Catálogo
         </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
+        <button onclick="switchView('missions')" id="nav-missions" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+            <i class="fa-solid fa-list-check text-base"></i>Misiones
+        </button>
+        <button onclick="switchView('sponsor-ads')" id="nav-sponsor-ads" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+            <i class="fa-solid fa-rectangle-ad text-base"></i>Patrocinados
+        </button>
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-star text-base"></i>Favoritos
         </button>
-        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
-            <i class="fa-solid fa-rectangle-ad text-base"></i>Campañas
-        </button>
-        <button onclick="switchView('faq')" id="nav-faq" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
-            <i class="fa-solid fa-shield-halved text-base"></i>Garantía
+        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+            <i class="fa-solid fa-clock-rotate-left text-base"></i>Historial
         </button>
     </nav>
 
@@ -518,9 +659,19 @@
         ];
 
         const premiosData = [
-            { id: '4h_free', name: 'Anuncio 4 horas gratis', pointsRequired: 500 },
-            { id: '7d_free', name: 'Anuncio gratis x 7 días', pointsRequired: 2000 },
-            { id: '1m_free', name: 'Anuncio gratis por 1 mes', pointsRequired: 7000 }
+            { id: 'free_4h_500', name: '1 anuncio gratis por 4 horas en 1 canal con +500 suscriptores', pointsRequired: 400 },
+            { id: 'free_24h_1000', name: '1 anuncio gratis 24 horas en 1 canal con +1000 suscriptores', pointsRequired: 900 },
+            { id: 'free_3d_3000', name: '1 anuncio gratis 3 días en 1 canal con +3000 suscriptores', pointsRequired: 1800 },
+            { id: 'free_7d_5000', name: '1 anuncio gratis 7 días en 1 canal con +5000 suscriptores', pointsRequired: 3500 },
+            { id: 'free_1m_3ch', name: '1 anuncio gratis por 1 mes en 3 canales con +3000 suscriptores', pointsRequired: 6500 },
+            { id: 'free_perm_10ch', name: '1 Anuncio gratis permanente en 10 canales con +20.000 suscriptores', pointsRequired: 12000 }
+        ];
+
+        const misionesData = [
+            { id: 'miss_video', title: 'Mira este vídeo durante 1 minuto', points: 150, desc: 'Haz click en play, espera a que finalice el contador dinámico de 60 segundos y reclama tu recompensa.', icon: 'fa-video' },
+            { id: 'miss_tg', title: 'Suscríbete a nuestro canal de Telegram', points: 200, desc: 'Únete a nuestro canal oficial para recibir ofertas flash exclusivas y cupones de regalo.', icon: 'fa-paper-plane' },
+            { id: 'miss_web', title: 'Visita nuestra página web oficial', points: 100, desc: 'Explora lista-golden.com para conocer nuestros servicios empresariales avanzados.', icon: 'fa-globe' },
+            { id: 'miss_share', title: 'Comparte nuestro canal con tus amigos', points: 250, desc: 'Ayúdanos a expandir la red Golden Ads compartiendo el enlace oficial con tus contactos.', icon: 'fa-share-nodes' }
         ];
 
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
@@ -529,7 +680,7 @@
         let claimedRewards = JSON.parse(localStorage.getItem('ads_claimed_rewards')) || []; 
         let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 2500; 
         let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
-        let completedSocialTasks = JSON.parse(localStorage.getItem('ads_social_tasks')) || [];
+        let missionTimers = JSON.parse(localStorage.getItem('ads_mission_timers')) || {};
         
         let totalSesionesHoy = parseInt(localStorage.getItem('ads_sesiones_contador')) || 0;
         let ultimaSesionFecha = localStorage.getItem('ads_ultima_sesion_fecha') || "";
@@ -553,10 +704,10 @@
             renderChannels();
             renderRewardsSlots();
             renderCarousel();
+            renderMissions();
             updateCartBadge();
             updatePointsDisplay();
             updateRewardsMenuBadge(); 
-            updateSocialTasksBadge();
             checkRouletteAvailability();
             initAiAssistant();
             initFomoBot();
@@ -740,57 +891,26 @@
         function updateRewardsMenuBadge() {
             const badge = document.getElementById('menu-rewards-count');
             if (badge) {
-                const rewardsEnCesta = carrito.filter(item => item.isReward).length;
-                const totalDesbloqueados = claimedRewards.length + rewardsEnCesta;
-                badge.innerText = totalDesbloqueados;
+                // Filtramos los premios desbloqueados con saldo que NO se han metido al carro (sin usar)
+                let countUnused = 0;
+                premiosData.forEach(p => {
+                    const yaReclamadoYEnCarro = carrito.some(item => item.isReward && item.detallesMejora.includes(p.name));
+                    if(userPoints >= p.pointsRequired && !yaReclamadoYEnCarro && !claimedRewards.includes(p.id)){
+                        countUnused++;
+                    }
+                });
+                badge.innerText = countUnused;
             }
         }
 
-        /* CONTROLADORES DE VENTANAS FLOTANTES ANIMADAS (PREMIOS Y SOCIAL) */
-        function openRewardsModalFlotante() {
-            renderRewardsSlots();
-            document.getElementById('rewards-floating-modal').classList.remove('hidden');
-        }
-        function closeRewardsModalFlotante() {
-            document.getElementById('rewards-floating-modal').classList.add('hidden');
-        }
-        function openSocialModalFlotante() {
-            updateSocialTasksBadge();
-            document.getElementById('social-floating-modal').classList.remove('hidden');
-        }
-        function closeSocialModalFlotante() {
-            document.getElementById('social-floating-modal').classList.add('hidden');
-        }
-
-        function updateSocialTasksBadge() {
-            const remainingTasks = 2 - completedSocialTasks.length;
-            document.getElementById('menu-social-count').innerText = remainingTasks;
-            
-            if (completedSocialTasks.includes(1)) {
-                const btn1 = document.getElementById('btn-social-task-1');
-                if(btn1) { btn1.className = "bg-slate-800 text-slate-500 text-[10px] px-3 py-1.5 rounded-lg font-bold"; btn1.innerText = "Hecho ✓"; btn1.disabled = true; }
+        function showAndScrollToRewards() {
+            const el = document.getElementById('rewards-section');
+            if(el) {
+                el.classList.remove('hidden-rewards'); 
+                setTimeout(() => {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
             }
-            if (completedSocialTasks.includes(2)) {
-                const btn2 = document.getElementById('btn-social-task-2');
-                if(btn2) { btn2.className = "bg-slate-800 text-slate-500 text-[10px] px-3 py-1.5 rounded-lg font-bold"; btn2.innerText = "Hecho ✓"; btn2.disabled = true; }
-            }
-        }
-
-        function completeSocialTask(taskId, url, rewardPts) {
-            window.open(url, "_blank");
-            triggerSuccessAnimation("Verificando...", "Comprobando suscripción en unos segundos.");
-            
-            setTimeout(() => {
-                if (!completedSocialTasks.includes(taskId)) {
-                    completedSocialTasks.push(taskId);
-                    localStorage.setItem('ads_social_tasks', JSON.stringify(completedSocialTasks));
-                    userPoints += rewardPts;
-                    localStorage.setItem('ads_user_points', userPoints.toString());
-                    updatePointsDisplay();
-                    updateSocialTasksBadge();
-                    triggerSuccessAnimation(`+${rewardPts} Puntos`, "¡Recompensa social añadida!");
-                }
-            }, 3500);
         }
 
         function renderRewardsSlots() {
@@ -803,42 +923,47 @@
                 card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs";
                 
                 let buttonHTML = '';
+                const enCarro = carrito.some(item => item.isReward && item.detallesMejora.includes(reward.name));
                 
-                if (claimedRewards.includes(reward.id)) {
-                    buttonHTML = `<button class="bg-slate-800 text-slate-500 font-bold px-3 py-1.5 rounded-lg border border-slate-700/50" disabled>Canjeado ✅</button>`;
+                if (claimedRewards.includes(reward.id) || enCarro) {
+                    buttonHTML = `<button class="bg-slate-950 text-slate-600 font-bold px-3 py-1.5 rounded-lg border border-slate-800" disabled>Reclamado 🔒</button>`;
                 } else if (userPoints >= reward.pointsRequired) {
-                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Usar 🛒</button>`;
+                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Reclamar Premio</button>`;
                 } else {
-                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Faltan ${reward.pointsRequired - userPoints} pts 🔒</button>`;
+                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Bloqueado 🔒</button>`;
                 }
 
                 card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg text-indigo-400 border border-indigo-500/20">🎁</div>
+                    <div class="flex items-center gap-3 max-w-[70%]">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg text-indigo-400 border border-indigo-500/20 flex-shrink-0">🎁</div>
                         <div>
-                            <h4 class="font-bold text-slate-200 text-left">${reward.name}</h4>
-                            <p class="text-[10px] text-amber-400 font-semibold mt-0.5 text-left"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>${reward.pointsRequired} Puntos</p>
+                            <h4 class="font-bold text-slate-200 leading-tight">${reward.name}</h4>
+                            <p class="text-[10px] text-amber-400 font-semibold mt-0.5"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>Requiere ${reward.pointsRequired} Pts</p>
                         </div>
                     </div>
                     <div>${buttonHTML}</div>
                 `;
                 container.appendChild(card);
             });
-            updateRewardsMenuBadge(); 
+            updateRewardsMenuBadge();
         }
 
         function fireRewardUnlock(rewardId) {
             const reward = premiosData.find(r => r.id === rewardId);
             if (!reward) return;
 
-            confetti({ particleCount: 140, spread: 75, origin: { y: 0.6 } });
+            confetti({
+                particleCount: 140,
+                spread: 75,
+                origin: { y: 0.6 }
+            });
+
             document.getElementById('gift-username').innerText = tgUserName;
             document.getElementById('gift-reward-name').innerText = reward.name;
             
             const giftModal = document.getElementById('gift-reward-modal');
             giftModal.classList.remove('hidden');
             giftModal.setAttribute('data-active-reward', rewardId);
-            closeRewardsModalFlotante();
         }
 
         function closeGiftModal() {
@@ -861,7 +986,7 @@
                     idUnique: Date.now(),
                     idCanalOriginal: 888, 
                     precioCalculado: 0,
-                    detallesMejora: `Premio Especial: ${reward.name}`,
+                    detallesMejora: `Premio: ${reward.name}`,
                     isReward: true,
                     duracion: 'Gratis',
                     fijado: 'no'
@@ -870,27 +995,41 @@
                 
                 updateCartBadge();
                 renderRewardsSlots();
-                updateRewardsMenuBadge(); 
-                triggerSuccessAnimation("Añadido", "Tu regalo se sumó a la cesta.");
+                triggerSuccessAnimation("Premio Canjeado", "Se ha añadido a tu cesta de forma gratuita.");
             }
         }
 
         function resetearTodoSistema() {
-            localStorage.clear(); 
-            favoritos = []; carrito = []; historialCampanas = []; claimedRewards = []; completedSocialTasks = [];
-            userPoints = 0; lastSpinTime = null; totalSesionesHoy = 0; ultimaSesionFecha = ""; ofertaFlashCanceladaHoy = false;
-            activeCoupon = null; activeCouponPct = 0;
+            localStorage.clear();
+            favoritos = [];
+            carrito = [];
+            historialCampanas = [];
+            claimedRewards = [];
+            missionTimers = {};
+            userPoints = 0; 
+            lastSpinTime = null;
+            totalSesionesHoy = 0;
+            ultimaSesionFecha = "";
+            ofertaFlashCanceladaHoy = false;
+            activeCoupon = null;
+            activeCouponPct = 0;
 
             localStorage.setItem('ads_user_points', '0');
             localStorage.setItem('ads_favoritos', JSON.stringify([]));
             localStorage.setItem('ads_carrito', JSON.stringify([]));
             localStorage.setItem('ads_historial', JSON.stringify([]));
             localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
-            localStorage.setItem('ads_social_tasks', JSON.stringify([]));
+            localStorage.setItem('ads_mission_timers', JSON.stringify({}));
 
-            updatePointsDisplay(); updateCartBadge(); updateRewardsMenuBadge(); updateSocialTasksBadge();
-            renderChannels(); renderRewardsSlots(); checkRouletteAvailability();
-            triggerSuccessAnimation("Reset Completado", "Los puntos y regalos se han restablecido.");
+            updatePointsDisplay();
+            updateCartBadge();
+            updateRewardsMenuBadge();
+            renderChannels();
+            renderRewardsSlots();
+            renderMissions();
+            checkRouletteAvailability();
+            
+            triggerSuccessAnimation("Reset Completado", "Los puntos y regalos se han restablecido a 0.");
         }
 
         function renderCarousel() {
@@ -941,7 +1080,7 @@
             const idx = carrito.findIndex(item => item.idUnique === uid);
             if(idx !== -1) {
                 carrito[idx][key] = value;
-                if(!carrito[idx].promoPack && !carrito[idx].isReward) {
+                if(!carrito[idx].promoPack && !carrito[idx].isReward && !carrito[idx].isSponsorAd) {
                     const original = canalesData.find(c => c.id === carrito[idx].idCanalOriginal);
                     const configTemp = { duracion: carrito[idx].duracion, fijado: carrito[idx].fijado };
                     carrito[idx].precioCalculado = getPrecio(original) + calcularCosteExtra(null, configTemp);
@@ -1004,10 +1143,10 @@
                         </div>
 
                         <div class="channel-details-dropdown">
-                            <p class="text-[11px] text-slate-300 mt-2 italic border-l-2 border-slate-700 pl-2 py-0.5 text-left">${c.descripcion}</p>
+                            <p class="text-[11px] text-slate-300 mt-2 italic border-l-2 border-slate-700 pl-2 py-0.5">${c.descripcion}</p>
                             <div class="mt-3 grid grid-cols-2 gap-2 text-[10px]">
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Duración:</label>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
                                     <select onchange="updateMejora(${c.id}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
                                         <option value="24h" ${currentConfig.duracion === '24h'?'selected':''}>24 Horas Estándar</option>
                                         <option value="48h" ${currentConfig.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
@@ -1015,7 +1154,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Fijado en Top:</label>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
                                     <select onchange="updateMejora(${c.id}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
                                         <option value="no" ${currentConfig.fijado === 'no'?'selected':''}>Sin Fijar</option>
                                         <option value="si" ${currentConfig.fijado === 'si'?'selected':''}>Fijar 1 Hora (+ $10.00)</option>
@@ -1025,7 +1164,7 @@
                         </div>
 
                         <div class="mt-3 flex items-center justify-between bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
-                            <div class="text-left">
+                            <div>
                                 <span class="text-[9px] text-slate-500 block uppercase font-bold"><i class="fa-solid fa-users text-[8px]"></i> Audiencia</span>
                                 <strong class="text-xs text-slate-300 font-mono">${c.subs.toLocaleString()} subs</strong>
                             </div>
@@ -1080,7 +1219,7 @@
             const val = document.getElementById('coupon-code-input').value.trim().toUpperCase();
             const errBox = document.getElementById('coupon-error-box');
             
-            if(val === "LISTAGGOLDEN20OFF" || val === "LISTAGOLDEN20OFF") {
+            if(val === "LISTAGOLDEN20OFF") {
                 errBox.classList.add('hidden');
                 activeCoupon = "LISTAGOLDEN20OFF";
                 activeCouponPct = 20;
@@ -1097,7 +1236,7 @@
         function calculateCartSubtotal() {
             let sub = 0;
             carrito.forEach(item => {
-                if(item.promoPack) { sub += item.customPrice; }
+                if(item.promoPack || item.isSponsorAd) { sub += item.customPrice; }
                 else { sub += item.precioCalculado; }
             });
             return sub;
@@ -1147,7 +1286,7 @@
                 item.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center gap-2 min-w-[190px] text-[10px] flex-shrink-0";
                 item.innerHTML = `
                     <img src="${c.imagen}" class="w-7 h-7 object-cover rounded-md">
-                    <div class="flex-1 min-w-0 text-left">
+                    <div class="flex-1 min-w-0">
                         <p class="font-bold text-slate-200 truncate leading-tight">${c.nombre}</p>
                         <p class="text-emerald-400 font-semibold mt-0.5">$${getPrecio(c).toFixed(2)}</p>
                     </div>
@@ -1183,16 +1322,16 @@
                 const div = document.createElement('div');
                 div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs";
                 
-                if(item.promoPack) {
+                if(item.promoPack || item.isSponsorAd) {
                     div.innerHTML = `
                         <div class="flex justify-between items-center">
-                            <div class="text-left"><h4 class="font-bold text-amber-400">Mega Pack Promocional</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
-                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$69.99</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                            <div><h4 class="font-bold text-amber-400">${item.promoPack ? 'Mega Pack Promocional' : 'Anuncio Patrocinado'}</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$${item.customPrice.toFixed(2)}</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
                         </div>`;
                 } else if(item.isReward) {
                     div.innerHTML = `
                         <div class="flex justify-between items-center">
-                            <div class="text-left"><h4 class="font-bold text-indigo-400">🎁 Recompensa Reclamada</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div><h4 class="font-bold text-indigo-400">🎁 Recompensa Reclamada</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
                             <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">GRATIS</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
                         </div>`;
                 } else {
@@ -1200,12 +1339,12 @@
                     if(canal) {
                         div.innerHTML = `
                             <div class="flex justify-between items-center">
-                                <div class="text-left"><h4 class="font-bold text-slate-200">${canal.nombre}</h4><p class="text-[9px] text-sky-400 font-mono">${item.detallesMejora}</p></div>
+                                <div><h4 class="font-bold text-slate-200">${canal.nombre}</h4><p class="text-[9px] text-sky-400 font-mono">${item.detallesMejora}</p></div>
                                 <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$${item.precioCalculado.toFixed(2)}</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
                             </div>
                             <div class="pt-2 border-t border-slate-700/50 grid grid-cols-2 gap-2 text-[9px] bg-slate-900/40 p-1.5 rounded-lg">
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Duración:</label>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Duración:</label>
                                     <select onchange="updateCartItemOptions(${item.idUnique}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
                                         <option value="24h" ${item.duracion === '24h'?'selected':''}>24 Horas</option>
                                         <option value="48h" ${item.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
@@ -1213,7 +1352,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Fijado en Top:</label>
+                                    <label class="text-slate-500 block font-bold mb-0.5">Fijado en Top:</label>
                                     <select onchange="updateCartItemOptions(${item.idUnique}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
                                         <option value="no" ${item.fijado === 'no'?'selected':''}>Sin Fijar</option>
                                         <option value="si" ${item.fijado === 'si'?'selected':''}>Fijar Top (+ $10.00)</option>
@@ -1244,21 +1383,21 @@
         }
 
         function removeFromCart(uid) { 
-            carrito = ServerlessMockRemove(uid); 
+            carrito = carrito.filter(i => i.idUnique !== uid); 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
             updateCartBadge(); 
-            updateRewardsMenuBadge(); 
+            updateRewardsMenuBadge();
             openCartModal(); 
-        }
-
-        function ServerlessMockRemove(uid) {
-            return carrito.filter(i => i.idUnique !== uid);
         }
         
         function clearCart() { 
-            carrito = []; activeCoupon = null; activeCouponPct = 0; 
+            carrito = []; 
+            activeCoupon = null; 
+            activeCouponPct = 0; 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
-            updateCartBadge(); updateRewardsMenuBadge(); openCartModal(); 
+            updateCartBadge(); 
+            updateRewardsMenuBadge();
+            openCartModal(); 
         }
         
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
@@ -1288,9 +1427,9 @@
             let txt = `¡Hola Administrador! Solicito la activación de publicidad.\n\n📋 *CARRITO DE COMPRA:*\n`;
             let hist = [];
             carrito.forEach((item, index) => {
-                if(item.promoPack) {
-                    txt += `${index+1}. *Mega Pack Promocional* - $69.99 USD\n`;
-                    hist.push("Mega Pack Especial");
+                if(item.promoPack || item.isSponsorAd) {
+                    txt += `${index+1}. *${item.promoPack ? 'Mega Pack' : 'Anuncio Patrocinado'}* - ${item.detallesMejora} ($${item.customPrice.toFixed(2)} USD)\n`;
+                    hist.push(item.detallesMejora);
                 } else if(item.isReward) {
                     txt += `${index+1}. *🎁 RECOMPENSA:* ${item.detallesMejora} - ¡GRATIS!\n`;
                     hist.push(item.detallesMejora);
@@ -1303,7 +1442,9 @@
                 }
             });
 
-            if(activeCoupon) { txt += `\n🎟️ *CUPÓN APLICADO:* ${activeCoupon} (-${activeCouponPct}%)\n`; }
+            if(activeCoupon) {
+                txt += `\n🎟️ *CUPÓN APLICADO:* ${activeCoupon} (-${activeCouponPct}%)\n`;
+            }
             txt += `\n💳 *MÉTODO DE PAGO:* ${selectedPayment}\n💰 *TOTAL NETO A PAGAR:* $${net.toFixed(2)} USD`;
             
             historialCampanas.unshift({ idCamp: Date.now(), fecha: new Date().toLocaleString(), canales: hist, total: net.toFixed(2), estado: 'progreso' });
@@ -1316,11 +1457,15 @@
         function switchView(view) {
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
             document.getElementById('view-catalog').classList.add('hidden');
+            document.getElementById('view-missions').classList.add('hidden');
+            document.getElementById('view-sponsor-ads').classList.add('hidden');
             document.getElementById('view-favorites').classList.add('hidden');
             document.getElementById('view-campaigns').classList.add('hidden');
             document.getElementById('view-faq').classList.add('hidden');
 
             if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); }
+            if(view === 'missions') { document.getElementById('view-missions').classList.remove('hidden'); document.getElementById('nav-missions').classList.add('active-tab'); renderMissions(); }
+            if(view === 'sponsor-ads') { document.getElementById('view-sponsor-ads').classList.remove('hidden'); document.getElementById('nav-sponsor-ads').classList.add('active-tab'); }
             if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
             if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
             if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
@@ -1353,12 +1498,12 @@
                 
                 const esProgreso = c.estado === 'progreso';
                 const estadoBadge = esProgreso 
-                    ? `<span class="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-spinner animate-spin mr-1 text-[9px]"></i>En progreso</span>` 
+                    ? `<span class="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-shadow animate-spin mr-1 text-[9px]"></i>En progreso</span>` 
                     : `<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-circle-check mr-1 text-[9px]"></i>Completado</span>`;
 
                 div.innerHTML = `
                     <div class="flex justify-between items-center text-[10px] text-slate-400"><span>${c.fecha}</span>${estadoBadge}</div>
-                    <p class="font-bold text-slate-200 mt-1 text-left">${c.canales.join(', ')}</p>
+                    <p class="font-bold text-slate-200 mt-1">${c.canales.join(', ')}</p>
                     <div class="flex justify-between items-center pt-1 border-t border-slate-800/50">
                         <div class="flex gap-2">
                             ${esProgreso ? `<button onclick="completeCampaign(${c.idCamp})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-2 py-1 rounded font-bold text-[9px] transition-colors cursor-pointer">Marcar Completado</button>` : ''}
@@ -1435,18 +1580,204 @@
                 const reply = await res.text();
                 const loaderEl = document.getElementById(loaderId);
                 if(loaderEl) loaderEl.remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">${reply}</div>`;
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">${reply}</div>`;
             } catch {
                 const loaderEl = document.getElementById(loaderId);
                 if(loaderEl) loaderEl.remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none text-left">Error de red. Contacta directamente a @Airdayz.</div>`;
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none">Error de red. Contacta directamente a @Airdayz.</div>`;
             }
             container.scrollTop = container.scrollHeight;
         }
         function initAiAssistant() {
-            document.getElementById('ai-chat-messages').innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">👋 ¡Hola <strong class="text-sky-400">${tgUserName}</strong>! Estoy aquí para guiarte en Lista Golden. ¿Qué dudas tienes sobre las campañas? 👇</div>`;
+            document.getElementById('ai-chat-messages').innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">👋 ¡Hola <strong class="text-sky-400">${tgUserName}</strong>! Estoy aquí para guiarte en Lista Golden. ¿Qué dudas tienes sobre las campañas? 👇</div>`;
         }
         function toggleAiChat() { const c = document.getElementById('ai-chat-window'); c.classList.toggle('hidden'); c.classList.toggle('flex'); }
+
+        /* NUEVAS LÓGICAS COMPLETAMENTE INTEGRADAS DE MANERA ADICIONAL */
+
+        function toggleSocialModal() {
+            document.getElementById('social-golden-modal').classList.toggle('hidden');
+        }
+
+        function openAiFromSocial() {
+            toggleSocialModal();
+            const win = document.getElementById('ai-chat-window');
+            if(win.classList.contains('hidden')) {
+                toggleAiChat();
+            }
+            const container = document.getElementById('ai-chat-messages');
+            container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-sky-400 max-w-[85%] rounded-tl-none font-bold">Hola! En qué puedo ayudarte?</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function calculateSponsorPrice(type) {
+            if(type === 'micro') {
+                let base = 29.99;
+                if(document.getElementById('micro-opt-img').checked) base += 15.00;
+                if(document.getElementById('micro-opt-vid').checked) base += 25.00;
+                if(document.getElementById('micro-opt-suprem').checked) base += 40.00;
+                document.getElementById('price-micro').innerText = `$${base.toFixed(2)} USD`;
+            }
+        }
+
+        function addSponsorToCart(type) {
+            let descStr = "";
+            let finalPrice = 0;
+            
+            if(type === 'micro') {
+                finalPrice = 29.99;
+                descStr = "Micro-Anuncio base en +100 canales";
+                if(document.getElementById('micro-opt-img').checked) { finalPrice += 15.00; descStr += " + Imagen Destacada"; }
+                if(document.getElementById('micro-opt-vid').checked) { finalPrice += 25.00; descStr += " + Vídeo Suplemento"; }
+                if(document.getElementById('micro-opt-suprem').checked) { finalPrice += 40.00; descStr += " + Pack Supremo (3 Enlaces, 7 Emojis, 2 Img)"; }
+            } else if(type === 'compacto') {
+                finalPrice = 49.99;
+                descStr = "Anuncio Compacto Individual (200 carac, 2 enlaces)";
+            } else if(type === 'completo') {
+                finalPrice = 79.99;
+                descStr = "Anuncio Completo (500 palabras, multimedia)";
+                if(document.getElementById('full-opt-spoiler').checked) { descStr += " con Spoiler Activo"; }
+            }
+
+            carrito.push({
+                idUnique: Date.now() + Math.floor(Math.random()*200),
+                idCanalOriginal: 777,
+                isSponsorAd: true,
+                customPrice: finalPrice,
+                detallesMejora: descStr,
+                duracion: '4 Horas',
+                fijado: 'no'
+            });
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            triggerSuccessAnimation("Añadido", "Anuncio Patrocinado sumado a la cesta.");
+        }
+
+        function renderMissions() {
+            const container = document.getElementById('missions-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const now = Date.now();
+
+            misionesData.forEach(mission => {
+                const lastClaim = missionTimers[mission.id] || 0;
+                const estaBloqueado = (now - lastClaim) < 24 * 60 * 60 * 1000;
+                
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-xl";
+                
+                let actionBtnHTML = "";
+                if(estaBloqueado) {
+                    let diff = (24 * 60 * 60 * 1000) - (now - lastClaim);
+                    let hours = Math.floor(diff / (1000 * 60 * 60));
+                    let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    actionBtnHTML = `<button class="w-full bg-slate-950 text-slate-600 text-xs py-2 rounded-xl border border-slate-850 font-bold" disabled><i class="fa-solid fa-lock mr-1.5"></i> Bloqueado por ${hours}h ${mins}m</button>`;
+                } else {
+                    actionBtnHTML = `<button onclick="executeMission('${mission.id}')" id="btn-action-${mission.id}" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold text-xs py-2 rounded-xl transition-transform hover:scale-[1.02] cursor-pointer">Completar Tarea</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xs"><i class="fa-solid ${mission.icon}"></i></div>
+                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-md"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>+${mission.points} Pts</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-200 uppercase tracking-wide flex items-center gap-1.5">
+                                ${mission.title}
+                                ${estaBloqueado ? '<i class="fa-solid fa-lock text-[9px] text-slate-500"></i>' : ''}
+                            </h3>
+                            <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">${mission.desc}</p>
+                        </div>
+                    </div>
+                    <div class="pt-1" id="wrapper-btn-${mission.id}">
+                        ${actionBtnHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function executeMission(id) {
+            const mission = misionesData.find(m => m.id === id);
+            if(!mission) return;
+
+            if(id === 'miss_video') {
+                document.getElementById('video-mission-modal').classList.remove('hidden');
+                let progress = 0;
+                let counter = 60;
+                
+                document.getElementById('video-timer-txt').innerText = `${counter}s restantes`;
+                document.getElementById('video-progress-bar').style.width = `0%`;
+                
+                let interval = setInterval(() => {
+                    counter--;
+                    progress += (100 / 60);
+                    document.getElementById('video-timer-txt').innerText = `${counter}s restantes`;
+                    document.getElementById('video-progress-bar').style.width = `${progress}%`;
+                    
+                    if(counter <= 0) {
+                        clearInterval(interval);
+                        document.getElementById('video-action-container').innerHTML = `
+                            <button onclick="claimMissionPoints('miss_video')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-2 rounded-xl text-xs uppercase tracking-wider shadow-md shadow-orange-500/20 cursor-pointer">Reclamar Recompensa</button>
+                        `;
+                    }
+                }, 1000);
+            } 
+            else if(id === 'miss_tg') {
+                window.open("https://t.me/ListaGolden", "_blank");
+                const btn = document.getElementById(`btn-action-${id}`);
+                btn.innerText = "Confirmar Suscripción";
+                btn.setAttribute("onclick", `confirmTelegramSubscription()`);
+            } 
+            else if(id === 'miss_web') {
+                window.open("https://lista-golden.com", "_blank");
+                claimMissionPoints('miss_web');
+            } 
+            else if(id === 'miss_share') {
+                window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/ListaGolden") + "&text=" + encodeURIComponent("¡Únete a Lista Golden Ads para conseguir y gestionar la mejor publicidad masiva de Telegram!"), "_blank");
+                claimMissionPoints('miss_share');
+            }
+        }
+
+        function confirmTelegramSubscription() {
+            const wrapper = document.getElementById('wrapper-btn-miss_tg');
+            wrapper.innerHTML = `
+                <div class="w-full bg-slate-950 border border-slate-850 rounded-xl p-2 text-center text-[10px] space-y-1">
+                    <p class="text-sky-400 font-bold flex items-center justify-center gap-1"><i class="fa-solid fa-spinner animate-spin"></i> Verificando tarea completa...</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                wrapper.innerHTML = `
+                    <button onclick="claimMissionPoints('miss_tg')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-2 rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer animate-bounce">Reclamar Recompensa</button>
+                `;
+            }, 15000);
+        }
+
+        function claimMissionPoints(id) {
+            const mission = misionesData.find(m => m.id === id);
+            if(!mission) return;
+
+            if(id === 'miss_video') {
+                document.getElementById('video-mission-modal').classList.add('hidden');
+                document.getElementById('video-action-container').innerHTML = `<button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando...</button>`;
+            }
+
+            userPoints += mission.points;
+            localStorage.setItem('ads_user_points', userPoints.toString());
+            
+            missionTimers[id] = Date.now();
+            localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
+            
+            updatePointsDisplay();
+            renderRewardsSlots();
+            renderMissions();
+            
+            confetti({ particleCount: 80, spread: 50 });
+            triggerSuccessAnimation(`+${mission.points} Puntos`, "Misión completada correctamente.");
+        }
     </script>
 </body>
 </html>
