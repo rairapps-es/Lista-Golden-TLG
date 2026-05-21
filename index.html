@@ -103,7 +103,7 @@
         <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-6 rounded-3xl border border-amber-400/40 max-w-sm w-full text-center space-y-4 shadow-2xl animate-fade-in">
             <div class="gift-box-anim">🎁</div>
             <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
-            <p class="text-xs text-slate-300">Has desbloqueado con éxito el premio especial:</p>
+            <p class="text-[11px] text-slate-300">Has desbloqueado con éxito el premio especial:</p>
             <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
                 Premio de Ejemplo
             </div>
@@ -512,7 +512,7 @@
             renderCarousel();
             updateCartBadge();
             updatePointsDisplay();
-            updateRewardsMenuBadge(); // Sincronización inicial del menú
+            updateRewardsMenuBadge(); 
             checkRouletteAvailability();
             initAiAssistant();
             initFomoBot();
@@ -619,7 +619,6 @@
             const nombres = ["Raúl", "Carlos", "Sofía", "Lucía", "Marta", "Andrés", "Mateo", "Emma", "Elena", "Oliver"];
             const banderas = ["🇪🇸", "🇲🇽", "🇦🇷", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
             
-            // Se limpian intervalos anteriores para prevenir fugas de memoria en reseteos
             if(window.fomoIntervalID) clearInterval(window.fomoIntervalID);
             window.fomoIntervalID = setInterval(() => {
                 if(Math.random() > 0.4) {
@@ -694,11 +693,9 @@
             document.getElementById('rewards-points-counter').innerText = userPoints;
         }
 
-        /* FUNCIÓN ARREGLADA: Cuenta los premios realmente desbloqueados o canjeados de la cesta */
         function updateRewardsMenuBadge() {
             const badge = document.getElementById('menu-rewards-count');
             if (badge) {
-                // Sumamos los IDs en claimedRewards más los que están activos físicamente en la cesta
                 const rewardsEnCesta = carrito.filter(item => item.isReward).length;
                 const totalDesbloqueados = claimedRewards.length + rewardsEnCesta;
                 badge.innerText = totalDesbloqueados;
@@ -746,7 +743,7 @@
                 `;
                 container.appendChild(card);
             });
-            updateRewardsMenuBadge(); // Asegura actualización en cascada
+            updateRewardsMenuBadge();
         }
 
         function fireRewardUnlock(rewardId) {
@@ -796,16 +793,14 @@
                 
                 updateCartBadge();
                 renderRewardsSlots();
-                updateRewardsMenuBadge(); // Arreglado: Forzamos refresco del menú desplegable
+                updateRewardsMenuBadge();
                 triggerSuccessAnimation("Añadido", "Tu regalo se sumó a la cesta.");
             }
         }
 
-        /* FUNCIÓN SOLICITADA: Resetea por completo los puntos y almacenes locales a cero */
         function resetearTodoSistema() {
-            localStorage.clear(); // Limpia almacenamiento completo
+            localStorage.clear(); 
             
-            // Restablecimiento de variables de control en memoria
             favoritos = [];
             carrito = [];
             historialCampanas = [];
@@ -818,14 +813,12 @@
             activeCoupon = null;
             activeCouponPct = 0;
 
-            // Guardado inicial a limpio
             localStorage.setItem('ads_user_points', '0');
             localStorage.setItem('ads_favoritos', JSON.stringify([]));
             localStorage.setItem('ads_carrito', JSON.stringify([]));
             localStorage.setItem('ads_historial', JSON.stringify([]));
             localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
 
-            // Actualización integral de la UI
             updatePointsDisplay();
             updateCartBadge();
             updateRewardsMenuBadge();
@@ -1023,9 +1016,9 @@
             const val = document.getElementById('coupon-code-input').value.trim().toUpperCase();
             const errBox = document.getElementById('coupon-error-box');
             
-            if(val === "LISTAGGOLDEN20OFF" || val === "LISTAGOLDEN20OFF") {
+            if(val === "LISTAGGOLDEN20OFF" || val === "LISTAGGOLDEN20OFF") {
                 errBox.classList.add('hidden');
-                activeCoupon = "LISTAGOLDEN20OFF";
+                activeCoupon = "LISTAGGOLDEN20OFF";
                 activeCouponPct = 20;
                 document.getElementById('coupon-input-field').classList.add('hidden');
                 triggerSuccessAnimation("¡Cupón Aplicado!", "20% de descuento asignado.");
@@ -1190,7 +1183,7 @@
             carrito = carrito.filter(i => i.idUnique !== uid); 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
             updateCartBadge(); 
-            updateRewardsMenuBadge(); // Asegura ajuste dinámico si eliminas regalos del carro
+            updateRewardsMenuBadge();
             openCartModal(); 
         }
         
