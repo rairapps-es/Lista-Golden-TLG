@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Golden Ads Pro v2 - Ultra Premium</title>
+    <title>Lista Golden Ads Pro v2</title>
     <!-- SDK Oficial de Telegram WebApps -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Canvas Confetti Library -->
+    <!-- Canvas Confetti Library para la animación del regalo -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -22,7 +22,7 @@
         body {
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             padding-bottom: 95px;
             overflow-x: hidden;
         }
@@ -32,11 +32,18 @@
         }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .animate-fade-in {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .wheel-transition {
+            transition: transform 4s cubic-bezier(0.25, 1, 0.2, 1);
+        }
+        /* Transición suave para las tarjetas colapsables */
         .channel-details-dropdown {
             max-height: 0;
             overflow: hidden;
@@ -44,11 +51,29 @@
             opacity: 0;
         }
         .channel-card-wrapper.expanded .channel-details-dropdown {
-            max-height: 600px;
+            max-height: 500px;
             opacity: 1;
         }
-        .channel-card-wrapper.expanded .arrow-icon { transform: rotate(180deg); }
-        .arrow-icon { transition: transform 0.3s ease; }
+        .channel-card-wrapper.expanded .arrow-icon {
+            transform: rotate(180deg);
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Regalo flotante animado */
+        @keyframes floatingGift {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        .gift-box-anim {
+            animation: floatingGift 2s ease-in-out infinite;
+            font-size: 4rem;
+        }
+        /* Ocultar sección de premios de forma prioritaria si es necesario */
+        .hidden-rewards {
+            display: none !important;
+        }
     </style>
 </head>
 <body onclick="closeUserMenuOutside(event)">
@@ -73,6 +98,20 @@
         </div>
     </div>
 
+    <!-- ANIMACIÓN DE REGALO FLOTANTE DESBLOQUEADO -->
+    <div id="gift-reward-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-6 rounded-3xl border border-amber-400/40 max-w-sm w-full text-center space-y-4 shadow-2xl animate-fade-in">
+            <div class="gift-box-anim">🎁</div>
+            <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
+            <p class="text-xs text-slate-300">Has desbloqueado con éxito el premio especial:</p>
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
+                Premio de Ejemplo
+            </div>
+            <p class="text-[10px] text-slate-400">El regalo se ha añadido a tu carrito de compras listo para enviar a Telegram.</p>
+            <button onclick="closeGiftModal()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/20 cursor-pointer">¡Genial!</button>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <header class="sticky top-0 bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center z-40 border-b border-slate-800/80 shadow-xl">
         <div class="flex items-center gap-2">
@@ -85,30 +124,44 @@
         
         <div class="flex items-center gap-3 relative">
             <button id="user-avatar-btn" onclick="toggleUserMenu(event)" class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 p-[2px] shadow-md hover:scale-105 transition-transform cursor-pointer overflow-hidden flex items-center justify-center">
-                <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">GA</div>
+                <img id="user-avatar-img" class="w-full h-full object-cover hidden rounded-full" src="" alt="Avatar">
+                <div id="user-avatar-text" class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xs font-black text-sky-400">--</div>
             </button>
 
-            <!-- MENÚ DESPLEGABLE -->
+            <!-- MENÚ DESPLEGABLE CON DATOS API TELEGRAM -->
             <div id="user-dropdown" class="absolute right-0 top-12 w-60 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 hidden z-50 animate-fade-in">
                 <div class="px-4 py-2 border-b border-slate-800/60 mb-1 flex flex-col gap-1.5">
-                    <p id="user-profile-name" class="text-xs font-black text-slate-200">Cargando...</p>
+                    <div class="flex items-center justify-between">
+                        <p id="user-profile-name" class="text-xs font-black text-slate-200">Cargando...</p>
+                        <span id="premium-badge" class="hidden text-[8px] bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter"><i class="fa-solid fa-star text-[7px] mr-0.5"></i>Premium</span>
+                    </div>
                     <p id="user-profile-tag" class="text-[10px] text-slate-400 font-mono">...</p>
                 </div>
                 <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="switchView('catalog'); scrollToSection('rewards-section'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Cupones de Premios</span>
+                <button onclick="openRewardsModalFlotante(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <div class="border-t border-slate-800/60 my-1"></div>
-                <button onclick="resetSystem(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 flex items-center gap-2 transition-colors">
-                    <i class="fa-solid fa-rotate text-rose-500 w-4"></i> Limpiar Todo (Reset)
+                <!-- NUEVO APARTADO SOCIAL INTEGRADO -->
+                <button id="menu-social-btn" onclick="openSocialModalFlotante(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-share-nodes text-emerald-400 w-4"></i> Tareas Sociales</span>
+                    <span id="menu-social-count" class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
                 </button>
+                <div class="border-t border-slate-800/60 my-1"></div>
+                <!-- BOTÓN INTEGRADO DE RESETEO DE PRUEBA -->
+                <button onclick="resetearTodoSistema(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-rotate text-rose-500 w-4"></i> Resetear Puntos y Datos
+                </button>
+                <div class="border-t border-slate-800/60 my-1"></div>
+                <a href="https://t.me/Airdayz" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2 transition-colors">
+                    <i class="fa-brands fa-telegram text-emerald-400 w-4"></i> Soporte Telegram
+                </a>
             </div>
 
-            <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg flex items-center gap-2">
+            <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2">
                 <i class="fa-solid fa-basket-shopping"></i>
                 <span>Cesta</span>
                 <span id="cart-count" class="bg-white text-slate-950 text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-black">0</span>
@@ -116,150 +169,338 @@
         </div>
     </header>
 
-    <!-- VISTA 1: CATÁLOGO / PRINCIPAL -->
-    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-6">
-        
-        <!-- MEJORA 1: MÓDULO DE MISIONES Y TAREAS CON CONTADOR DINÁMICO Y PASO DE VERIFICACIÓN -->
-        <section class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl space-y-3">
-            <div class="flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                <i class="fa-solid fa-list-check text-sky-400 text-sm"></i>
-                <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Misiones Diarias (Gana Puntos)</h3>
-            </div>
-            <div id="missions-container" class="space-y-2.5">
-                <!-- Tarea 1: Telegram -->
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div>
-                        <h4 class="font-bold text-slate-200">Unirse al canal oficial @ListaGolden</h4>
-                        <p class="text-[10px] text-slate-400">Requiere validación mediante API de Telegram.</p>
-                        <span class="text-amber-400 font-bold text-[10px]"><i class="fa-solid fa-coins mr-1"></i>+150 Pts</span>
-                    </div>
-                    <div class="flex items-center gap-2 justify-end text-[11px]" id="actions-task-tg">
-                        <a href="https://t.me/LISTAGOLDEN" target="_blank" onclick="startTaskVerification('tg')" class="bg-sky-600 text-white px-3 py-1.5 rounded-lg font-bold">1. Ir al Canal</a>
-                        <button id="btn-verify-tg" disabled class="bg-slate-800 text-slate-500 px-3 py-1.5 rounded-lg font-bold">2. Verificar</button>
-                    </div>
+    <!-- LANZADORES FLOTANTES: RULETA DIARIA COMPLETA -->
+    <div id="roulette-triggers-container" class="fixed bottom-38 right-4 z-40">
+        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-14 h-14 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-xl font-bold border-2 border-slate-900 hidden cursor-pointer transition-transform hover:scale-110 animate-bounce">
+            <i class="fa-solid fa-pie-chart"></i>
+        </button>
+        <div id="floating-roulette-blocked" class="w-14 h-14 bg-slate-800 border-2 border-slate-700 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 font-bold opacity-70 relative group">
+            <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
+            <span class="text-[7px] text-slate-400 tracking-tighter mt-0.5 font-bold">RULETA</span>
+            <span class="text-[6px] text-slate-500 tracking-tighter font-mono">MAÑANA</span>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES FOMO DE COMPRA -->
+    <div id="fomo-notification" class="fixed bottom-24 left-4 z-40 bg-slate-900/95 border border-slate-800 px-3 py-2 rounded-xl shadow-2xl max-w-xs text-[10px] text-slate-300 flex items-center gap-2.5 translate-y-20 opacity-0 transition-all duration-500 pointer-events-none">
+        <span id="fomo-flag" class="text-base">🇪🇸</span>
+        <div>
+            <p id="fomo-text" class="font-medium text-slate-200">Cargando venta...</p>
+        </div>
+    </div>
+
+    <!-- NUEVO VENTANA MODAL FLOTANTE DE PREMIOS (MEJORA SOLICITADA) -->
+    <div id="rewards-floating-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-md rounded-3xl border border-indigo-500/30 p-5 space-y-4 shadow-2xl relative animate-fade-in max-h-[85vh] flex flex-col">
+            <button onclick="closeRewardsModalFlotante()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex justify-between items-center pr-8 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-gift text-amber-400 text-lg"></i>
+                    <h3 class="text-sm font-black uppercase text-slate-100 tracking-wider">Premios Disponibles</h3>
                 </div>
-                <!-- Tarea 2: Web -->
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div>
-                        <h4 class="font-bold text-slate-200">Visitar nuestro Blog de Estrategias</h4>
-                        <p class="text-[10px] text-slate-400">Permanece 15 seg en la web para encontrar el código secreto.</p>
-                        <span class="text-amber-400 font-bold text-[10px]"><i class="fa-solid fa-coins mr-1"></i>+100 Pts</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 justify-end" id="actions-task-web">
-                        <a href="https://pollinations.ai" target="_blank" onclick="startTaskVerification('web')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] whitespace-nowrap">1. Visitar Web</a>
-                        <div class="flex gap-1">
-                            <input type="text" id="web-code-input" placeholder="Código web" class="bg-slate-900 border border-slate-800 rounded-lg p-1.5 w-24 text-[10px] focus:outline-none text-center" disabled>
-                            <button id="btn-verify-web" disabled onclick="validateWebTaskCode()" class="bg-slate-800 text-slate-500 px-2.5 py-1.5 rounded-lg font-bold text-[11px]">Validar</button>
+                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i><span id="rewards-points-counter">0</span> pts</span>
+            </div>
+            <div id="rewards-slots-container" class="grid gap-2.5 overflow-y-auto flex-1 pr-1 scrollbar-none"></div>
+        </div>
+    </div>
+
+    <!-- NUEVO VENTANA MODAL FLOTANTE APARTADO SOCIAL (MEJORA SOLICITADA) -->
+    <div id="social-floating-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-md rounded-3xl border border-emerald-500/30 p-5 space-y-4 shadow-2xl relative animate-fade-in">
+            <button onclick="closeSocialModalFlotante()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-share-nodes text-emerald-400 text-lg"></i>
+                <h3 class="text-sm font-black uppercase text-slate-100 tracking-wider">Comunidad y Redes</h3>
+            </div>
+            <p class="text-[11px] text-slate-400">Únete a nuestros canales para ganar puntos extra al instante.</p>
+            <div class="space-y-2.5 text-xs">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 text-base"><i class="fa-brands fa-telegram"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Canal Oficial Lista Golden</h4>
+                            <p class="text-[10px] text-emerald-400 font-semibold mt-0.5">+150 Puntos</p>
                         </div>
                     </div>
+                    <button id="btn-social-task-1" onclick="completeSocialTask(1, 'https://t.me/LISTAGOLDEN', 150)" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider cursor-pointer">Unirse</button>
                 </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-base"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Canal de Reseñas Golden</h4>
+                            <p class="text-[10px] text-emerald-400 font-semibold mt-0.5">+100 Puntos</p>
+                        </div>
+                    </div>
+                    <button id="btn-social-task-2" onclick="completeSocialTask(2, 'https://t.me/Airdayz', 100)" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider cursor-pointer">Unirse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA 1: CATÁLOGO -->
+    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
+        
+        <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
+        <section class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden">
+            <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-fire animate-pulse"></i> Canales Destacados de la Semana</p>
+            <div class="relative min-h-[75px] flex items-center">
+                <div id="carousel-track" class="w-full transition-all duration-300"></div>
+            </div>
+            <div class="absolute bottom-3 right-3 flex gap-1">
+                <button onclick="prevCarousel()" class="w-5 h-5 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center text-[10px] text-slate-400 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="nextCarousel()" class="w-5 h-5 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center text-[10px] text-slate-400 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
-        <!-- MEJORA 2: MÓDULO DE PREMIOS DISPONIBLES (ESTADO INTERMEDIO Y CÓDIGOS ÚNICOS) -->
-        <section id="rewards-section" class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <div class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
-                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Canjear Premios por Puntos</h3>
+        <!-- BANNER AGREGA TU CANAL -->
+        <section id="banner-add-channel" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl hidden relative">
+            <button onclick="closeBannerPermanently(event)" class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/40 text-slate-300 flex items-center justify-center text-[10px] hover:bg-black/60 z-10 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="openAddChannelModal()" class="w-full bg-slate-900 hover:bg-slate-850 p-3.5 rounded-[15px] flex items-center justify-between cursor-pointer text-left pr-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20">🚀</div>
+                    <div>
+                        <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Quieres monetizar o destacar tu canal?</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu espacio o adquiere el Potenciador Recomendado de 7 días o 1 mes.</p>
+                    </div>
                 </div>
-                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-coins mr-1"></i>Balance: <span id="rewards-points-counter">0</span> pts</span>
-            </div>
-            
-            <!-- Slots de Canje -->
-            <div id="rewards-slots-container" class="grid gap-2.5 sm:grid-cols-3"></div>
-
-            <!-- Tus Cupones Activos Generados -->
-            <div class="pt-2">
-                <p class="text-[10px] font-black uppercase text-indigo-400 tracking-wider mb-2"><i class="fa-solid fa-ticket mr-1"></i>Mis Cupones de Premios Desbloqueados</p>
-                <div id="my-coupons-container" class="grid gap-2 text-xs">
-                    <p class="text-slate-500 text-[11px] italic py-2">No tienes cupones pendientes de programación.</p>
-                </div>
-            </div>
+            </button>
         </section>
 
         <!-- FILTROS Y CATEGORÍAS -->
         <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
-            <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+            <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
                 <button onclick="filterCategory('todos', event)" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30 whitespace-nowrap">Todos</button>
                 <button onclick="filterCategory('Tecnología', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap">Tecnología</button>
                 <button onclick="filterCategory('Finanzas', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap">Finanzas</button>
+                <button onclick="filterCategory('Entretenimiento', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap">Entretenimiento</button>
             </div>
+            <select id="sort-filter" onchange="renderChannels()" class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 text-xs text-slate-300 focus:outline-none min-w-[95px]">
+                <option value="default">⇅ Filtrar</option>
+                <option value="subs-desc">Más Suscriptores</option>
+                <option value="price-asc">Precio más bajo</option>
+                <option value="offers">Con Oferta Activa</option>
+                <option value="recommended">Canales Recomendados</option>
+            </select>
         </section>
 
-        <!-- CONTENEDOR DE TARJETAS (CONTRATACIÓN DE ANUNCIOS) -->
+        <!-- CONTENEDOR DE TARJETAS -->
         <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
     </main>
 
+    <!-- MODAL POPUP: OFERTA FLASH -->
+    <div id="flash-offer-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-indigo-950 w-full max-w-sm rounded-2xl border border-amber-500/40 p-5 text-center space-y-4 relative shadow-2xl">
+            <div class="w-14 h-14 bg-amber-400 text-slate-950 rounded-full flex items-center justify-center text-2xl font-black mx-auto shadow-lg shadow-amber-400/20 animate-pulse">🔥</div>
+            <div>
+                <h3 class="text-base font-black uppercase text-amber-400 tracking-wide">¡Recompensa de Lealtad Activa!</h3>
+                <p class="text-[11px] text-slate-300 mt-1">Has desbloqueado el <strong class="text-white">Mega Pack Golden Premium</strong> por un precio especial.</p>
+            </div>
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-left">
+                <div>
+                    <span class="text-[9px] text-slate-500 uppercase font-bold block">Valor real: $170.00</span>
+                    <span class="text-base font-black text-emerald-400">$69.99 USD</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md font-medium"><i class="fa-solid fa-users mr-1"></i>2 compraron ya</span>
+                </div>
+            </div>
+            <div class="text-xs bg-black/40 py-1.5 rounded-lg border border-slate-800 text-slate-400">
+                La oferta expira en: <strong id="flash-timer" class="text-rose-400 font-mono">01:00:00</strong>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="closeFlashOffer(false)" class="bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 cursor-pointer">Rechazar</button>
+                <button onclick="claimFlashOffer()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/10 cursor-pointer">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRO DE NUEVO CANAL -->
+    <div id="add-channel-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
+            <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center">
+                <span class="font-black text-xs text-slate-950 uppercase">Formulario de Monetización & Destacados</span>
+                <button onclick="closeAddChannelModal()" class="text-slate-950 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none text-xs">
+                <div class="border-b border-slate-800 pb-3 mb-2">
+                    <p class="text-amber-400 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Opción 1: Registrar Nuevo Canal</p>
+                    <div class="space-y-2">
+                        <input type="text" id="reg-channel-name" placeholder="Nombre del Canal" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        <input type="text" id="reg-channel-user" placeholder="Enlace o @Username" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        <input type="number" id="reg-channel-subs" placeholder="Total Suscriptores" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="reg-channel-type" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Público">Público</option><option value="Privado">Privado</option></select>
+                            <select id="reg-channel-cat" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Tecnología">Tecnología</option><option value="Finanzas">Finanzas</option><option value="Entretenimiento">Entretenimiento</option></select>
+                        </div>
+                        <input type="number" id="reg-channel-price" placeholder="Precio por Post ($ USD)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        <button onclick="submitChannelRegistration('alta')" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 hover:from-amber-500 hover:to-orange-600 p-2.5 rounded-xl font-bold text-slate-200 hover:text-slate-950 transition-all uppercase tracking-wider text-[10px] cursor-pointer">Solicitar Alta ($19.99 Lifetime)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-indigo-400 font-bold mb-1.5 uppercase tracking-wide text-[10px]">Opción 2: Potenciador de Visibilidad (Socio Existente)</p>
+                    <div class="space-y-2">
+                        <input type="text" id="boost-channel-user" placeholder="@Username del canal ya registrado" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        <select id="boost-pack-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none">
+                            <option value="7dias">Plan Cohete Destacado (7 Días) — $9.99 USD</option>
+                            <option value="1mes">Plan Cohete Destacado (1 Mes) — $29.99 USD</option>
+                        </select>
+                        <button onclick="submitChannelRegistration('boost')" class="w-full bg-gradient-to-r from-indigo-600 to-sky-600 p-2.5 rounded-xl font-black text-white uppercase tracking-wider text-[10px] cursor-pointer">Adquirir Potenciador Recomendado</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LA RULETA DE LA FORTUNA -->
+    <div id="roulette-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-5 flex flex-col items-center gap-5 relative">
+            <button onclick="closeRouletteModal()" class="absolute top-3 right-3 text-slate-400 text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center">
+                <h3 class="text-sm font-black text-slate-100 uppercase tracking-wider">Ruleta de la Fortuna Diaria</h3>
+                <p class="text-[10px] text-slate-400 mt-0.5">Suma puntos para canjear un anuncio 100% gratis.</p>
+            </div>
+            <div class="relative w-48 h-48 flex items-center justify-center">
+                <div class="absolute top-0 z-20 text-amber-400 text-xl -mt-2"><i class="fa-solid fa-caret-down"></i></div>
+                <div id="roulette-wheel" class="w-full h-full rounded-full border-4 border-slate-800 bg-gradient-to-tr from-indigo-900 via-slate-900 to-slate-850 relative overflow-hidden flex items-center justify-center wheel-transition">
+                    <div class="text-center font-black text-[10px] tracking-tight text-slate-400">
+                        <div class="text-slate-200">💎 LUCK WHEEL</div>
+                        <div class="text-[8px] text-amber-400 mt-1" id="wheel-total-display">Historial: 0 Pts</div>
+                    </div>
+                </div>
+                <button id="spin-btn" onclick="spinRoulette()" class="absolute w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full border-4 border-slate-950 flex items-center justify-center font-black text-[10px] text-slate-950 z-10 cursor-pointer shadow-xl">GIRAR</button>
+            </div>
+            <div id="spin-timer-display" class="text-[10px] text-slate-500 font-medium italic">Listo</div>
+        </div>
+    </div>
+
     <!-- VISTA 2: FAVORITOS -->
     <main id="view-favorites" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
-        <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Tus Favoritos</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Tus Favoritos</h2>
+            <button onclick="clearFavorites()" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-3 py-1 rounded-xl text-xs font-bold cursor-pointer">Borrar Todo</button>
+        </div>
         <div id="favorites-container" class="grid gap-4 sm:grid-cols-2"></div>
     </main>
 
     <!-- VISTA 3: CAMPAÑAS -->
     <main id="view-campaigns" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
-        <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-sky-400 mr-2"></i>Tus Campañas</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wide"><i class="fa-solid fa-rectangle-ad text-sky-400 mr-2"></i>Tus Campañas</h2>
+            <button onclick="clearCampaignHistory()" class="text-[10px] text-slate-500 font-bold underline cursor-pointer">Limpiar Historial Completo</button>
+        </div>
         <div id="campaigns-container" class="space-y-3"></div>
     </main>
 
-    <!-- ASISTENTE CHAT FLOTANTE CON IA Y BOTONES FAQ AUTOMÁTICOS -->
-    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-50 flex flex-col items-end">
-        <div id="ai-chat-window" class="w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col mb-3 animate-fade-in h-[420px]">
+    <!-- VISTA 4: GARANTÍA -->
+    <main id="view-faq" class="p-4 max-w-2xl mx-auto space-y-4 hidden">
+        <h2 class="text-base font-black text-slate-200 text-center uppercase tracking-wide">Garantía y Soporte</h2>
+        <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-xs text-slate-300 space-y-2">
+            <p class="font-bold text-white">¿Cuánto tiempo tarda en publicarse mi anuncio?</p>
+            <p>Una vez verificado el pago en Telegram, agendamos tu espacio en las siguientes 12-24 horas. Recibirás un enlace directo de confirmación cuando esté arriba.</p>
+        </div>
+    </main>
+
+    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
+    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-40 flex flex-col items-end">
+        <div id="ai-chat-window" class="w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col mb-3 animate-fade-in h-96">
             <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                     <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
                 </div>
-                <button onclick="toggleAiChat()" class="text-slate-200 text-sm"><i class="fa-solid fa-minus"></i></button>
+                <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
             </div>
-            
             <div id="ai-chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-[11px] scrollbar-none bg-slate-950/40"></div>
-            
-            <!-- MEJORA 4: ACCIONES FAQ PRE-PROGRAMADAS PARA FILTRAR SOPORTE HUMANO -->
-            <div class="p-2 border-t border-slate-800/60 bg-slate-900/80 flex flex-wrap gap-1" id="chat-faq-options">
-                <button onclick="triggerFaqResponse('claim')" class="bg-slate-800 text-[10px] font-medium text-slate-300 px-2 py-1 rounded-md border border-slate-700/40">¿Cómo reclamo un premio?</button>
-                <button onclick="triggerFaqResponse('publish')" class="bg-slate-800 text-[10px] font-medium text-slate-300 px-2 py-1 rounded-md border border-slate-700/40">¿Cómo contrato publicidad?</button>
-                <button onclick="triggerFaqResponse('human')" class="bg-amber-500/10 text-[10px] font-bold text-amber-400 px-2 py-1 rounded-md border border-amber-500/20 w-full text-center mt-0.5"><i class="fa-solid fa-user-tie mr-1"></i>Hablar con soporte humano</button>
-            </div>
-
             <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5">
-                <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta algo al bot..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
-                <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs"><i class="fa-solid fa-paper-plane"></i></button>
+                <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
-        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-xl text-white">
+        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-xl text-white cursor-pointer hover:scale-110 transition-transform">
             <i class="fa-solid fa-headset"></i>
         </button>
     </div>
 
     <!-- MENÚ INFERIOR FIJO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
-        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold active-tab">
+        <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold active-tab cursor-pointer">
             <i class="fa-solid fa-layer-group text-base"></i>Catálogo
         </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold">
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-star text-base"></i>Favoritos
         </button>
-        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold">
+        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-rectangle-ad text-base"></i>Campañas
+        </button>
+        <button onclick="switchView('faq')" id="nav-faq" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-3 text-[10px] font-bold cursor-pointer">
+            <i class="fa-solid fa-shield-halved text-base"></i>Garantía
         </button>
     </nav>
 
     <!-- MODAL DE LA CESTA DE COMPRA -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+    <div id="cart-modal" class="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850">
-                <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Cesta</h3>
-                <button onclick="closeCartModal()" class="text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-black text-sm uppercase text-slate-200 tracking-wide"><i class="fa-solid fa-basket-shopping text-sky-400 mr-2"></i>Tu Pedido</h3>
+                    <button onclick="clearCart()" id="btn-clear-cart" class="hidden text-rose-400 text-xs font-semibold underline ml-2 cursor-pointer">Vaciar</button>
+                </div>
+                <button onclick="closeCartModal()" class="text-slate-400 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 max-h-[40vh]"></div>
+            <div id="cart-items" class="p-4 overflow-y-auto space-y-2.5 flex-1 max-h-[30vh]"></div>
 
-            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-3">
-                <div class="flex justify-between items-center"><span class="text-slate-200 font-bold text-xs">Total Neto:</span><span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span></div>
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white flex justify-center items-center gap-2">
-                    <i class="fa-brands fa-telegram"></i> Enviar a Telegram
+            <!-- CAMPAÑA DE VENTA CRUZADA -->
+            <div id="cross-selling-area" class="px-4 py-2 border-t border-slate-800/60 bg-slate-950/40">
+                <p class="text-[9px] font-black uppercase text-amber-400 tracking-wider mb-2">🔥 ¡Agrega estos canales que lo están partiendo!</p>
+                <div id="cross-selling-container" class="flex gap-2 overflow-x-auto scrollbar-none pb-1"></div>
+            </div>
+
+            <!-- Panel de Operaciones e Importes -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800/60 space-y-3.5">
+                <div class="coupon-wrapper text-xs">
+                    <button onclick="toggleCouponField()" class="text-sky-400 font-bold underline text-[11px] block cursor-pointer">
+                        ¿Tienes un cupón de descuento?
+                    </button>
+                    <div id="coupon-input-field" class="hidden mt-2 flex gap-2">
+                        <input type="text" id="coupon-code-input" placeholder="LISTAGOLDEN20OFF" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 focus:outline-none text-[11px]">
+                        <button onclick="validateCouponCode()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-xl text-[11px] cursor-pointer">Validar</button>
+                    </div>
+                    <div id="coupon-error-box" class="hidden mt-2 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-rose-400 text-[10px]">
+                        <p class="font-bold">Código no válido.</p>
+                        <p class="mt-0.5">💡 Suscríbete a nuestro canal y <strong class="text-white">CONSIGUE CÓDIGO DESCUENTO EN @LISTAGOLDEN</strong></p>
+                        <a href="https://t.me/LISTAGOLDEN" target="_blank" class="mt-1.5 inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-2.5 py-1 rounded-md uppercase tracking-tight text-[9px]">Unirme ahora</a>
+                    </div>
+                </div>
+
+                <div id="coupon-display-area" class="hidden flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-xs text-emerald-400 font-medium">
+                    <span><i class="fa-solid fa-ticket mr-1"></i> Cupón activo: <strong id="active-coupon-name">NINGUNO</strong></span>
+                    <button onclick="removeCoupon()" class="text-rose-400 font-bold ml-2 underline text-[10px] cursor-pointer">Quitar</button>
+                </div>
+
+                <div id="payment-method-section" class="space-y-2">
+                    <p class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Selecciona Método de Pago:</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectPaymentMethod('PayPal')" id="pay-PayPal" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-brands fa-paypal text-sky-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">PayPal</span>
+                        </button>
+                        <button type="button" onclick="selectPaymentMethod('Telegram Stars')" id="pay-Stars" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-solid fa-star text-amber-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">Estrellas</span>
+                        </button>
+                        <button type="button" onclick="selectPaymentMethod('USDT (TRC20)')" id="pay-USDT" class="pay-btn p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all">
+                            <i class="fa-solid fa-coins text-emerald-400 text-sm"></i><span class="text-[9px] text-slate-300 font-bold">USDT</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-1 pt-1">
+                    <div class="flex justify-between text-xs text-slate-400"><span>Subtotal:</span><span id="cart-subtotal">$0.00</span></div>
+                    <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium"><span>Descuento:</span><span id="cart-total-discount">-$0.00</span></div>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-800"><span class="text-slate-200 font-bold text-sm">Total Neto:</span><span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span></div>
+                </div>
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer text-white">
+                    <i class="fa-brands fa-telegram"></i> Enviar Pedido a Telegram
                 </button>
             </div>
         </div>
@@ -269,61 +510,226 @@
         const MI_TELEGRAM_USER = "Airdayz";
         
         const canalesData = [
-            { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", categoria: "Finanzas", subs: 45000, precioBase: 50 },
-            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", categoria: "Tecnología", subs: 120000, precioBase: 90 },
-            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", categoria: "Entretenimiento", subs: 85000, precioBase: 30 }
+            { id: 1, nombre: "Crypto Alertas Pro", username: "crypto_alertas_test", tipo: "Público", categoria: "Finanzas", subs: 45000, precioBase: 50, descuento: 15, imagen: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=150", descripcion: "Alertas DeFi e inversiones cripto diarias en tiempo real.", destacado: true, recomendado: false },
+            { id: 2, nombre: "Tech & Gadgets Privé", username: "tech_gadgets_vip", tipo: "Privado", categoria: "Tecnología", subs: 120000, precioBase: 90, descuento: 0, imagen: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150", descripcion: "Unboxings exclusivos y reviews de tecnología punta.", destacado: false, recommended: true },
+            { id: 3, nombre: "Memes & Humor Viral", username: "memes_humor_test", tipo: "Público", categoria: "Entretenimiento", subs: 85000, precioBase: 30, descuento: 30, imagen: "https://images.unsplash.com/photo-1531256374423-a33502219008?w=150", descripcion: "Tráfico masivo, memes virales y alta interacción diaria.", destacado: true, recommended: true },
+            { id: 4, nombre: "Inversiones Inteligentes", username: "inversiones_int", tipo: "Público", categoria: "Finanzas", subs: 62000, precioBase: 40, descuento: 0, imagen: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=150", descripcion: "Tips informativos sobre la bolsa de valores y finanzas.", destacado: false, recommended: false },
+            { id: 5, nombre: "Cine & Series Streaming", username: "cine_streaming", tipo: "Público", categoria: "Entretenimiento", subs: 195000, precioBase: 65, descuento: 10, imagen: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=150", descripcion: "Reseñas de cine, trailers y novedades de plataformas top.", destacado: false, recommended: false }
         ];
 
         const premiosData = [
-            { id: 'post_24h', name: 'Anuncio por 24 horas', pointsRequired: 500, duracion: '24h' },
-            { id: 'post_48h', name: 'Anuncio por 48 horas', pointsRequired: 1200, duracion: '48h' },
-            { id: 'post_perm', name: 'Anuncio Permanente', pointsRequired: 3000, duracion: 'perm' }
+            { id: '4h_free', name: 'Anuncio 4 horas gratis', pointsRequired: 500 },
+            { id: '7d_free', name: 'Anuncio gratis x 7 días', pointsRequired: 2000 },
+            { id: '1m_free', name: 'Anuncio gratis por 1 mes', pointsRequired: 7000 }
         ];
 
-        // Carga de Estados Locales (Arquitectura de Datos)
         let favoritos = JSON.parse(localStorage.getItem('ads_favoritos')) || [];
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
-        let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 1000;
-        let cuponesPremios = JSON.parse(localStorage.getItem('ads_cupones_premios')) || []; 
-        let misionesStatus = JSON.parse(localStorage.getItem('ads_misiones_status')) || { tg: { done: false, nextAvail: 0 }, web: { done: false, nextAvail: 0 } };
+        let claimedRewards = JSON.parse(localStorage.getItem('ads_claimed_rewards')) || []; 
+        let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 2500; 
+        let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
+        let completedSocialTasks = JSON.parse(localStorage.getItem('ads_social_tasks')) || [];
+        
+        let totalSesionesHoy = parseInt(localStorage.getItem('ads_sesiones_contador')) || 0;
+        let ultimaSesionFecha = localStorage.getItem('ads_ultima_sesion_fecha') || "";
+        let ofertaFlashCanceladaHoy = localStorage.getItem('ads_flash_cancelada_hoy') === "true";
 
+        let activeCoupon = null;
+        let activeCouponPct = 0;
         let currentCategory = 'todos';
-        let tgUserName = "Anunciante Golden";
-
-        // Estructuras de configuración en tiempo real (Add-ons y Toggles por Tarjeta)
-        let configuracionAnuncios = {};
+        let selectedPayment = 'PayPal'; 
+        let currentCarouselIndex = 0;
+        let tgUserName = "Anunciante Golden"; 
+        let flashTimerInterval = null;
+        let currentWheelRotation = 0;
+        let dynamicAdCounts = {};
+        let mejorasSeleccionadas = {}; 
 
         document.addEventListener("DOMContentLoaded", () => {
-            initTelegramData();
-            updatePointsDisplay();
+            initTelegramUserData();
+            trackSessionCount();
+            generateDailySeedCounters();
             renderChannels();
             renderRewardsSlots();
-            renderCuponesDisponibles();
-            updateMisionesUI();
+            renderCarousel();
             updateCartBadge();
+            updatePointsDisplay();
+            updateRewardsMenuBadge(); 
+            updateSocialTasksBadge();
+            checkRouletteAvailability();
             initAiAssistant();
-            setInterval(updateMisionesUI, 1000); // Actualiza contadores dinámicos de misiones en tiempo real
-            
+            initFomoBot();
+            checkBannerFrequency();
+            setInterval(nextCarousel, 4000);
             setTimeout(() => {
                 const loader = document.getElementById('global-loader');
                 if(loader) loader.classList.add('opacity-0');
                 setTimeout(() => { if(loader) loader.remove(); }, 500);
-            }, 4000);
+            }, 500);
         });
 
-        function initTelegramData() {
+        function initTelegramUserData() {
+            let userTag = "@usuario_telegram";
+            let iniciales = "GA";
+            let esPremium = false;
+
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
                 const tgData = window.Telegram.WebApp.initDataUnsafe;
                 if (tgData && tgData.user) {
                     const u = tgData.user;
                     tgUserName = u.first_name + (u.last_name ? " " + u.last_name : "");
-                    document.getElementById('user-profile-name').innerText = tgUserName;
-                    document.getElementById('user-profile-tag').innerText = u.username ? "@" + u.username : `ID: ${u.id}`;
-                    document.getElementById('user-avatar-text').innerText = u.first_name.substring(0,2).toUpperCase();
+                    userTag = u.username ? "@" + u.username : `ID: ${u.id}`;
+                    iniciales = u.first_name.substring(0, 2).toUpperCase();
+                    esPremium = u.is_premium || false;
+                    
+                    if (u.photo_url) {
+                        const avatarImg = document.getElementById('user-avatar-img');
+                        avatarImg.src = u.photo_url;
+                        avatarImg.classList.remove('hidden');
+                        document.getElementById('user-avatar-text').classList.add('hidden');
+                    }
                 }
             }
+            document.getElementById('user-profile-name').innerText = tgUserName;
+            document.getElementById('user-profile-tag').innerText = userTag;
+            document.getElementById('user-avatar-text').innerText = iniciales;
+            if (esPremium) document.getElementById('premium-badge').classList.remove('hidden');
+        }
+
+        function trackSessionCount() {
+            const hoy = new Date().toDateString();
+            if (ultimaSesionFecha !== hoy) {
+                totalSesionesHoy = 1;
+                ofertaFlashCanceladaHoy = false;
+                localStorage.setItem('ads_flash_cancelada_hoy', "false");
+            } else {
+                totalSesionesHoy++;
+            }
+            localStorage.setItem('ads_sesiones_contador', totalSesionesHoy);
+            localStorage.setItem('ads_ultima_sesion_fecha', hoy);
+
+            if (totalSesionesHoy === 5 && !ofertaFlashCanceladaHoy) {
+                setTimeout(triggerFlashOfferModal, 2000);
+            }
+        }
+
+        function generateDailySeedCounters() {
+            const seedDate = new Date().toDateString();
+            canalesData.forEach(c => {
+                let hash = 0;
+                const str = seedDate + c.id;
+                for (let i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                dynamicAdCounts[c.id] = Math.abs(hash) % 4; 
+            });
+        }
+
+        function triggerFlashOfferModal() {
+            document.getElementById('flash-offer-modal').classList.remove('hidden');
+            let t = 3600;
+            clearInterval(flashTimerInterval);
+            flashTimerInterval = setInterval(() => {
+                t--;
+                let h = Math.floor(t / 3600).toString().padStart(2, '0');
+                let m = Math.floor((t % 3600) / 60).toString().padStart(2, '0');
+                let s = (t % 60).toString().padStart(2, '0');
+                document.getElementById('flash-timer').innerText = `${h}:${m}:${s}`;
+                if(t <= 0) closeFlashOffer(false);
+            }, 1000);
+        }
+
+        function closeFlashOffer(purchased) {
+            document.getElementById('flash-offer-modal').classList.add('hidden');
+            clearInterval(flashTimerInterval);
+            if (!purchased) {
+                ofertaFlashCanceladaHoy = true;
+                localStorage.setItem('ads_flash_cancelada_hoy', "true");
+            }
+        }
+
+        function claimFlashOffer() {
+            carrito.push({ idUnique: Date.now(), idCanalOriginal: 999, promoPack: true, customPrice: 69.99, detallesMejora: "Mega Pack Especial Multi-Categoría", duracion: 'Especial', fijado: 'no' });
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            closeFlashOffer(true);
+            triggerSuccessAnimation("Pack Añadido", "Se aplicó el descuento especial en la cesta.");
+        }
+
+        function initFomoBot() {
+            const nombres = ["Raúl", "Carlos", "Sofía", "Lucía", "Marta", "Andrés", "Mateo", "Emma", "Elena", "Oliver"];
+            const banderas = ["🇪🇸", "🇲🇽", "🇦🇷", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
+            
+            if(window.fomoIntervalID) clearInterval(window.fomoIntervalID);
+            window.fomoIntervalID = setInterval(() => {
+                if(Math.random() > 0.4) {
+                    const n = nombres[Math.floor(Math.random() * nombres.length)];
+                    const b = banderas[Math.floor(Math.random() * banderas.length)];
+                    const c = canalesData[Math.floor(Math.random() * canalesData.length)].nombre;
+                    
+                    document.getElementById('fomo-flag').innerText = b;
+                    document.getElementById('fomo-text').innerHTML = `<strong class="text-amber-400 font-bold">${n}</strong> de ${b} contrató anuncios en el canal <span class="text-sky-400 font-bold">${c}</span>.`;
+                    const banner = document.getElementById('fomo-notification');
+                    banner.classList.remove('translate-y-20', 'opacity-0');
+                    setTimeout(() => { banner.classList.add('translate-y-20', 'opacity-0'); }, 5000);
+                }
+            }, 16000);
+        }
+
+        function checkRouletteAvailability() {
+            const now = Date.now();
+            const btnFlotante = document.getElementById('floating-roulette-trigger');
+            const btnBloqueado = document.getElementById('floating-roulette-blocked');
+            
+            document.getElementById('wheel-total-display').innerText = `Historial: ${userPoints} Pts`;
+
+            if (!lastSpinTime || (now - parseInt(lastSpinTime)) >= 24 * 60 * 60 * 1000) {
+                btnFlotante.classList.remove('hidden');
+                btnBloqueado.classList.add('hidden');
+                document.getElementById('spin-timer-display').innerText = "¡Listo para girar!";
+            } else {
+                btnFlotante.classList.add('hidden');
+                btnBloqueado.classList.remove('hidden');
+                
+                let diff = (24 * 60 * 60 * 1000) - (now - parseInt(lastSpinTime));
+                let hours = Math.floor(diff / (1000 * 60 * 60));
+                let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('spin-timer-display').innerText = `Disponible en ${hours}h ${minutes}m`;
+            }
+        }
+        
+        function openRouletteModal() { document.getElementById('roulette-modal').classList.remove('hidden'); }
+        function closeRouletteModal() { document.getElementById('roulette-modal').classList.add('hidden'); }
+
+        function spinRoulette() {
+            const btn = document.getElementById('spin-btn');
+            btn.setAttribute('disabled', 'true');
+            const opciones = [{ pts: 10, deg: 72 }, { pts: 25, deg: 144 }, { pts: 50, deg: 216 }, { pts: 100, deg: 288 }, { pts: 250, deg: 360 }];
+            const r = Math.random() * 100;
+            let sel = opciones[0];
+            if (r > 50 && r <= 80) sel = opciones[1];
+            else if (r > 80 && r <= 93) sel = opciones[2];
+            else if (r > 93 && r <= 99) sel = opciones[3];
+            else if (r > 99) sel = opciones[4];
+
+            currentWheelRotation += 3600 + sel.deg;
+            document.getElementById('roulette-wheel').style.transform = `rotate(${currentWheelRotation}deg)`;
+            
+            setTimeout(() => {
+                userPoints += sel.pts;
+                localStorage.setItem('ads_user_points', userPoints.toString());
+                lastSpinTime = Date.now().toString();
+                localStorage.setItem('ads_last_spin_time', lastSpinTime);
+                updatePointsDisplay();
+                closeRouletteModal();
+                checkRouletteAvailability();
+                renderRewardsSlots(); 
+                triggerSuccessAnimation(`+${sel.pts} Puntos`, "Puntos guardados.");
+                btn.removeAttribute('disabled');
+            }, 4000);
         }
 
         function updatePointsDisplay() {
@@ -331,284 +737,307 @@
             document.getElementById('rewards-points-counter').innerText = userPoints;
         }
 
-        // =========================================================================
-        // MEJORA 1: ACCIONES, VERIFICACIONES Y CONTADORES DIARIOS DINÁMICOS
-        // =========================================================================
-        function startTaskVerification(type) {
-            const now = Date.now();
-            if (type === 'tg') {
-                const btnVerify = document.getElementById('btn-verify-tg');
-                btnVerify.innerText = "Verificando en 15s...";
-                let counter = 15;
-                const timer = setInterval(() => {
-                    counter--;
-                    btnVerify.innerText = `Verificando en ${counter}s...`;
-                    if (counter <= 0) {
-                        clearInterval(timer);
-                        // Simulación de respuesta getChatMember de la API de Telegram
-                        btnVerify.removeAttribute('disabled');
-                        btnVerify.className = "bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg font-bold";
-                        btnVerify.innerText = "Reclamar Puntos";
-                        btnVerify.onclick = () => claimMissionPoints('tg', 150);
-                    }
-                }, 1000);
-            } else if (type === 'web') {
-                const btnVerify = document.getElementById('btn-verify-web');
-                const inputCode = document.getElementById('web-code-input');
-                inputCode.removeAttribute('disabled');
-                btnVerify.innerText = "Esperando...";
-                
-                setTimeout(() => {
-                    btnVerify.removeAttribute('disabled');
-                    btnVerify.className = "bg-emerald-500 text-slate-950 px-2.5 py-1.5 rounded-lg font-bold";
-                    btnVerify.innerText = "Validar";
-                    triggerSuccessAnimation("Código Generado", "Copia el código 'GOLD77' del blog e introdúcelo.");
-                }, 15000);
+        function updateRewardsMenuBadge() {
+            const badge = document.getElementById('menu-rewards-count');
+            if (badge) {
+                const rewardsEnCesta = carrito.filter(item => item.isReward).length;
+                const totalDesbloqueados = claimedRewards.length + rewardsEnCesta;
+                badge.innerText = totalDesbloqueados;
             }
         }
 
-        function validateWebTaskCode() {
-            const val = document.getElementById('web-code-input').value.trim();
-            if (val.toUpperCase() === "GOLD77") {
-                claimMissionPoints('web', 100);
-            } else {
-                alert("Código incorrecto. Búscalo detenidamente al final del blog.");
-            }
-        }
-
-        function claimMissionPoints(type, pts) {
-            userPoints += pts;
-            misionesStatus[type].done = true;
-            misionesStatus[type].nextAvail = Date.now() + (24 * 60 * 60 * 1000);
-            localStorage.setItem('ads_user_points', userPoints.toString());
-            localStorage.setItem('ads_misiones_status', JSON.stringify(misionesStatus));
-            
-            updatePointsDisplay();
-            updateMisionesUI();
+        /* CONTROLADORES DE VENTANAS FLOTANTES ANIMADAS (PREMIOS Y SOCIAL) */
+        function openRewardsModalFlotante() {
             renderRewardsSlots();
-            triggerSuccessAnimation(`+${pts} Puntos`, "Misión completada correctamente.");
+            document.getElementById('rewards-floating-modal').classList.remove('hidden');
+        }
+        function closeRewardsModalFlotante() {
+            document.getElementById('rewards-floating-modal').classList.add('hidden');
+        }
+        function openSocialModalFlotante() {
+            updateSocialTasksBadge();
+            document.getElementById('social-floating-modal').classList.remove('hidden');
+        }
+        function closeSocialModalFlotante() {
+            document.getElementById('social-floating-modal').classList.add('hidden');
         }
 
-        function updateMisionesUI() {
-            const now = Date.now();
-            // Control e inyección de cuenta regresiva dinámica para la Tarea de Telegram
-            const containerTg = document.getElementById('actions-task-tg');
-            if (misionesStatus.tg.done && now < misionesStatus.tg.nextAvail) {
-                let diff = misionesStatus.tg.nextAvail - now;
-                containerTg.innerHTML = `<span class="text-slate-500 font-mono italic text-[11px]">Disponible en ${formatTime(diff)}</span>`;
-            } else if (misionesStatus.tg.done && now >= misionesStatus.tg.nextAvail) {
-                misionesStatus.tg.done = false;
-                localStorage.setItem('ads_misiones_status', JSON.stringify(misionesStatus));
-                location.reload();
+        function updateSocialTasksBadge() {
+            const remainingTasks = 2 - completedSocialTasks.length;
+            document.getElementById('menu-social-count').innerText = remainingTasks;
+            
+            if (completedSocialTasks.includes(1)) {
+                const btn1 = document.getElementById('btn-social-task-1');
+                if(btn1) { btn1.className = "bg-slate-800 text-slate-500 text-[10px] px-3 py-1.5 rounded-lg font-bold"; btn1.innerText = "Hecho ✓"; btn1.disabled = true; }
             }
-
-            // Control e inyección de cuenta regresiva dinámica para la Tarea Web
-            const containerWeb = document.getElementById('actions-task-web');
-            if (misionesStatus.web.done && now < misionesStatus.web.nextAvail) {
-                let diff = misionesStatus.web.nextAvail - now;
-                containerWeb.innerHTML = `<span class="text-slate-500 font-mono italic text-[11px]">Disponible en ${formatTime(diff)}</span>`;
-            } else if (misionesStatus.web.done && now >= misionesStatus.web.nextAvail) {
-                misionesStatus.web.done = false;
-                localStorage.setItem('ads_misiones_status', JSON.stringify(misionesStatus));
-                location.reload();
+            if (completedSocialTasks.includes(2)) {
+                const btn2 = document.getElementById('btn-social-task-2');
+                if(btn2) { btn2.className = "bg-slate-800 text-slate-500 text-[10px] px-3 py-1.5 rounded-lg font-bold"; btn2.innerText = "Hecho ✓"; btn2.disabled = true; }
             }
         }
 
-        function formatTime(ms) {
-            let s = Math.floor(ms / 1000);
-            let h = Math.floor(s / 3600).toString().padStart(2, '0');
-            let m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
-            let sec = (s % 60).toString().padStart(2, '0');
-            return `${h}:${m}:${sec}`;
+        function completeSocialTask(taskId, url, rewardPts) {
+            window.open(url, "_blank");
+            triggerSuccessAnimation("Verificando...", "Comprobando suscripción en unos segundos.");
+            
+            setTimeout(() => {
+                if (!completedSocialTasks.includes(taskId)) {
+                    completedSocialTasks.push(taskId);
+                    localStorage.setItem('ads_social_tasks', JSON.stringify(completedSocialTasks));
+                    userPoints += rewardPts;
+                    localStorage.setItem('ads_user_points', userPoints.toString());
+                    updatePointsDisplay();
+                    updateSocialTasksBadge();
+                    triggerSuccessAnimation(`+${rewardPts} Puntos`, "¡Recompensa social añadida!");
+                }
+            }, 3500);
         }
 
-        // =========================================================================
-        // MEJORA 2: PREMIOS CON ESTADO INTERMEDIO (CUPONES DE RESERVA)
-        // =========================================================================
         function renderRewardsSlots() {
             const container = document.getElementById('rewards-slots-container');
-            if(!container) return; container.innerHTML = '';
+            if(!container) return;
+            container.innerHTML = '';
 
             premiosData.forEach(reward => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-col justify-between gap-2 text-center";
+                card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs";
                 
-                let btnHtml = '';
-                if (userPoints >= reward.pointsRequired) {
-                    btnHtml = `<button onclick="exchangePointsForCoupon('${reward.id}')" class="w-full bg-amber-500 text-slate-950 font-black py-1 rounded-md uppercase tracking-tight text-[10px]">Canjear Cupón</button>`;
+                let buttonHTML = '';
+                
+                if (claimedRewards.includes(reward.id)) {
+                    buttonHTML = `<button class="bg-slate-800 text-slate-500 font-bold px-3 py-1.5 rounded-lg border border-slate-700/50" disabled>Canjeado ✅</button>`;
+                } else if (userPoints >= reward.pointsRequired) {
+                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Usar 🛒</button>`;
                 } else {
-                    btnHtml = `<button disabled class="w-full bg-slate-900 text-slate-600 font-bold py-1 rounded-md text-[10px]">Faltan ${reward.pointsRequired - userPoints} pts</button>`;
+                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Faltan ${reward.pointsRequired - userPoints} pts 🔒</button>`;
                 }
 
                 card.innerHTML = `
-                    <div class="text-xs">
-                        <p class="font-bold text-slate-200">${reward.name}</p>
-                        <p class="text-[10px] text-amber-400 font-bold mt-0.5"><i class="fa-solid fa-coins mr-1"></i>${reward.pointsRequired} Pts</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg text-indigo-400 border border-indigo-500/20">🎁</div>
+                        <div>
+                            <h4 class="font-bold text-slate-200 text-left">${reward.name}</h4>
+                            <p class="text-[10px] text-amber-400 font-semibold mt-0.5 text-left"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>${reward.pointsRequired} Puntos</p>
+                        </div>
                     </div>
-                    ${btnHtml}
+                    <div>${buttonHTML}</div>
                 `;
                 container.appendChild(card);
             });
+            updateRewardsMenuBadge(); 
         }
 
-        function exchangePointsForCoupon(rewardId) {
+        function fireRewardUnlock(rewardId) {
             const reward = premiosData.find(r => r.id === rewardId);
-            if (!reward || userPoints < reward.pointsRequired) return;
+            if (!reward) return;
 
-            userPoints -= reward.pointsRequired;
-            localStorage.setItem('ads_user_points', userPoints.toString());
-            updatePointsDisplay();
-
-            // Generar código único aleatorio seguro para mitigar saturación inmediata
-            const uniqueCode = "GOLD-" + Math.floor(100000 + Math.random() * 900000);
-            cuponesPremios.push({ code: uniqueCode, name: reward.name, duracion: reward.duracion, used: false });
-            localStorage.setItem('ads_cupones_premios', JSON.stringify(cuponesPremios));
-
-            confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
-            renderRewardsSlots();
-            renderCuponesDisponibles();
-            triggerSuccessAnimation("Cupón Generado", `Código: ${uniqueCode}. Reservado con éxito.`);
-        }
-
-        function renderCuponesDisponibles() {
-            const container = document.getElementById('my-coupons-container');
-            if(!container) return; container.innerHTML = '';
-
-            const activos = cuponesPremios.filter(c => !c.used);
-            document.getElementById('menu-rewards-count').innerText = activos.length;
-
-            if(activos.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 text-[11px] italic py-1">No tienes cupones pendientes de programación.</p>`;
-                return;
-            }
-
-            activos.forEach(cup => {
-                const div = document.createElement('div');
-                div.className = "bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs";
-                div.innerHTML = `
-                    <div>
-                        <p class="font-bold text-slate-200"><i class="fa-solid fa-ticket text-amber-400 mr-1.5"></i>${cup.name}</p>
-                        <span class="text-[10px] font-mono bg-slate-950 px-1.5 py-0.5 rounded text-indigo-300 border border-slate-800">${cup.code}</span>
-                    </div>
-                    <button onclick="injectCouponToConfigurator('${cup.code}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg text-[10px]">Programar Ahora</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function injectCouponToConfigurator(code) {
-            const cup = cuponesPremios.find(c => c.code === code);
-            if(!cup) return;
+            confetti({ particleCount: 140, spread: 75, origin: { y: 0.6 } });
+            document.getElementById('gift-username').innerText = tgUserName;
+            document.getElementById('gift-reward-name').innerText = reward.name;
             
-            // Forzar inyección de la bonificación de forma visual en los selectores de los canales
-            canalesData.forEach(c => {
-                updateAdAddonValue(c.id, 'duracion', cup.duracion);
-                const selectDur = document.getElementById(`sel-dur-${c.id}`);
-                if(selectDur) selectDur.value = cup.duracion;
-            });
-
-            triggerSuccessAnimation("Cupón Inyectado", "Configuradores adaptados. Elige tu canal y agrégalo sin costo.");
-            // Marcamos el cupón como procesado en la cesta una vez ejecutado el checkout
-            window.activeCouponClaimedCode = code; 
+            const giftModal = document.getElementById('gift-reward-modal');
+            giftModal.classList.remove('hidden');
+            giftModal.setAttribute('data-active-reward', rewardId);
+            closeRewardsModalFlotante();
         }
 
-        // =========================================================================
-        // MEJORA 3: CONTRATACIÓN CON CALCULADOR DE PRESUPUESTO DINÁMICO (ADD-ONS)
-        // =========================================================================
-        function updateAdAddonValue(canalId, key, value) {
-            if (!configuracionAnuncios[canalId]) {
-                configuracionAnuncios[canalId] = { duracion: '24h', fijado: false, multimedia: 'ninguno', spoiler: false };
-            }
-            
-            if (key === 'fijado' || key === 'spoiler') {
-                configuracionAnuncios[canalId][key] = value;
-            } else {
-                configuracionAnuncios[canalId][key] = value;
-            }
+        function closeGiftModal() {
+            const giftModal = document.getElementById('gift-reward-modal');
+            const rewardId = giftModal.getAttribute('data-active-reward');
+            giftModal.classList.add('hidden');
 
-            // Forzar recálculo dinámico matemático en vivo sobre la tarjeta antes de enviar al carrito
-            const canal = canalesData.find(c => c.id === canalId);
-            const precioDisplay = document.getElementById(`live-price-${canalId}`);
-            if(precioDisplay && canal) {
-                let total = canal.precioBase;
-                const cfg = configuracionAnuncios[canalId];
+            if(rewardId) {
+                const reward = premiosData.find(r => r.id === rewardId);
+                if (!claimedRewards.includes(rewardId)) {
+                    claimedRewards.push(rewardId);
+                    localStorage.setItem('ads_claimed_rewards', JSON.stringify(claimedRewards));
+                }
                 
-                if(cfg.duracion === '48h') total += 20;
-                if(cfg.duracion === 'perm') total += 45;
-                if(cfg.fijado) total += 15;
-                if(cfg.multimedia === 'video') total += 10;
-                if(cfg.multimedia === 'pack') total += 25;
+                userPoints -= reward.pointsRequired;
+                localStorage.setItem('ads_user_points', userPoints.toString());
+                updatePointsDisplay();
 
-                precioDisplay.innerText = `$${total.toFixed(2)} USD`;
+                carrito.push({
+                    idUnique: Date.now(),
+                    idCanalOriginal: 888, 
+                    precioCalculado: 0,
+                    detallesMejora: `Premio Especial: ${reward.name}`,
+                    isReward: true,
+                    duracion: 'Gratis',
+                    fijado: 'no'
+                });
+                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+                
+                updateCartBadge();
+                renderRewardsSlots();
+                updateRewardsMenuBadge(); 
+                triggerSuccessAnimation("Añadido", "Tu regalo se sumó a la cesta.");
             }
+        }
+
+        function resetearTodoSistema() {
+            localStorage.clear(); 
+            favoritos = []; carrito = []; historialCampanas = []; claimedRewards = []; completedSocialTasks = [];
+            userPoints = 0; lastSpinTime = null; totalSesionesHoy = 0; ultimaSesionFecha = ""; ofertaFlashCanceladaHoy = false;
+            activeCoupon = null; activeCouponPct = 0;
+
+            localStorage.setItem('ads_user_points', '0');
+            localStorage.setItem('ads_favoritos', JSON.stringify([]));
+            localStorage.setItem('ads_carrito', JSON.stringify([]));
+            localStorage.setItem('ads_historial', JSON.stringify([]));
+            localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
+            localStorage.setItem('ads_social_tasks', JSON.stringify([]));
+
+            updatePointsDisplay(); updateCartBadge(); updateRewardsMenuBadge(); updateSocialTasksBadge();
+            renderChannels(); renderRewardsSlots(); checkRouletteAvailability();
+            triggerSuccessAnimation("Reset Completado", "Los puntos y regalos se han restablecido.");
+        }
+
+        function renderCarousel() {
+            const track = document.getElementById('carousel-track');
+            if(!track || canalesData.length === 0) return;
+            const c = canalesData[currentCarouselIndex];
+            track.innerHTML = `
+                <div class="flex items-center justify-between gap-4 animate-fade-in text-xs w-full">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <img src="${c.imagen}" class="w-10 h-10 object-cover rounded-xl border border-slate-800 flex-shrink-0">
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-slate-100 truncate">${c.nombre}</h4>
+                            <p class="text-[10px] text-slate-400 font-mono"><i class="fa-solid fa-users text-[8px] mr-1"></i>${c.subs.toLocaleString()} subs</p>
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${c.id})" class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 cursor-pointer shadow-md shadow-amber-400/10">+ $${getPrecio(c).toFixed(2)}</button>
+                </div>
+            `;
+        }
+        function nextCarousel() { currentCarouselIndex = (currentCarouselIndex + 1) % canalesData.length; renderCarousel(); }
+        function prevCarousel() { currentCarouselIndex = (currentCarouselIndex - 1 + canalesData.length) % canalesData.length; renderCarousel(); }
+
+        function updateMejora(canalId, tipoMejora, valor) {
+            if (!mejorasSeleccionadas[canalId]) {
+                mejorasSeleccionadas[canalId] = { duracion: '24h', fijado: 'no' };
+            }
+            mejorasSeleccionadas[canalId][tipoMejora] = valor;
+            
+            const contenedorPrecio = document.getElementById(`precio-display-${canalId}`);
+            if (contenedorPrecio) {
+                const canal = canalesData.find(c => c.id === canalId);
+                let calculo = getPrecio(canal) + calcularCosteExtra(canalId);
+                contenedorPrecio.innerText = `$${calculo.toFixed(2)} USD`;
+            }
+        }
+
+        function calcularCosteExtra(canalId, configObjeto = null) {
+            const config = configObjeto ? configObjeto : mejorasSeleccionadas[canalId];
+            if (!config) return 0;
+            let extra = 0;
+            if (config.duracion === '48h') extra += 15;
+            if (config.duracion === 'perm') extra += 35;
+            if (config.fijado === 'si') extra += 10;
+            return extra;
+        }
+
+        function updateCartItemOptions(uid, key, value) {
+            const idx = carrito.findIndex(item => item.idUnique === uid);
+            if(idx !== -1) {
+                carrito[idx][key] = value;
+                if(!carrito[idx].promoPack && !carrito[idx].isReward) {
+                    const original = canalesData.find(c => c.id === carrito[idx].idCanalOriginal);
+                    const configTemp = { duracion: carrito[idx].duracion, fijado: carrito[idx].fijado };
+                    carrito[idx].precioCalculado = getPrecio(original) + calcularCosteExtra(null, configTemp);
+                    
+                    let detStr = `Post ${carrito[idx].duracion === '24h' ? '24h' : (carrito[idx].duracion==='48h'?'48h':'Permanente')}`;
+                    if(carrito[idx].fijado === 'si') detStr += ' + Top Fijado';
+                    carrito[idx].detallesMejora = detStr;
+                }
+                localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+                openCartModal(); 
+            }
+        }
+
+        function toggleCardDropdownSlide(element) {
+            const wrapper = element.closest('.channel-card-wrapper');
+            wrapper.classList.toggle('expanded');
         }
 
         function buildChannelCardHTML(c, isFav) {
-            if (!configuracionAnuncios[c.id]) {
-                configuracionAnuncios[c.id] = { duracion: '24h', fijado: false, multimedia: 'ninguno', spoiler: false };
+            let etiquetaHtml = '';
+            let bordeResaltado = 'border-slate-700/60';
+            let fondoResaltado = 'bg-slate-800/40';
+
+            if (c.destacado) {
+                etiquetaHtml = `<span class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase flex items-center gap-0.5 shadow-sm animate-pulse"><i class="fa-solid fa-rocket text-[7px]"></i> DESTACADO</span>`;
+                bordeResaltado = 'border-amber-500/50';
+                fondoResaltado = 'bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/20';
+            } else if (c.recomendado) {
+                etiquetaHtml = `<span class="bg-sky-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-thumbs-up text-[7px]"></i> RECOMENDADO</span>`;
+                bordeResaltado = 'border-sky-500/40';
             }
-            const cfg = configuracionAnuncios[c.id];
+
+            if (!mejorasSeleccionadas[c.id]) {
+                mejorasSeleccionadas[c.id] = { duracion: '24h', fijado: 'no' };
+            }
+            const currentConfig = mejorasSeleccionadas[c.id];
+            const adsToday = dynamicAdCounts[c.id] ?? 0;
 
             return `
-                <div class="channel-card-wrapper bg-slate-900 rounded-2xl border border-slate-800 flex flex-col justify-between shadow-md overflow-hidden transition-all duration-300">
-                    <div class="p-4 space-y-3">
-                        <div class="flex gap-3 items-start cursor-pointer" onclick="toggleCardDropdown(this)">
-                            <div class="w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center font-black text-sky-400 border border-slate-700">${c.nombre.substring(0,2)}</div>
+                <div class="channel-card-wrapper ${fondoResaltado} rounded-2xl border ${bordeResaltado} flex flex-col justify-between shadow-md overflow-hidden transition-all duration-300">
+                    <div class="p-4">
+                        <div class="flex gap-3 items-start cursor-pointer" onclick="toggleCardDropdownSlide(this)">
+                            <img src="${c.imagen}" class="w-11 h-11 rounded-xl object-cover border border-slate-700">
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-slate-200 text-xs truncate flex items-center gap-1.5">
-                                    ${c.nombre} <i class="fa-solid fa-chevron-down text-[8px] text-slate-500 arrow-icon"></i>
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[9px] font-bold px-1.5 py-0.5 rounded-full">${c.tipo}</span>
+                                    ${etiquetaHtml}
+                                </div>
+                                <h3 class="font-bold text-slate-200 text-xs mt-1 truncate leading-none flex items-center gap-1.5">
+                                    ${c.nombre} 
+                                    <i class="fa-solid fa-chevron-down text-[8px] text-slate-500 arrow-icon"></i>
                                 </h3>
-                                <p class="text-[10px] text-sky-400 font-mono">@${c.username}</p>
+                                <p class="text-[10px] text-sky-400/80 font-mono mt-0.5">@${c.username}</p>
                             </div>
-                            <button onclick="event.stopPropagation(); toggleFav(${c.id})" class="text-xs text-${isFav ? 'amber-400' : 'slate-600'}"><i class="fa-solid fa-star"></i></button>
+                            <button onclick="event.stopPropagation(); toggleFav(${c.id})" class="text-xs text-${isFav ? 'amber-400' : 'slate-600'} cursor-pointer"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
+                        </div>
+                        
+                        <div class="mt-2 text-[9px] font-bold text-orange-400/90 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-[8px]"></i> Hoy se anunciaron ${adsToday} personas
                         </div>
 
-                        <div class="channel-details-dropdown space-y-3 pt-1">
-                            <div class="border-t border-slate-800/80 pt-2 grid grid-cols-2 gap-2 text-[10px]">
+                        <div class="channel-details-dropdown">
+                            <p class="text-[11px] text-slate-300 mt-2 italic border-l-2 border-slate-700 pl-2 py-0.5 text-left">${c.descripcion}</p>
+                            <div class="mt-3 grid grid-cols-2 gap-2 text-[10px]">
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5">Formato Base:</label>
-                                    <select id="sel-dur-${c.id}" onchange="updateAdAddonValue(${c.id}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
-                                        <option value="24h">Post 24 Horas</option>
-                                        <option value="48h">Post 48 Horas (+ $20.00)</option>
-                                        <option value="perm">Post Permanente (+ $45.00)</option>
+                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Duración:</label>
+                                    <select onchange="updateMejora(${c.id}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
+                                        <option value="24h" ${currentConfig.duracion === '24h'?'selected':''}>24 Horas Estándar</option>
+                                        <option value="48h" ${currentConfig.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
+                                        <option value="perm" ${currentConfig.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-slate-500 block font-bold mb-0.5">Multimedia:</label>
-                                    <select onchange="updateAdAddonValue(${c.id}, 'multimedia', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
-                                        <option value="ninguno">Solo Texto / Imagen Estándar</option>
-                                        <option value="video">Vídeo Optimizador (+ $10.00)</option>
-                                        <option value="pack">Pack Supremo Completo (+ $25.00)</option>
+                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Fijado en Top:</label>
+                                    <select onchange="updateMejora(${c.id}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 text-slate-300 focus:outline-none">
+                                        <option value="no" ${currentConfig.fijado === 'no'?'selected':''}>Sin Fijar</option>
+                                        <option value="si" ${currentConfig.fijado === 'si'?'selected':''}>Fijar 1 Hora (+ $10.00)</option>
                                     </select>
-                                </div>
-                            </div>
-
-                            <!-- MEJORA 3.2: AD-ONS INTERRUPTORES COMPLEMENTARIOS (FIJADO Y SPOILER OPTATIVO) -->
-                            <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-850 space-y-1.5 text-[10px]">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-slate-300 font-medium"><i class="fa-solid fa-thumbtack text-sky-400 mr-1"></i>Fijar en el TOP 1 Hora (+ $15.00)</span>
-                                    <input type="checkbox" onchange="updateAdAddonValue(${c.id}, 'fijado', this.checked)" class="w-4 h-4 accent-sky-500 cursor-pointer">
-                                </div>
-                                <div class="flex justify-between items-center pt-1 border-t border-slate-850">
-                                    <span class="text-slate-300 font-medium"><i class="fa-solid fa-eye-slash text-indigo-400 mr-1"></i>Efecto Spoiler Opcional (Ocultar vista previa)</span>
-                                    <input type="checkbox" onchange="updateAdAddonValue(${c.id}, 'spoiler', this.checked)" class="w-4 h-4 accent-indigo-500 cursor-pointer">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs">
-                            <div>
-                                <span class="text-[9px] text-slate-500 block font-bold">Audiencia</span>
-                                <strong class="text-slate-300 font-mono">${c.subs.toLocaleString()} subs</strong>
+                        <div class="mt-3 flex items-center justify-between bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
+                            <div class="text-left">
+                                <span class="text-[9px] text-slate-500 block uppercase font-bold"><i class="fa-solid fa-users text-[8px]"></i> Audiencia</span>
+                                <strong class="text-xs text-slate-300 font-mono">${c.subs.toLocaleString()} subs</strong>
                             </div>
                             <div class="text-right">
-                                <span class="text-[9px] text-slate-500 block font-bold">Presupuesto Estimado</span>
-                                <span id="live-price-${c.id}" class="font-black text-emerald-400">$${c.precioBase.toFixed(2)} USD</span>
+                                ${c.descuento > 0 ? `<span class="text-[10px] text-rose-500 line-through block font-bold">$${c.precioBase}</span>` : ''}
+                                <span id="precio-display-${c.id}" class="text-sm font-black text-emerald-400">$${(getPrecio(c) + calcularCosteExtra(c.id)).toFixed(2)} USD</span>
                             </div>
                         </div>
                     </div>
-                    <div class="px-4 pb-4">
-                        <button onclick="addConfiguredToCart(${c.id})" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer">Añadir Configuración</button>
+                    <div class="px-4 pb-4 flex gap-1.5">
+                        <a href="https://t.me/${c.username}" target="_blank" class="bg-sky-500/10 text-sky-400 border border-sky-500/20 w-9 h-9 rounded-xl flex items-center justify-center text-xs hover:bg-sky-500/20 transition-colors cursor-pointer"><i class="fa-brands fa-telegram-plane"></i></a>
+                        <button onclick="addToCart(${c.id})" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer">+ Añadir a la Cesta</button>
                     </div>
                 </div>
             `;
@@ -616,151 +1045,378 @@
 
         function renderChannels() {
             const container = document.getElementById('channels-container');
-            if(!container) return; container.innerHTML = '';
+            if(!container) return;
+            container.innerHTML = '';
             let filtrados = [...canalesData];
+            
             if (currentCategory !== 'todos') filtrados = filtrados.filter(c => c.categoria === currentCategory);
             
-            filtrados.forEach(c => {
-                container.innerHTML += buildChannelCardHTML(c, favoritos.includes(c.id));
+            const filterSelect = document.getElementById('sort-filter').value;
+            if (filterSelect === 'subs-desc') filtrados.sort((a,b) => b.subs - a.subs);
+            if (filterSelect === 'price-asc') filtrados.sort((a,b) => getPrecio(a) - getPrecio(b));
+            if (filterSelect === 'offers') filtrados = filtrados.filter(c => c.descuento > 0);
+            if (filterSelect === 'recommended') filtrados = filtrados.filter(c => c.recommended === true || c.destacado === true);
+            
+            filtrados.forEach((c) => {
+                const isFav = favoritos.includes(c.id);
+                container.innerHTML += buildChannelCardHTML(c, isFav);
             });
         }
 
-        function addConfiguredToCart(id) {
+        function getPrecio(canal) { return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase; }
+        
+        function toggleFav(id) { 
+            favoritos = favoritos.includes(id) ? favoritos.filter(fId => fId !== id) : [...favoritos, id]; 
+            localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); 
+            renderChannels(); 
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) renderFavorites();
+        }
+
+        function toggleCouponField() {
+            document.getElementById('coupon-input-field').classList.toggle('hidden');
+        }
+
+        function validateCouponCode() {
+            const val = document.getElementById('coupon-code-input').value.trim().toUpperCase();
+            const errBox = document.getElementById('coupon-error-box');
+            
+            if(val === "LISTAGGOLDEN20OFF" || val === "LISTAGOLDEN20OFF") {
+                errBox.classList.add('hidden');
+                activeCoupon = "LISTAGOLDEN20OFF";
+                activeCouponPct = 20;
+                document.getElementById('coupon-input-field').classList.add('hidden');
+                triggerSuccessAnimation("¡Cupón Aplicado!", "20% de descuento asignado.");
+                openCartModal();
+            } else {
+                errBox.classList.remove('hidden');
+            }
+        }
+
+        function removeCoupon() { activeCoupon = null; activeCouponPct = 0; openCartModal(); }
+
+        function calculateCartSubtotal() {
+            let sub = 0;
+            carrito.forEach(item => {
+                if(item.promoPack) { sub += item.customPrice; }
+                else { sub += item.precioCalculado; }
+            });
+            return sub;
+        }
+
+        function addToCart(id) {
             const canal = canalesData.find(c => c.id === id);
             if(!canal) return;
 
-            const cfg = configuracionAnuncios[id] || { duracion: '24h', fijado: false, multimedia: 'ninguno', spoiler: false };
-            
-            let total = canal.precioBase;
-            let det = `Formato: ${cfg.duracion}`;
-            if(cfg.duracion === '48h') total += 20;
-            if(cfg.duracion === 'perm') total += 45;
-            if(cfg.fijado) { total += 15; det += ' + Fijado Top'; }
-            if(cfg.multimedia !== 'ninguno') { total += (cfg.multimedia === 'video' ? 10 : 25); det += ` + Multi: ${cfg.multimedia}`; }
-            if(cfg.spoiler) det += ' [Con Efecto Spoiler]';
+            const config = mejorasSeleccionadas[id] || { duracion: '24h', fijado: 'no' };
+            const extra = calcularCosteExtra(id);
+            const precioFinalItem = getPrecio(canal) + extra;
 
-            // Comprobar si se está canjeando un cupón de premio para dejar el costo neto a 0
-            let isFree = false;
-            if (window.activeCouponClaimedCode) {
-                total = 0;
-                isFree = true;
-                det = `🎁 PREMIO APLICADO (${window.activeCouponClaimedCode}) | ` + det;
-            }
+            let detalleStr = `Post ${config.duracion === '24h' ? '24h' : (config.duracion==='48h'?'48h':'Permanente')}`;
+            if(config.fijado === 'si') detalleStr += ' + Top Fijado';
 
-            carrito.push({
-                idUnique: Date.now() + Math.floor(Math.random() * 100),
-                idCanalOriginal: id,
-                nombreCanal: canal.nombre,
-                precioCalculado: total,
-                detalles: det,
-                couponUsedCode: isFree ? window.activeCouponClaimedCode : null
+            carrito.push({ 
+                idUnique: Date.now() + Math.floor(Math.random()*100), 
+                idCanalOriginal: parseInt(id),
+                precioCalculado: precioFinalItem,
+                detallesMejora: detalleStr,
+                duracion: config.duracion,
+                fijado: config.fijado
             });
 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            window.activeCouponClaimedCode = null; // Consumir el estado de inyección del cupón
-            
             updateCartBadge();
-            renderCuponesDisponibles();
-            triggerSuccessAnimation("Añadido a Cesta", "Tus add-ons y presupuesto se han guardado.");
+            triggerSuccessAnimation("Añadido", "Canal sumado a la cesta.");
+        }
+
+        function renderCrossSelling() {
+            const container = document.getElementById('cross-selling-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const currentIds = carrito.map(i => i.idCanalOriginal);
+            const sugeridos = canalesData.filter(c => !currentIds.includes(c.id));
+
+            if(sugeridos.length === 0) {
+                document.getElementById('cross-selling-area').classList.add('hidden');
+                return;
+            }
+            document.getElementById('cross-selling-area').classList.remove('hidden');
+
+            sugeridos.forEach(c => {
+                const item = document.createElement('div');
+                item.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center gap-2 min-w-[190px] text-[10px] flex-shrink-0";
+                item.innerHTML = `
+                    <img src="${c.imagen}" class="w-7 h-7 object-cover rounded-md">
+                    <div class="flex-1 min-w-0 text-left">
+                        <p class="font-bold text-slate-200 truncate leading-tight">${c.nombre}</p>
+                        <p class="text-emerald-400 font-semibold mt-0.5">$${getPrecio(c).toFixed(2)}</p>
+                    </div>
+                    <button onclick="addToCart(${c.id}); openCartModal();" class="bg-sky-600 text-white font-bold p-1 px-2 rounded-md hover:bg-sky-500 cursor-pointer text-[9px]">+ Agregar</button>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function openCartModal() {
-            const container = document.getElementById('cart-items');
-            if(!container) return; container.innerHTML = '';
+            const container = document.getElementById('cart-items'); 
+            if(!container) return;
+            container.innerHTML = '';
             document.getElementById('cart-modal').classList.remove('hidden');
+            
+            renderCrossSelling();
 
-            let subtotal = 0;
+            if(carrito.length === 0) {
+                document.getElementById('cart-subtotal').innerText = "$0.00"; 
+                document.getElementById('cart-total').innerText = "$0.00 USD";
+                document.getElementById('row-discount').classList.add('hidden'); 
+                document.getElementById('coupon-display-area').classList.add('hidden');
+                document.getElementById('btn-clear-cart').classList.add('hidden'); 
+                document.getElementById('payment-method-section').classList.add('hidden');
+                document.getElementById('cross-selling-area').classList.add('hidden');
+                return;
+            }
+            document.getElementById('btn-clear-cart').classList.remove('hidden');
+            document.getElementById('payment-method-section').classList.remove('hidden');
+            let sub = calculateCartSubtotal();
+            
             carrito.forEach(item => {
-                subtotal += item.precioCalculado;
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-2.5 rounded-xl flex justify-between items-center text-xs";
-                div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-slate-200">${item.nombreCanal}</h4>
-                        <p class="text-[10px] text-slate-400">${item.detalles}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-black text-emerald-400">$${item.precioCalculado.toFixed(2)}</span>
-                        <button onclick="removeFromCart(${item.idUnique})" class="text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                `;
+                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs";
+                
+                if(item.promoPack) {
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="text-left"><h4 class="font-bold text-amber-400">Mega Pack Promocional</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$69.99</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                        </div>`;
+                } else if(item.isReward) {
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="text-left"><h4 class="font-bold text-indigo-400">🎁 Recompensa Reclamada</h4><p class="text-[9px] text-slate-400">${item.detallesMejora}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">GRATIS</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                        </div>`;
+                } else {
+                    const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                    if(canal) {
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <div class="text-left"><h4 class="font-bold text-slate-200">${canal.nombre}</h4><p class="text-[9px] text-sky-400 font-mono">${item.detallesMejora}</p></div>
+                                <div class="flex items-center gap-2"><span class="font-bold text-emerald-400">$${item.precioCalculado.toFixed(2)}</span><button onclick="removeFromCart(${item.idUnique})" class="text-rose-400 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button></div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-700/50 grid grid-cols-2 gap-2 text-[9px] bg-slate-900/40 p-1.5 rounded-lg">
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Duración:</label>
+                                    <select onchange="updateCartItemOptions(${item.idUnique}, 'duracion', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
+                                        <option value="24h" ${item.duracion === '24h'?'selected':''}>24 Horas</option>
+                                        <option value="48h" ${item.duracion === '48h'?'selected':''}>48 Horas (+ $15.00)</option>
+                                        <option value="perm" ${item.duracion === 'perm'?'selected':''}>Permanente (+ $35.00)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-slate-500 block font-bold mb-0.5 text-left">Fijado en Top:</label>
+                                    <select onchange="updateCartItemOptions(${item.idUnique}, 'fijado', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-md p-1 text-slate-300 focus:outline-none">
+                                        <option value="no" ${item.fijado === 'no'?'selected':''}>Sin Fijar</option>
+                                        <option value="si" ${item.fijado === 'si'?'selected':''}>Fijar Top (+ $10.00)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
                 container.appendChild(div);
             });
 
-            document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)} USD`;
+            document.getElementById('cart-subtotal').innerText = `$${sub.toFixed(2)}`;
+            if(activeCoupon) {
+                let disc = sub * (activeCouponPct / 100);
+                document.getElementById('row-discount').classList.remove('hidden');
+                document.getElementById('cart-total-discount').innerText = `-$${disc.toFixed(2)}`;
+                document.getElementById('cart-total').innerText = `$${Math.max(sub - disc, 0).toFixed(2)} USD`;
+                document.getElementById('coupon-display-area').classList.remove('hidden');
+                document.getElementById('active-coupon-name').innerText = activeCoupon;
+            } else {
+                document.getElementById('row-discount').classList.add('hidden');
+                document.getElementById('cart-total').innerText = `$${sub.toFixed(2)} USD`;
+                document.getElementById('coupon-display-area').classList.add('hidden');
+            }
+            
+            selectPaymentMethod(selectedPayment);
         }
 
-        function removeFromCart(uid) {
-            const item = carrito.find(i => i.idUnique === uid);
-            if(item && item.couponUsedCode) {
-                // Si eliminamos el anuncio gratis de la cesta, le devolvemos el cupón al usuario
-                cuponesPremios = cuponesPremios.map(c => c.code === item.couponUsedCode ? { ...c, used: false } : c);
-                localStorage.setItem('ads_cupones_premios', JSON.stringify(cuponesPremios));
-                renderCuponesDisponibles();
+        function removeFromCart(uid) { 
+            carrito = ServerlessMockRemove(uid); 
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
+            updateCartBadge(); 
+            updateRewardsMenuBadge(); 
+            openCartModal(); 
+        }
+
+        function ServerlessMockRemove(uid) {
+            return carrito.filter(i => i.idUnique !== uid);
+        }
+        
+        function clearCart() { 
+            carrito = []; activeCoupon = null; activeCouponPct = 0; 
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito)); 
+            updateCartBadge(); updateRewardsMenuBadge(); openCartModal(); 
+        }
+        
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+        function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
+        
+        function selectPaymentMethod(m) { 
+            selectedPayment = m; 
+            document.querySelectorAll('.pay-btn').forEach(b => {
+                b.classList.remove('border-sky-400', 'bg-sky-500/10');
+                b.classList.add('border-slate-800', 'bg-slate-900');
+            });
+            
+            const btnId = m === 'PayPal' ? 'pay-PayPal' : (m === 'Telegram Stars' ? 'pay-Stars' : 'pay-USDT');
+            const targetBtn = document.getElementById(btnId);
+            if(targetBtn) {
+                targetBtn.classList.remove('border-slate-800', 'bg-slate-900');
+                targetBtn.classList.add('border-sky-400', 'bg-sky-500/10');
             }
-            carrito = carrito.filter(i => i.idUnique !== uid);
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
-            openCartModal();
         }
 
         function checkout() {
             if(carrito.length === 0) return;
-            
-            let txt = `¡Hola Administrador! Envío orden de publicidad configurada:\n\n`;
-            let histNames = [];
-            let totalPay = 0;
+            let sub = calculateCartSubtotal();
+            let disc = activeCoupon ? (sub * (activeCouponPct / 100)) : 0;
+            let net = Math.max(sub - disc, 0);
 
-            carrito.forEach((item, idx) => {
-                txt += `${idx+1}. *${item.nombreCanal}* — ${item.detalles} ($${item.precioCalculado.toFixed(2)} USD)\n`;
-                histNames.push(item.nombreCanal);
-                totalPay += item.precioCalculado;
-
-                // Quemar los cupones físicamente del almacenamiento si se enviaron en el checkout
-                if(item.couponUsedCode) {
-                    cuponesPremios = cuponesPremios.map(c => c.code === item.couponUsedCode ? { ...c, used: true } : c);
+            let txt = `¡Hola Administrador! Solicito la activación de publicidad.\n\n📋 *CARRITO DE COMPRA:*\n`;
+            let hist = [];
+            carrito.forEach((item, index) => {
+                if(item.promoPack) {
+                    txt += `${index+1}. *Mega Pack Promocional* - $69.99 USD\n`;
+                    hist.push("Mega Pack Especial");
+                } else if(item.isReward) {
+                    txt += `${index+1}. *🎁 RECOMPENSA:* ${item.detallesMejora} - ¡GRATIS!\n`;
+                    hist.push(item.detallesMejora);
+                } else {
+                    const canal = canalesData.find(c => c.id === item.idCanalOriginal);
+                    if(canal) {
+                        txt += `${index+1}. *${canal.nombre}* (${item.detallesMejora}) - $${item.precioCalculado.toFixed(2)} USD\n`;
+                        hist.push(`${canal.nombre} (${item.detallesMejora})`);
+                    }
                 }
             });
 
-            txt += `\n💰 *IMPORTE TOTAL:* $${totalPay.toFixed(2)} USD`;
-            localStorage.setItem('ads_cupones_premios', JSON.stringify(cuponesPremios));
-
-            // Guardar en el módulo de historial de campañas
-            historialCampanas.unshift({ idCamp: Date.now(), fecha: new Date().toLocaleString(), canales: histNames, total: totalPay.toFixed(2) });
+            if(activeCoupon) { txt += `\n🎟️ *CUPÓN APLICADO:* ${activeCoupon} (-${activeCouponPct}%)\n`; }
+            txt += `\n💳 *MÉTODO DE PAGO:* ${selectedPayment}\n💰 *TOTAL NETO A PAGAR:* $${net.toFixed(2)} USD`;
+            
+            historialCampanas.unshift({ idCamp: Date.now(), fecha: new Date().toLocaleString(), canales: hist, total: net.toFixed(2), estado: 'progreso' });
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
 
             window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(txt), "_blank");
-            carrito = [];
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
-            renderCuponesDisponibles();
-            closeCartModal();
+            clearCart(); closeCartModal();
         }
 
-        // =========================================================================
-        // MEJORA 4: ASISTENTE IA CON ACCIONES FAQ AUTOMÁTICAS E INTEGRACIÓN HUMANA
-        // =========================================================================
-        function triggerFaqResponse(type) {
-            const messages = document.getElementById('ai-chat-messages');
-            if (type === 'claim') {
-                messages.innerHTML += `
-                    <div class="bg-sky-600/20 border border-sky-500/30 p-2.5 rounded-xl text-sky-200 max-w-[85%] ml-auto text-right rounded-tr-none">¿Cómo reclamo un premio?</div>
-                    <div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none mt-1">Completa las misiones diarias para acumular puntos. Cuando tengas suficientes, ve a la sección "Canjear Premios" y genera un cupón único de reserva. Luego pulsa "Programar Ahora" para aplicarlo sin coste en tus anuncios.</div>
-                `;
-            } else if (type === 'publish') {
-                messages.innerHTML += `
-                    <div class="bg-sky-600/20 border border-sky-500/30 p-2.5 rounded-xl text-sky-200 max-w-[85%] ml-auto text-right rounded-tr-none">¿Cómo contrato publicidad?</div>
-                    <div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none mt-1">Despliega cualquier canal del catálogo, personaliza las opciones (duración, fijado o multimedia) y el calculador dinámico estimará el presupuesto. Añádelo a la cesta y envíalo al administrador.</div>
-                `;
-            } else if (type === 'human') {
-                messages.innerHTML += `
-                    <div class="bg-slate-800 p-2.5 rounded-xl text-amber-400 font-bold max-w-[85%] rounded-tl-none mt-1 flex flex-col gap-1">
-                        <span>Redireccionando al soporte oficial humano...</span>
-                        <a href="https://t.me/${MI_TELEGRAM_USER}" target="_blank" class="bg-amber-500 text-slate-950 text-center font-black py-1 rounded-md uppercase tracking-wide mt-1 text-[10px]">Abrir Chat Directo</a>
+        function switchView(view) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
+            document.getElementById('view-catalog').classList.add('hidden');
+            document.getElementById('view-favorites').classList.add('hidden');
+            document.getElementById('view-campaigns').classList.add('hidden');
+            document.getElementById('view-faq').classList.add('hidden');
+
+            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); renderChannels(); }
+            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
+            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
+            if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
+        }
+
+        function filterCategory(cat, e) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); e.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
+        function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); document.getElementById('menu-campaigns-count').innerText = historialCampanas.filter(c => c.estado === 'progreso').length; }
+        function closeUserMenuOutside(e) { const d = document.getElementById('user-dropdown'); if(d && !d.classList.contains('hidden') && !d.contains(e.target)) d.classList.add('hidden'); }
+        
+        function renderFavorites() { 
+            const container = document.getElementById('favorites-container'); 
+            if(!container) return; 
+            container.innerHTML = ''; 
+            const favs = canalesData.filter(c => favoritos.includes(c.id)); 
+            if(favs.length === 0){
+                container.innerHTML = `<p class="text-slate-500 text-xs py-4 text-center col-span-full">Aún no tienes canales en favoritos.</p>`;
+                return;
+            } 
+            favs.forEach(c => { container.innerHTML += buildChannelCardHTML(c, true); }); 
+        }
+        function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
+        
+        function renderCampaigns() {
+            const container = document.getElementById('campaigns-container'); if(!container) return; container.innerHTML = '';
+            if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-slate-500 text-center py-4 text-xs">Sin registros de campañas pasadas.</p>`; return; }
+            
+            historialCampanas.forEach((c) => {
+                const div = document.createElement('div'); 
+                div.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-800 text-xs space-y-2 animate-fade-in";
+                
+                const esProgreso = c.estado === 'progreso';
+                const estadoBadge = esProgreso 
+                    ? `<span class="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-spinner animate-spin mr-1 text-[9px]"></i>En progreso</span>` 
+                    : `<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-circle-check mr-1 text-[9px]"></i>Completado</span>`;
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] text-slate-400"><span>${c.fecha}</span>${estadoBadge}</div>
+                    <p class="font-bold text-slate-200 mt-1 text-left">${c.canales.join(', ')}</p>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-800/50">
+                        <div class="flex gap-2">
+                            ${esProgreso ? `<button onclick="completeCampaign(${c.idCamp})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-2 py-1 rounded font-bold text-[9px] transition-colors cursor-pointer">Marcar Completado</button>` : ''}
+                            <button onclick="deleteCampaign(${c.idCamp})" class="bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white px-2 py-1 rounded font-bold text-[9px] transition-colors cursor-pointer"><i class="fa-solid fa-trash mr-1"></i>Eliminar</button>
+                        </div>
+                        <p class="text-emerald-400 font-black text-right">$${c.total} USD</p>
                     </div>
                 `;
+                container.appendChild(div);
+            });
+        }
+        
+        function completeCampaign(idCamp) {
+            historialCampanas = historialCampanas.map(c => c.idCamp === idCamp ? { ...c, estado: 'completado' } : c);
+            localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+            renderCampaigns();
+            triggerSuccessAnimation("Campaña Completada", "El estado ha sido actualizado con éxito.");
+        }
+
+        function deleteCampaign(idCamp) {
+            historialCampanas = historialCampanas.filter(c => c.idCamp !== idCamp);
+            localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+            renderCampaigns();
+            triggerSuccessAnimation("Eliminado", "Registro borrado de tu cuenta.");
+        }
+
+        function clearCampaignHistory() { historialCampanas = []; localStorage.setItem('ads_historial', JSON.stringify(historialCampanas)); renderCampaigns(); }
+        function checkBannerFrequency() { if(!localStorage.getItem('ads_banner_hidden_time')) document.getElementById('banner-add-channel').classList.remove('hidden'); }
+        function closeBannerPermanently(e) { e.stopPropagation(); document.getElementById('banner-add-channel').classList.add('hidden'); localStorage.setItem('ads_banner_hidden_time', "true"); }
+        function openAddChannelModal() { document.getElementById('add-channel-modal').classList.remove('hidden'); }
+        function closeAddChannelModal() { document.getElementById('add-channel-modal').classList.add('hidden'); }
+        
+        function submitChannelRegistration(tipo) { 
+            let txt = "";
+            if(tipo === 'alta') {
+                const name = document.getElementById('reg-channel-name').value.trim();
+                const user = document.getElementById('reg-channel-user').value.trim();
+                const subs = document.getElementById('reg-channel-subs').value.trim();
+                const cat = document.getElementById('reg-channel-cat').value;
+                const price = document.getElementById('reg-channel-price').value.trim();
+                
+                if(!name || !user || !subs || !price) { alert("Por favor complete todos los campos de alta."); return; }
+                txt = `¡Hola Administrador! Solicito registrar mi canal:\n📌 Nombre: ${name}\n🔗 Enlace: ${user}\n📊 Subs: ${subs}\n📁 Categoría: ${cat}\n💰 Precio sugerido: $${price} USD`;
+            } else {
+                const user = document.getElementById('boost-channel-user').value.trim();
+                const pack = document.getElementById('boost-pack-type').value;
+                if(!user) { alert("Por favor ingresa el @Username de tu canal registrado."); return; }
+                txt = `¡Hola Administrador! Deseo adquirir un potenciador de visibilidad:\n🔗 Canal: ${user}\n🚀 Plan elegido: ${pack === '7dias' ? 'Plan Cohete 7 Días ($9.99)' : 'Plan Cohete 1 Mes ($29.99)'}`;
             }
-            messages.scrollTop = messages.scrollHeight;
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(txt), "_blank");
+            closeAddChannelModal(); 
+        }
+        
+        function triggerSuccessAnimation(title, desc) {
+            document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
+            const t = document.getElementById('success-toast'); const b = document.getElementById('toast-box');
+            t.classList.remove('opacity-0', 'pointer-events-none'); b.classList.replace('scale-75', 'scale-100');
+            setTimeout(() => { t.classList.add('opacity-0', 'pointer-events-none'); b.classList.replace('scale-100', 'scale-75'); }, 1550);
         }
 
         async function sendAiMessage() {
@@ -773,61 +1429,24 @@
             container.innerHTML += `<div id="${loaderId}" class="bg-slate-800 p-2 rounded-xl text-slate-400 max-w-[40px] text-center rounded-tl-none"><i class="fa-solid fa-circle-notch animate-spin text-[10px]"></i></div>`;
             container.scrollTop = container.scrollHeight;
 
-            const sysPrompt = `Te llamas Golden AI. Hablas con ${tgUserName}. Sé directo y conciso. Si te preguntan algo complejo que no esté en las FAQ automáticas, recomiéndales pulsar el botón de Soporte Humano para hablar con @Airdayz. Máximo dos frases breves.`;
+            const sysPrompt = `Te llamas Asistente Golden AI. Hablas con el cliente cuyo nombre real es ${tgUserName}. Sé muy directo, entusiasta y conciso. Vendes publicidad en Telegram. El cliente contrata en la web app, paga vía PayPal, Estrellas o USDT y confirma con el administrador @Airdayz. Responde en máximo 2 frases breves e invita a comprar.`;
             try {
                 const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?system=${encodeURIComponent(sysPrompt)}&private=true`);
                 const reply = await res.text();
-                document.getElementById(loaderId).remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">${reply}</div>`;
+                const loaderEl = document.getElementById(loaderId);
+                if(loaderEl) loaderEl.remove();
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">${reply}</div>`;
             } catch {
-                document.getElementById(loaderId).remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none">Error de conexión. Usa las opciones FAQ o contacta a @Airdayz.</div>`;
+                const loaderEl = document.getElementById(loaderId);
+                if(loaderEl) loaderEl.remove();
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none text-left">Error de red. Contacta directamente a @Airdayz.</div>`;
             }
             container.scrollTop = container.scrollHeight;
         }
-
-        // =========================================================================
-        // UTILIDADES Y SOPORTE DE NAVEGACIÓN
-        // =========================================================================
-        function toggleCardDropdown(element) { element.closest('.channel-card-wrapper').classList.toggle('expanded'); }
-        function switchView(view) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById('view-catalog').classList.add('hidden');
-            document.getElementById('view-favorites').classList.add('hidden');
-            document.getElementById('view-campaigns').classList.add('hidden');
-            if(view === 'catalog') { document.getElementById('view-catalog').classList.remove('hidden'); document.getElementById('nav-catalog').classList.add('active-tab'); }
-            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
-            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
+        function initAiAssistant() {
+            document.getElementById('ai-chat-messages').innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">👋 ¡Hola <strong class="text-sky-400">${tgUserName}</strong>! Estoy aquí para guiarte en Lista Golden. ¿Qué dudas tienes sobre las campañas? 👇</div>`;
         }
-        function toggleFav(id) { favoritos = favoritos.includes(id) ? favoritos.filter(fId => fId !== id) : [...favoritos, id]; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderChannels(); }
-        function renderFavorites() {
-            const container = document.getElementById('favorites-container'); container.innerHTML = '';
-            const favs = canalesData.filter(c => favoritos.includes(c.id));
-            if(favs.length === 0) { container.innerHTML = `<p class="text-slate-500 text-xs text-center col-span-full">No tienes favoritos.</p>`; return; }
-            favs.forEach(c => { container.innerHTML += buildChannelCardHTML(c, true); });
-        }
-        function renderCampaigns() {
-            const container = document.getElementById('campaigns-container'); container.innerHTML = '';
-            if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-slate-500 text-center text-xs py-4">No tienes campañas previas.</p>`; return; }
-            historialCampanas.forEach(c => {
-                container.innerHTML += `<div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs"><div class="text-slate-500 text-[10px]">${c.fecha}</div><p class="font-bold text-slate-200 mt-1">${c.canales.join(', ')}</p><div class="text-right text-emerald-400 font-bold mt-1">$${c.total} USD</div></div>`;
-            });
-        }
-        function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); }
-        function closeUserMenuOutside(e) { const d = document.getElementById('user-dropdown'); if(d && !d.classList.contains('hidden') && !d.contains(e.target)) d.classList.add('hidden'); }
-        function filterCategory(cat, e) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); e.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
-        function updateCartBadge() { document.getElementById('cart-count').innerText = carrito.length; }
-        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function toggleAiChat() { const c = document.getElementById('ai-chat-window'); c.classList.toggle('hidden'); c.classList.toggle('flex'); }
-        function initAiAssistant() { document.getElementById('ai-chat-messages').innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">¡Hola! Soy tu asistente inteligente. Elige una de las preguntas frecuentes o escribe abajo si tienes dudas complejas. 😊</div>`; }
-        function scrollToSection(id) { setTimeout(() => { document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150); }
-        function triggerSuccessAnimation(title, desc) {
-            document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
-            const t = document.getElementById('success-toast'); const b = document.getElementById('toast-box');
-            t.classList.remove('opacity-0', 'pointer-events-none'); b.classList.replace('scale-75', 'scale-100');
-            setTimeout(() => { t.classList.add('opacity-0', 'pointer-events-none'); b.classList.replace('scale-100', 'scale-75'); }, 1800);
-        }
-        function resetSystem() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
