@@ -34,8 +34,8 @@
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); scale: 0.95; }
-            to { opacity: 1; transform: translateY(0); scale: 1; }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
             animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -70,10 +70,6 @@
             animation: floatingGift 2s ease-in-out infinite;
             font-size: 4rem;
         }
-        /* Ocultar sección de premios de forma prioritaria */
-        .hidden-rewards {
-            display: none !important;
-        }
     </style>
 </head>
 <body onclick="closeUserMenuOutside(event)">
@@ -84,7 +80,7 @@
             <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
             <div class="absolute inset-0 rounded-full border-4 border-t-sky-400 border-r-indigo-500 animate-spin"></div>
         </div>
-        <h2 class="mt-6 font-bold text-xs text-slate-400 tracking-widest uppercase">Cargando SmartApp...</h2>
+        <h2 class="mt-6 font-bold text-xs text-slate-400 tracking-widest uppercase">Cargando Golden Ads...</h2>
     </div>
 
     <!-- NOTIFICACIÓN POP-UP GLOBAL -->
@@ -98,27 +94,12 @@
         </div>
     </div>
 
-    <!-- VENTANA FLOTANTE ANIMADA: PREMIOS POR PUNTOS -->
-    <div id="rewards-floating-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-5 rounded-3xl border border-slate-800 max-w-md w-full text-center space-y-4 shadow-2xl animate-fade-in relative max-h-[85vh] flex flex-col">
-            <button onclick="toggleRewardsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
-            <div class="flex justify-between items-center border-b border-slate-800/80 pb-3 flex-shrink-0">
-                <div class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
-                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Premios para Desbloquear</h3>
-                </div>
-                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i>Tus puntos: <span id="rewards-points-counter">0</span> pts</span>
-            </div>
-            <div id="rewards-slots-container" class="grid gap-2.5 overflow-y-auto scrollbar-none flex-1 py-1 pr-1"></div>
-        </div>
-    </div>
-
     <!-- ANIMACIÓN DE REGALO FLOTANTE DESBLOQUEADO -->
     <div id="gift-reward-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-6 rounded-3xl border border-amber-400/40 max-w-sm w-full text-center space-y-4 shadow-2xl animate-fade-in">
             <div class="gift-box-anim">🎁</div>
             <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
-            <p class="text-[10px] text-slate-300">Has desbloqueado con éxito el premio especial:</p>
+            <p class="text-xs text-slate-300">Has desbloqueado con éxito el premio especial:</p>
             <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
                 Premio de Ejemplo
             </div>
@@ -127,48 +108,21 @@
         </div>
     </div>
 
-    <!-- VENTANA FLOTANTE ANIMADA: CONTRATACIÓN DE ANUNCIO SIMULADO -->
-    <div id="simulated-ad-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 w-full max-w-sm rounded-3xl border border-amber-400/30 p-5 space-y-4 shadow-2xl relative animate-fade-in">
-            <button onclick="toggleSimulatedAdModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
-            <div class="text-center space-y-1">
-                <div class="w-10 h-10 bg-amber-400/10 border border-amber-400/20 rounded-full flex items-center justify-center text-xl text-amber-400 mx-auto mb-1"><i class="fa-solid fa-rectangle-ad"></i></div>
-                <h3 class="text-sm font-black text-slate-200 uppercase tracking-wide">Impulsa tu Marca Global</h3>
-                <p class="text-[11px] text-slate-400">Selecciona el paquete de visibilidad prioritario que mejor se adapte a tus objetivos comerciales.</p>
+    <!-- MODAL DE PREMIOS FLOTANTE Y ANIMADO -->
+    <div id="rewards-modal-view" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-5 rounded-3xl border border-indigo-500/40 max-w-md w-full space-y-4 shadow-2xl scale-95 opacity-0 transition-all duration-300 transform" id="rewards-modal-box">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-gift text-amber-400 text-base"></i>
+                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Canjear Recompensas</h3>
+                </div>
+                <button onclick="toggleRewardsModal(false)" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="space-y-2 pt-2 text-xs">
-                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
-                    <div class="flex items-center gap-2.5">
-                        <input type="radio" name="simulated-ad-plan" value="7dias" checked class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
-                        <div>
-                            <p class="font-bold text-slate-200">Campañas Básicas (7 Días)</p>
-                            <p class="text-[9px] text-slate-400">Soporte y tráfico garantizado</p>
-                        </div>
-                    </div>
-                    <span class="font-black text-emerald-400 font-mono">$19.99</span>
-                </label>
-                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
-                    <div class="flex items-center gap-2.5">
-                        <input type="radio" name="simulated-ad-plan" value="15dias" class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
-                        <div>
-                            <p class="font-bold text-slate-200">Impulso Premium (15 Días)</p>
-                            <p class="text-[9px] text-slate-400">Mayor indexación en listas altas</p>
-                        </div>
-                    </div>
-                    <span class="font-black text-emerald-400 font-mono">$34.99</span>
-                </label>
-                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
-                    <div class="flex items-center gap-2.5">
-                        <input type="radio" name="simulated-ad-plan" value="1mes" class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
-                        <div>
-                            <p class="font-bold text-amber-400">Monopolio Total (1 Mes)</p>
-                            <p class="text-[9px] text-slate-400">Posicionamiento fijo y rotativo top</p>
-                        </div>
-                    </div>
-                    <span class="font-black text-emerald-400 font-mono">$59.99</span>
-                </label>
+            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-[11px] text-slate-400 font-medium">Tus Puntos Acumulados:</span>
+                <span class="text-xs text-amber-400 font-black"><i class="fa-solid fa-coins mr-1"></i><span id="rewards-points-counter">0</span> pts</span>
             </div>
-            <button onclick="addSimulatedAdToCart()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/10 transition-transform hover:scale-[1.01] cursor-pointer mt-2">Agregar al carrito</button>
+            <div id="rewards-slots-container" class="grid gap-2.5 max-h-[50vh] overflow-y-auto pr-1 scrollbar-none"></div>
         </div>
     </div>
 
@@ -287,17 +241,24 @@
                     </div>
                     <p id="user-profile-tag" class="text-[10px] text-slate-400 font-mono">...</p>
                 </div>
-                <!-- CAMBIO DE PERFIL DINÁMICO REQUERIDO -->
-                <button onclick="toggleUserRole(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-800 flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-user-gear text-amber-400 w-4"></i> Rol: <span id="current-role-label">Anunciante</span></span>
-                    <span class="text-[8px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded-md uppercase">Cambiar</span>
-                </button>
+                
+                <!-- ALTERNADOR DE PERFIL / ROL -->
+                <div class="px-4 py-1.5">
+                    <button onclick="toggleUserRole(); toggleUserMenu(event)" class="w-full bg-gradient-to-r from-slate-850 to-slate-800 border border-slate-750 p-2 rounded-xl flex items-center justify-between text-left transition-all">
+                        <div>
+                            <p class="text-[9px] text-slate-500 uppercase font-bold">Perfil Actual</p>
+                            <p id="role-display-text" class="text-xs font-black text-sky-400">Anunciante</p>
+                        </div>
+                        <i class="fa-solid fa-user-gear text-slate-400 text-xs"></i>
+                    </button>
+                </div>
                 <div class="border-t border-slate-800/60 my-1"></div>
-                <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors sub-advertiser-only">
+
+                <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="toggleRewardsModal(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                <button onclick="toggleRewardsModal(true); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
@@ -320,21 +281,64 @@
         </div>
     </header>
 
-    <!-- LANZADORES FLOTANTES: RULETA DIARIA COMPLETA -->
-    <div id="roulette-triggers-container" class="fixed bottom-34 right-4 z-40 flex flex-col gap-2.5">
-        <!-- BOTÓN DE ACCESO SOCIAL GLOBAL -->
-        <button onclick="toggleSocialModal()" class="w-14 h-14 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full shadow-2xl flex flex-col items-center justify-center text-white text-lg font-bold border-2 border-slate-900 cursor-pointer transition-transform hover:scale-110">
+    <!-- LANZADORES FLOTANTES ALINEADOS PERFECTAMENTE UNO ENCIMA DEL OTRO -->
+    <div id="roulette-triggers-container" class="fixed bottom-24 right-4 z-40 flex flex-col gap-3 items-center justify-center">
+        <!-- BOTÓN SOCIAL -->
+        <button onclick="toggleSocialModal()" class="w-12 h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full shadow-2xl flex items-center justify-center text-white text-base border border-slate-900/60 cursor-pointer transition-transform hover:scale-110">
             <i class="fa-solid fa-share-nodes"></i>
-            <span class="text-[6px] uppercase tracking-tighter mt-0.5 font-black">Social</span>
         </button>
         
-        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-14 h-14 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-xl font-bold border-2 border-slate-900 hidden cursor-pointer transition-transform hover:scale-110 animate-bounce">
+        <!-- BOTÓN DE LA RULETA -->
+        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-12 h-12 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-base border border-slate-900/60 hidden cursor-pointer transition-transform hover:scale-110">
             <i class="fa-solid fa-pie-chart"></i>
         </button>
-        <div id="floating-roulette-blocked" class="w-14 h-14 bg-slate-800 border-2 border-slate-700 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 font-bold opacity-70 relative group">
-            <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
-            <span class="text-[7px] text-slate-400 tracking-tighter mt-0.5 font-bold">RULETA</span>
-            <span class="text-[6px] text-slate-500 tracking-tighter font-mono">MAÑANA</span>
+        <div id="floating-roulette-blocked" class="w-12 h-12 bg-slate-800 border border-slate-700/60 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 opacity-70 relative">
+            <i class="fa-solid fa-lock text-[10px]"></i>
+            <span class="text-[6px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">Ruleta</span>
+        </div>
+
+        <!-- BOTÓN ASISTENTE IA CHAT -->
+        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-base text-white cursor-pointer hover:scale-110 transition-transform border border-slate-900/60">
+            <i class="fa-solid fa-headset"></i>
+        </button>
+    </div>
+
+    <!-- MODAL DE LA SIMULACIÓN DE ANUNCIARSE -->
+    <div id="ad-simulation-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-amber-500/40 p-5 space-y-4 relative shadow-2xl animate-fade-in">
+            <button onclick="toggleAdSimulationModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+            <div class="text-center space-y-1">
+                <div class="w-9 h-9 bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-full flex items-center justify-center text-base mx-auto mb-1"><i class="fa-solid fa-rectangle-ad"></i></div>
+                <h3 class="text-xs font-black text-slate-200 uppercase tracking-wide">Destacar mi Canal Aquí</h3>
+                <p class="text-[11px] text-slate-400">Consigue máxima visibilidad apareciendo fijo en la sección premium del catálogo.</p>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Elige los días de patrocinio:</label>
+                <div class="space-y-2 text-xs">
+                    <label class="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-amber-500/50">
+                        <div class="flex items-center gap-2">
+                            <input type="radio" name="sim-plan" value="7" checked class="text-amber-500 bg-slate-900 focus:ring-0 border-slate-800">
+                            <span class="text-slate-200 font-medium">Plan Cohete (7 Días)</span>
+                        </div>
+                        <span class="font-black text-emerald-400">$14.99 USD</span>
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-amber-500/50">
+                        <div class="flex items-center gap-2">
+                            <input type="radio" name="sim-plan" value="15" class="text-amber-500 bg-slate-900 focus:ring-0 border-slate-800">
+                            <span class="text-slate-200 font-medium">Plan Órbita (15 Días)</span>
+                        </div>
+                        <span class="font-black text-emerald-400">$24.99 USD</span>
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-amber-500/50">
+                        <div class="flex items-center gap-2">
+                            <input type="radio" name="sim-plan" value="30" class="text-amber-500 bg-slate-900 focus:ring-0 border-slate-800">
+                            <span class="text-slate-200 font-medium">Plan Galaxia (1 Mes)</span>
+                        </div>
+                        <span class="font-black text-emerald-400">$39.99 USD</span>
+                    </label>
+                </div>
+            </div>
+            <button onclick="addSimulationAdToCart()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/10 cursor-pointer">Agregar al Carrito</button>
         </div>
     </div>
 
@@ -350,7 +354,7 @@
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
         
         <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
-        <section class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden sub-advertiser-only">
+        <section id="carousel-section" class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden">
             <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-fire animate-pulse"></i> Canales Destacados de la Semana</p>
             <div class="relative min-h-[75px] flex items-center">
                 <div id="carousel-track" class="w-full transition-all duration-300"></div>
@@ -369,14 +373,14 @@
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20">🚀</div>
                     <div>
                         <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Quieres monetizar o destacar tu canal?</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu space o adquiere el Potenciador Recomendado de 7 días o 1 mes.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu space o adquiere un Potenciador de 7 días o 1 mes.</p>
                     </div>
                 </div>
             </button>
         </section>
 
         <!-- FILTROS Y CATEGORÍAS -->
-        <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between sub-advertiser-only">
+        <section id="filters-section" class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
             <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
                 <button onclick="filterCategory('todos', event)" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30 whitespace-nowrap">Todos</button>
                 <button onclick="filterCategory('Tecnología', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap">Tecnología</button>
@@ -392,24 +396,8 @@
             </select>
         </section>
 
-        <!-- CONTENEDOR DE TARJETAS DE CANALES -->
-        <div id="channels-container" class="grid gap-4 sm:grid-cols-2 sub-advertiser-only"></div>
-
-        <!-- TARJETA INFERIOR: SIMULACIÓN DE ANUNCIO INTEGRADA -->
-        <div id="simulated-ad-card-box" class="sub-advertiser-only border-2 border-dashed border-indigo-500/40 bg-gradient-to-br from-slate-900 to-indigo-950/20 p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4 mt-2">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="w-11 h-11 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-xl flex items-center justify-center text-xl flex-shrink-0">📢</div>
-                <div class="min-w-0">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">Espacio Promocional</span>
-                        <span class="text-[9px] text-amber-400 font-bold"><i class="fa-solid fa-fire mr-1"></i>¡Alta Conversión!</span>
-                    </div>
-                    <h4 class="font-bold text-slate-200 text-xs mt-1 truncate">¿Tu Banner Aquí? Alcanza +10k visualizaciones directas</h4>
-                    <p class="text-[10px] text-slate-400 truncate mt-0.5">Posición exclusiva al pie del catálogo principal de la WebApp.</p>
-                </div>
-            </div>
-            <button onclick="toggleSimulatedAdModal()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[9px] px-2.5 py-1.5 rounded-lg uppercase tracking-wider shadow-md shadow-orange-500/10 cursor-pointer whitespace-nowrap transition-transform hover:scale-105">ANUNCIARME</button>
-        </div>
+        <!-- CONTENEDOR DE TARJETAS -->
+        <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
     </main>
 
     <!-- VISTA: MISIONES RECOMPENSADAS -->
@@ -482,10 +470,10 @@
                     <h3 class="text-xs font-black text-amber-400 uppercase">Anuncio Completo</h3>
                     <p class="text-[10px] text-slate-300 leading-relaxed">Hasta 500 palabras. Incluye hasta 3 enlaces, emojis ilimitados y 1 archivo multimedia (imagen o vídeo).</p>
                 </div>
-                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-850 text-[10px] space-y-1.5">
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-850 text-[10px] space-y-1.5">
                     <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
                         <input type="checkbox" id="full-opt-spoiler" class="rounded border-slate-800 text-amber-500 bg-slate-950 focus:ring-0">
-                        <span class="font-semibold">Agregar efecto Spoiler opcional</span>
+                        <span class="font-semibold">Agregar effecto Spoiler opcional</span>
                     </label>
                 </div>
                 <div class="flex items-center justify-between pt-1">
@@ -528,7 +516,7 @@
         <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
             <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center">
                 <span class="font-black text-xs text-slate-950 uppercase">Formulario de Monetización & Destacados</span>
-                <button onclick="closeAddChannelModal()" class="text-slate-955 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeAddChannelModal()" class="text-slate-950 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none text-xs">
                 <div class="border-b border-slate-800 pb-3 mb-2">
@@ -542,6 +530,17 @@
                             <select id="reg-channel-cat" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none"><option value="Tecnología">Tecnología</option><option value="Finanzas">Finanzas</option><option value="Entretenimiento">Entretenimiento</option></select>
                         </div>
                         <input type="number" id="reg-channel-price" placeholder="Precio por Post ($ USD)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none">
+                        
+                        <!-- SELECTOR DE MÉTODO DE PAGO ADICIONADO -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] text-slate-500 uppercase font-bold">Método de Pago Preferido:</label>
+                            <select id="reg-channel-payment" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none">
+                                <option value="PayPal">PayPal</option>
+                                <option value="USDT (TRC20)">USDT (TRC20)</option>
+                                <option value="Telegram Stars">Estrellas de Telegram</option>
+                            </select>
+                        </div>
+
                         <button onclick="submitChannelRegistration('alta')" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 hover:from-amber-500 hover:to-orange-600 p-2.5 rounded-xl font-bold text-slate-200 hover:text-slate-950 transition-all uppercase tracking-wider text-[10px] cursor-pointer">Solicitar Alta ($19.99 Lifetime)</button>
                     </div>
                 </div>
@@ -554,6 +553,17 @@
                             <option value="7dias">Plan Cohete Destacado (7 Días) — $9.99 USD</option>
                             <option value="1mes">Plan Cohete Destacado (1 Mes) — $29.99 USD</option>
                         </select>
+                        
+                        <!-- SELECTOR DE MÉTODO DE PAGO ADICIONADO -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] text-slate-500 uppercase font-bold">Método de Pago Preferido:</label>
+                            <select id="boost-channel-payment" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 focus:outline-none">
+                                <option value="PayPal">PayPal</option>
+                                <option value="USDT (TRC20)">USDT (TRC20)</option>
+                                <option value="Telegram Stars">Estrellas de Telegram</option>
+                            </select>
+                        </div>
+
                         <button onclick="submitChannelRegistration('boost')" class="w-full bg-gradient-to-r from-indigo-600 to-sky-600 p-2.5 rounded-xl font-black text-white uppercase tracking-wider text-[10px] cursor-pointer">Adquirir Potenciador Recomendado</button>
                     </div>
                 </div>
@@ -610,42 +620,50 @@
         </div>
     </main>
 
-    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
-    <div id="ai-chat-widget" class="fixed bottom-24 right-4 z-50 flex flex-col items-end">
-        <div id="ai-chat-window" class="w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col mb-3 animate-fade-in h-96">
-            <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                    <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
-                </div>
-                <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
+    <!-- ASISTENTE CHAT FLOTANTE CON IA (CORREGIDO ESTRUCTURALMENTE) -->
+    <div id="ai-chat-window" class="fixed bottom-24 right-4 z-50 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col animate-fade-in h-96">
+        <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
             </div>
-            <div id="ai-chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-[11px] scrollbar-none bg-slate-950/40"></div>
-            <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5">
-                <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-                <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
+            <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
         </div>
-        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-xl text-white cursor-pointer hover:scale-110 transition-transform">
-            <i class="fa-solid fa-headset"></i>
-        </button>
+        
+        <!-- Contenedor independiente de mensajes con Scroll -->
+        <div id="ai-chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-[11px] bg-slate-950/40 scrollbar-none"></div>
+        
+        <!-- BOTONES DE BIENVENIDA / PREGUNTAS SUGERIDAS -->
+        <div id="ai-suggestions" class="p-2 bg-slate-950/80 border-t border-slate-850 flex flex-col gap-1 flex-shrink-0">
+            <button onclick="suggestQuestion('¿Cómo puedo añadir y monetizar mi propio canal?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors">🚀 ¿Cómo puedo añadir y monetizar mi propio canal?</button>
+            <button onclick="suggestQuestion('¿Qué métodos de pago acepta la plataforma?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors">💳 ¿Qué métodos de pago acepta la plataforma?</button>
+            <button onclick="suggestQuestion('¿Cómo funciona la Ruleta de la Fortuna diaria?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors">💎 ¿Cómo funciona la Ruleta de la Fortuna diaria?</button>
+        </div>
+
+        <!-- Barra de entrada fija inferior -->
+        <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5 flex-shrink-0">
+            <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+            <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
     </div>
 
     <!-- MENÚ INFERIOR FIJO EXTENDIDO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
         <button onclick="switchView('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold active-tab cursor-pointer">
-            <i class="fa-solid fa-layer-group text-base"></i>Catálogo
+            <span id="nav-catalog-icon-wrapper" class="flex flex-col items-center gap-1">
+                <i class="fa-solid fa-layer-group text-base"></i>Catálogo
+            </span>
         </button>
         <button onclick="switchView('missions')" id="nav-missions" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-list-check text-base"></i>Misiones
         </button>
-        <button onclick="switchView('sponsor-ads')" id="nav-sponsor-ads" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
+        <button onclick="switchView('sponsor-ads')" id="nav-sponsor-ads" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-rectangle-ad text-base"></i>Patrocinados
         </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-star text-base"></i>Favoritos
         </button>
-        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
+        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-clock-rotate-left text-base"></i>Historial
         </button>
     </nav>
@@ -710,8 +728,10 @@
                     <div id="row-discount" class="hidden flex justify-between text-xs text-emerald-400 font-medium"><span>Descuento:</span><span id="cart-total-discount">-$0.00</span></div>
                     <div class="flex justify-between items-center pt-1 border-t border-slate-800"><span class="text-slate-200 font-bold text-sm">Total Neto:</span><span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span></div>
                 </div>
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer text-white">
-                    <i class="fa-brands fa-telegram"></i> Enviar Pedido a Telegram
+                
+                <!-- BOTÓN "ABRE MI PRIVADO" OPTIMIZADO CON METODO DE PAGO -->
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer text-white shadow-lg">
+                    <i class="fa-brands fa-telegram"></i> Abre mi Privado en Telegram
                 </button>
             </div>
         </div>
@@ -755,6 +775,7 @@
         let totalSesionesHoy = parseInt(localStorage.getItem('ads_sesiones_contador')) || 0;
         let ultimaSesionFecha = localStorage.getItem('ads_ultima_sesion_fecha') || "";
         let ofertaFlashCanceladaHoy = localStorage.getItem('ads_flash_cancelada_hoy') === "true";
+        let userRole = localStorage.getItem('ads_user_role') || "Anunciante"; 
 
         let activeCoupon = null;
         let activeCouponPct = 0;
@@ -767,21 +788,11 @@
         let dynamicAdCounts = {};
         let mejorasSeleccionadas = {}; 
 
-        // Variable global para gestionar el rol del usuario (anunciante o creador)
-        let currentUserRole = localStorage.getItem('ads_user_role') || 'anunciante';
-
-        // Estructuras de precios de patrocinados compartidas globalmente
-        let sponsorPrices = {
-            micro: 29.99
-        };
-
         document.addEventListener("DOMContentLoaded", () => {
             initTelegramUserData();
             trackSessionCount();
             generateDailySeedCounters();
-            applyRoleInterface(); // Aplica los cambios acordes al perfil del usuario
-            renderChannels();
-            renderRewardsSlots();
+            applyRoleInterface(); 
             renderCarousel();
             renderMissions();
             updateCartBadge();
@@ -799,69 +810,78 @@
             }, 500);
         });
 
-        // Alterna entre modo anunciante y creador de contenido
         function toggleUserRole() {
-            currentUserRole = currentUserRole === 'anunciante' ? 'creador' : 'anunciante';
-            localStorage.setItem('ads_user_role', currentUserRole);
+            userRole = (userRole === "Anunciante") ? "Creador de contenido" : "Anunciante";
+            localStorage.setItem('ads_user_role', userRole);
+            document.getElementById('role-display-text').innerText = userRole;
             applyRoleInterface();
-            triggerSuccessAnimation("Perfil Cambiado", `Ahora navegas como ${currentUserRole === 'anunciante' ? 'Anunciante' : 'Creador de Contenido'}.`);
+            triggerSuccessAnimation("Perfil Cambiado", `Ahora estás en modo ${userRole}.`);
         }
 
-        // Modifica la UI y oculta dinámicamente las secciones según el rol
         function applyRoleInterface() {
-            const label = document.getElementById('current-role-label');
-            if(label) label.innerText = currentUserRole === 'anunciante' ? 'Anunciante' : 'Creador';
-
-            const targets = document.querySelectorAll('.sub-advertiser-only');
-            if(currentUserRole === 'creador') {
-                targets.forEach(el => el.style.setProperty('display', 'none', 'important'));
-                // Si el creador estaba en una pestaña de anunciante, lo redireccionamos a misiones
-                const currentTabActive = document.querySelector('nav .active-tab');
-                if(currentTabActive && (currentTabActive.id === 'nav-catalog' || currentTabActive.id === 'nav-sponsor-ads' || currentTabActive.id === 'nav-favorites' || currentTabActive.id === 'nav-campaigns')) {
+            document.getElementById('role-display-text').innerText = userRole;
+            const navCatalogWrapper = document.getElementById('nav-catalog-icon-wrapper');
+            
+            if(userRole === "Creador de contenido") {
+                // Modificar barra de navegación inferior
+                navCatalogWrapper.innerHTML = `<i class="fa-solid fa-rocket text-base animate-pulse text-amber-400"></i>Potenciar`;
+                document.getElementById('nav-catalog').setAttribute("onclick", "openAddChannelModal()");
+                
+                // Si el usuario está viendo el catálogo, mandarlo a misiones
+                if(!document.getElementById('view-catalog').classList.contains('hidden')) {
                     switchView('missions');
                 }
             } else {
-                targets.forEach(el => el.style.removeProperty('display'));
+                // Restaurar vista de Anunciante normal
+                navCatalogWrapper.innerHTML = `<i class="fa-solid fa-layer-group text-base"></i>Catálogo`;
+                document.getElementById('nav-catalog').setAttribute("onclick", "switchView('catalog')");
                 renderChannels();
             }
         }
 
-        function toggleRewardsModal() {
-            const modal = document.getElementById('rewards-floating-modal');
-            if(modal) modal.classList.toggle('hidden');
-        }
-
-        function toggleSimulatedAdModal() {
-            const modal = document.getElementById('simulated-ad-modal');
-            if(modal) modal.classList.toggle('hidden');
-        }
-
-        function addSimulatedAdToCart() {
-            const radios = document.getElementsByName('simulated-ad-plan');
-            let selectedPlan = '7dias';
-            for (let i = 0; i < radios.length; i++) {
-                if (radios[i].checked) { selectedPlan = radios[i].value; break; }
+        function toggleRewardsModal(show) {
+            const modal = document.getElementById('rewards-modal-view');
+            const box = document.getElementById('rewards-modal-box');
+            if(show) {
+                renderRewardsSlots();
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    box.classList.remove('scale-95', 'opacity-0');
+                }, 50);
+            } else {
+                box.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { modal.classList.add('hidden'); }, 300);
             }
+        }
 
-            let duracionStr = "7 Días";
-            let coste = 19.99;
-            if(selectedPlan === '15dias') { duracionStr = "15 Días"; coste = 34.99; }
-            if(selectedPlan === '1mes') { duracionStr = "1 Mes"; coste = 55.99; }
+        function toggleAdSimulationModal(show) {
+            const modal = document.getElementById('ad-simulation-modal');
+            if(show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function addSimulationAdToCart() {
+            const selectedPlan = document.querySelector('input[name="sim-plan"]:checked').value;
+            let totalCost = 14.99;
+            let daysText = "7 Días";
+            
+            if(selectedPlan === "15") { totalCost = 24.99; daysText = "15 Días"; }
+            if(selectedPlan === "30") { totalCost = 39.99; daysText = "1 Mes"; }
 
             carrito.push({
-                idUnique: Date.now() + Math.floor(Math.random()*200),
-                idCanalOriginal: 777, // Identificador de simulación publicitaria
-                customPrice: coste,
-                detallesMejora: `Anuncio Catalogo Fijo (${duracionStr})`,
+                idUnique: Date.now(),
+                idCanalOriginal: 777,
                 isSponsorAd: true,
-                duracion: selectedPlan,
+                customPrice: totalCost,
+                detallesMejora: `Anuncio Fijo Catálogo por ${daysText}`,
+                duracion: daysText,
                 fijado: 'si'
             });
 
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
-            toggleSimulatedAdModal();
-            triggerSuccessAnimation("Añadido", "Simulación añadida a la cesta.");
+            toggleAdSimulationModal(false);
+            triggerSuccessAnimation("Añadido", "Simulación de post guardada en cesta.");
         }
 
         function initTelegramUserData() {
@@ -956,7 +976,7 @@
 
         function initFomoBot() {
             const nombres = ["Raúl", "Carlos", "Sofía", "Lucía", "Marta", "Andrés", "Mateo", "Emma", "Elena", "Oliver"];
-            const banderas = ["🇪🇸", "🇲🇽", "🇦🇷", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
+            const banderas = ["🇪🇸", "🇲🇽", "🇦震", "🇨🇴", "🇨🇱", "🇵🇪", "🇻🇪"];
             
             if(window.fomoIntervalID) clearInterval(window.fomoIntervalID);
             window.fomoIntervalID = setInterval(() => {
@@ -968,10 +988,8 @@
                     document.getElementById('fomo-flag').innerText = b;
                     document.getElementById('fomo-text').innerHTML = `<strong class="text-amber-400 font-bold">${n}</strong> de ${b} contrató anuncios en el canal <span class="text-sky-400 font-bold">${c}</span>.`;
                     const banner = document.getElementById('fomo-notification');
-                    if(banner) {
-                        banner.classList.remove('translate-y-20', 'opacity-0');
-                        setTimeout(() => { banner.classList.add('translate-y-20', 'opacity-0'); }, 5000);
-                    }
+                    banner.classList.remove('translate-y-20', 'opacity-0');
+                    setTimeout(() => { banner.classList.add('translate-y-20', 'opacity-0'); }, 5000);
                 }
             }, 16000);
         }
@@ -984,17 +1002,17 @@
             document.getElementById('wheel-total-display').innerText = `Historial: ${userPoints} Pts`;
 
             if (!lastSpinTime || (now - parseInt(lastSpinTime)) >= 24 * 60 * 60 * 1000) {
-                if(btnFlotante) btnFlotante.classList.remove('hidden');
-                if(btnBloqueado) btnBloqueado.classList.add('hidden');
-                document.getElementById('spin-timer-display').innerText = "¡Listo para girar!";
+                btnFlotante.classList.remove('hidden');
+                btnBloqueado.classList.add('hidden');
+                document.getElementById('spin-timer-display').innerText = "¡Listo!";
             } else {
-                if(btnFlotante) btnFlotante.classList.add('hidden');
-                if(btnBloqueado) btnBloqueado.classList.remove('hidden');
+                btnFlotante.classList.add('hidden');
+                btnBloqueado.classList.remove('hidden');
                 
                 let diff = (24 * 60 * 60 * 1000) - (now - parseInt(lastSpinTime));
                 let hours = Math.floor(diff / (1000 * 60 * 60));
                 let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                document.getElementById('spin-timer-display').innerText = `Disponible en ${hours}h ${minutes}m`;
+                document.getElementById('spin-timer-display').innerText = `${hours}h ${minutes}m`;
             }
         }
         
@@ -1023,9 +1041,8 @@
                 updatePointsDisplay();
                 closeRouletteModal();
                 checkRouletteAvailability();
-                renderRewardsSlots(); 
-                triggerSuccessAnimation(`+${sel.pts} Puntos`, "Puntos guardados.");
                 btn.removeAttribute('disabled');
+                triggerSuccessAnimation(`+${sel.pts} Puntos`, "Puntos guardados.");
             }, 4000);
         }
 
@@ -1055,25 +1072,25 @@
 
             premiosData.forEach(reward => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs text-left";
+                card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs";
                 
                 let buttonHTML = '';
                 const enCarro = carrito.some(item => item.isReward && item.detallesMejora.includes(reward.name));
                 
                 if (claimedRewards.includes(reward.id) || enCarro) {
-                    buttonHTML = `<button class="bg-slate-950 text-slate-600 font-bold px-3 py-1.5 rounded-lg border border-slate-800" disabled>Reclamado 🔒</button>`;
+                    buttonHTML = `<button class="bg-slate-900 text-slate-600 font-bold px-3 py-1.5 rounded-lg border border-slate-800 text-[10px]" disabled>🔒 Reclamado</button>`;
                 } else if (userPoints >= reward.pointsRequired) {
-                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Reclamar</button>`;
+                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-3 py-1.5 rounded-lg uppercase tracking-tight shadow-md cursor-pointer text-[10px]">Reclamar</button>`;
                 } else {
-                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Bloqueado</button>`;
+                    buttonHTML = `<button class="bg-slate-900 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-800" disabled>🔒 Bloqueado</button>`;
                 }
 
                 card.innerHTML = `
-                    <div class="flex items-center gap-3 max-w-[70%]">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg text-indigo-400 border border-indigo-500/20 flex-shrink-0">🎁</div>
+                    <div class="flex items-center gap-3 max-w-[65%]">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-base text-indigo-400 border border-indigo-500/20 flex-shrink-0">🎁</div>
                         <div>
-                            <h4 class="font-bold text-slate-200 leading-tight">${reward.name}</h4>
-                            <p class="text-[10px] text-amber-400 font-semibold mt-0.5"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>Requiere ${reward.pointsRequired} Pts</p>
+                            <h4 class="font-bold text-slate-200 text-[11px] leading-tight">${reward.name}</h4>
+                            <p class="text-[9px] text-amber-400 font-semibold mt-0.5"><i class="fa-solid fa-coins mr-1"></i>${reward.pointsRequired} Pts</p>
                         </div>
                     </div>
                     <div>${buttonHTML}</div>
@@ -1087,11 +1104,8 @@
             const reward = premiosData.find(r => r.id === rewardId);
             if (!reward) return;
 
-            confetti({
-                particleCount: 140,
-                spread: 75,
-                origin: { y: 0.6 }
-            });
+            confetti({ particleCount: 140, spread: 75, origin: { y: 0.6 } });
+            toggleRewardsModal(false);
 
             document.getElementById('gift-username').innerText = tgUserName;
             document.getElementById('gift-reward-name').innerText = reward.name;
@@ -1099,7 +1113,6 @@
             const giftModal = document.getElementById('gift-reward-modal');
             giftModal.classList.remove('hidden');
             giftModal.setAttribute('data-active-reward', rewardId);
-            toggleRewardsModal(); // Cierra el modal de listado de premios para limpieza visual
         }
 
         function closeGiftModal() {
@@ -1130,45 +1143,30 @@
                 localStorage.setItem('ads_carrito', JSON.stringify(carrito));
                 
                 updateCartBadge();
-                renderRewardsSlots();
                 triggerSuccessAnimation("Premio Canjeado", "Se ha añadido a tu cesta de forma gratuita.");
             }
         }
 
         function resetearTodoSistema() {
             localStorage.clear();
-            favoritos = [];
-            carrito = [];
-            historialCampanas = [];
-            claimedRewards = [];
-            missionTimers = {};
-            userPoints = 0; 
-            lastSpinTime = null;
-            totalSesionesHoy = 0;
-            ultimaSesionFecha = "";
-            ofertaFlashCanceladaHoy = false;
-            activeCoupon = null;
-            activeCouponPct = 0;
-            currentUserRole = 'anunciante';
+            favoritos = []; carrito = []; historialCampanas = []; claimedRewards = []; missionTimers = {};
+            userPoints = 2500; lastSpinTime = null; totalSesionesHoy = 0; ultimaSesionFecha = ""; ofertaFlashCanceladaHoy = false;
+            activeCoupon = null; activeCouponPct = 0; userRole = "Anunciante";
 
-            localStorage.setItem('ads_user_points', '0');
+            localStorage.setItem('ads_user_points', '2500');
             localStorage.setItem('ads_favoritos', JSON.stringify([]));
             localStorage.setItem('ads_carrito', JSON.stringify([]));
             localStorage.setItem('ads_historial', JSON.stringify([]));
             localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
             localStorage.setItem('ads_mission_timers', JSON.stringify({}));
-            localStorage.setItem('ads_user_role', 'anunciante');
+            localStorage.setItem('ads_user_role', 'Anunciante');
 
-            applyRoleInterface();
             updatePointsDisplay();
             updateCartBadge();
-            updateRewardsMenuBadge();
-            renderChannels();
-            renderRewardsSlots();
-            renderMissions();
+            applyRoleInterface();
             checkRouletteAvailability();
             
-            triggerSuccessAnimation("Reset Completado", "Los puntos y regalos se han restablecido a 0.");
+            triggerSuccessAnimation("Reset Completado", "Los puntos y datos se restablecieron.");
         }
 
         function renderCarousel() {
@@ -1184,7 +1182,7 @@
                             <p class="text-[10px] text-slate-400 font-mono"><i class="fa-solid fa-users text-[8px] mr-1"></i>${c.subs.toLocaleString()} subs</p>
                         </div>
                     </div>
-                    <button onclick="addToCart(${c.id})" class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 cursor-pointer shadow-md shadow-amber-400/10">+ $${getPrecio(c).toFixed(2)}</button>
+                    <button onclick="addToCart(${c.id})" class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-lg text-[10px] flex-shrink-0 cursor-pointer shadow-md">+ $${getPrecio(c).toFixed(2)}</button>
                 </div>
             `;
         }
@@ -1325,8 +1323,14 @@
             const container = document.getElementById('channels-container');
             if(!container) return;
             container.innerHTML = '';
-            let filtrados = [...canalesData];
             
+            // Si el rol es creador de contenido, no necesita ver el catálogo de canales de compra
+            if(userRole === "Creador de contenido") {
+                container.innerHTML = `<p class="text-slate-500 text-center text-xs col-span-full py-6">El catálogo comercial está oculto en el perfil de Creador.</p>`;
+                return;
+            }
+
+            let filtrados = [...canalesData];
             if (currentCategory !== 'todos') filtrados = filtrados.filter(c => c.categoria === currentCategory);
             
             const filterSelect = document.getElementById('sort-filter').value;
@@ -1339,6 +1343,20 @@
                 const isFav = favoritos.includes(c.id);
                 container.innerHTML += buildChannelCardHTML(c, isFav);
             });
+
+            // AGREGAR AL FINAL DE ABAJO LA TARJETA DE SIMULACIÓN DE ANUNCIO
+            container.innerHTML += `
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl border-2 border-dashed border-slate-800 p-4 flex flex-col justify-between shadow-lg text-center items-center space-y-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center border border-slate-850 text-indigo-400">
+                        <i class="fa-solid fa-rectangle-ad text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-xs text-slate-100 uppercase tracking-wide">¡Tu Canal Aquí Disponible!</h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5 max-w-[200px] mx-auto">Consigue miles de impresiones diarias dentro de nuestra Web App.</p>
+                    </div>
+                    <button onclick="toggleAdSimulationModal(true)" class="bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[9px] font-black uppercase px-2.5 py-1 rounded-lg tracking-wider hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer">ANUNCIARME</button>
+                </div>
+            `;
         }
 
         function getPrecio(canal) { return canal.descuento > 0 ? canal.precioBase * (1 - canal.descuento/100) : canal.precioBase; }
@@ -1359,14 +1377,14 @@
             const errBox = document.getElementById('coupon-error-box');
             
             if(val === "LISTAGOLDEN20OFF") {
-                if (errBox) errBox.classList.add('hidden');
+                errBox.classList.add('hidden');
                 activeCoupon = "LISTAGOLDEN20OFF";
                 activeCouponPct = 20;
                 document.getElementById('coupon-input-field').classList.add('hidden');
                 triggerSuccessAnimation("¡Cupón Aplicado!", "20% de descuento asignado.");
                 openCartModal();
             } else {
-                if (errBox) errBox.classList.remove('hidden');
+                errBox.classList.remove('hidden');
             }
         }
 
@@ -1414,7 +1432,7 @@
             const currentIds = carrito.map(i => i.idCanalOriginal);
             const sugeridos = canalesData.filter(c => !currentIds.includes(c.id));
 
-            if(sugeridos.length === 0) {
+            if(sugeridos.length === 0 || userRole === "Creador de contenido") {
                 document.getElementById('cross-selling-area').classList.add('hidden');
                 return;
             }
@@ -1459,7 +1477,7 @@
             
             carrito.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs text-left";
+                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs";
                 
                 if(item.promoPack || item.isSponsorAd) {
                     div.innerHTML = `
@@ -1594,17 +1612,7 @@
         }
 
         function switchView(view) {
-            // Impedir el acceso a vistas comerciales si es creador de contenido
-            if(currentUserRole === 'creador' && (view === 'catalog' || view === 'sponsor-ads' || view === 'favorites' || view === 'campaigns')) {
-                view = 'missions';
-            }
-
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-            
-            const targetBtnId = view === 'catalog' ? 'nav-catalog' : (view === 'missions' ? 'nav-missions' : (view === 'sponsor-ads' ? 'nav-sponsor-ads' : (view === 'favorites' ? 'nav-favorites' : 'nav-campaigns')));
-            const targetBtn = document.getElementById(targetBtnId);
-            if(targetBtn) targetBtn.classList.add('active-tab');
-
             document.getElementById('view-catalog').classList.add('hidden');
             document.getElementById('view-missions').classList.add('hidden');
             document.getElementById('view-sponsor-ads').classList.add('hidden');
@@ -1612,331 +1620,315 @@
             document.getElementById('view-campaigns').classList.add('hidden');
             document.getElementById('view-faq').classList.add('hidden');
 
-            const viewContainer = document.getElementById(`view-${view}`);
-            if(viewContainer) viewContainer.classList.remove('hidden');
-
-            if(view === 'favorites') renderFavorites();
-            if(view === 'campaigns') renderCampaignHistory();
+            if(view === 'catalog') { 
+                document.getElementById('view-catalog').classList.remove('hidden'); 
+                document.getElementById('nav-catalog').classList.add('active-tab'); 
+                renderChannels(); 
+            }
+            if(view === 'missions') { document.getElementById('view-missions').classList.remove('hidden'); document.getElementById('nav-missions').classList.add('active-tab'); renderMissions(); }
+            if(view === 'sponsor-ads') { document.getElementById('view-sponsor-ads').classList.remove('hidden'); document.getElementById('nav-sponsor-ads').classList.add('active-tab'); }
+            if(view === 'favorites') { document.getElementById('view-favorites').classList.remove('hidden'); document.getElementById('nav-favorites').classList.add('active-tab'); renderFavorites(); }
+            if(view === 'campaigns') { document.getElementById('view-campaigns').classList.remove('hidden'); document.getElementById('nav-campaigns').classList.add('active-tab'); renderCampaigns(); }
+            if(view === 'faq') { document.getElementById('view-faq').classList.remove('hidden'); document.getElementById('nav-faq').classList.add('active-tab'); }
         }
 
-        function renderFavorites() {
-            const container = document.getElementById('favorites-container');
-            if(!container) return;
-            container.innerHTML = '';
+        function filterCategory(cat, e) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-sky-500/20', 'bg-slate-800')); e.target.classList.replace('bg-slate-800', 'bg-sky-500/20'); renderChannels(); }
+        function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); document.getElementById('menu-campaigns-count').innerText = historialCampanas.filter(c => c.estado === 'progreso').length; }
+        function closeUserMenuOutside(e) { const d = document.getElementById('user-dropdown'); if(d && !d.classList.contains('hidden') && !d.contains(e.target)) d.classList.add('hidden'); }
+        
+        function renderFavorites() { 
+            const container = document.getElementById('favorites-container'); 
+            if(!container) return; 
+            container.innerHTML = ''; 
+            const favs = canalesData.filter(c => favoritos.includes(c.id)); 
+            if(favs.length === 0){
+                container.innerHTML = `<p class="text-slate-500 text-xs py-4 text-center col-span-full">Aún no tienes canales en favoritos.</p>`;
+                return;
+            } 
+            favs.forEach(c => { container.innerHTML += buildChannelCardHTML(c, true); }); 
+        }
+        function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify(favoritos)); renderFavorites(); }
+        
+        function renderCampaigns() {
+            const container = document.getElementById('campaigns-container'); if(!container) return; container.innerHTML = '';
+            if(historialCampanas.length === 0) { container.innerHTML = `<p class="text-slate-500 text-center py-4 text-xs">Sin registros de campañas pasadas.</p>`; return; }
             
-            const filtrados = canalesData.filter(c => favoritos.includes(c.id));
-            if(filtrados.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-500 text-xs font-medium italic">No tienes canales guardados en favoritos todavía.</div>`;
-                return;
-            }
-            filtrados.forEach(c => {
-                container.innerHTML += buildChannelCardHTML(c, true);
-            });
-        }
-
-        function clearFavorites() { favoritos = []; localStorage.setItem('ads_favoritos', JSON.stringify([])); renderFavorites(); renderChannels(); }
-
-        function renderCampaignHistory() {
-            const container = document.getElementById('campaigns-container');
-            if(!container) return;
-            container.innerHTML = '';
-
-            document.getElementById('menu-campaigns-count').innerText = historialCampanas.length;
-
-            if(historialCampanas.length === 0) {
-                container.innerHTML = `<div class="py-8 text-center text-slate-500 text-xs font-medium italic">No se registran campañas contratadas.</div>`;
-                return;
-            }
-
-            historialCampanas.forEach(camp => {
-                const item = document.createElement('div');
-                item.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-left flex justify-between items-start gap-4 shadow-md";
+            historialCampanas.forEach((c) => {
+                const div = document.createElement('div'); 
+                div.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-800 text-xs space-y-2 animate-fade-in";
                 
-                let canalesHTML = camp.canales.map(c => `<span class="block text-slate-300 font-semibold">• ${c}</span>`).join('');
-                
-                item.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono"><span>ID: ${camp.idCamp}</span><span>•</span><span>${camp.fecha}</span></div>
-                        <div class="pt-1 space-y-0.5">${canalesHTML}</div>
-                    </div>
-                    <div class="text-right flex flex-col items-end gap-1.5 flex-shrink-0">
-                        <span class="font-black text-emerald-400 font-mono text-sm">$${camp.total}</span>
-                        <span class="text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide bg-amber-400/10 text-amber-400 border border-amber-400/20">Verificando</span>
+                const esProgreso = c.estado === 'progreso';
+                const estadoBadge = esProgreso 
+                    ? `<span class="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-shadow animate-spin mr-1 text-[9px]"></i>En progreso</span>` 
+                    : `<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-circle-check mr-1 text-[9px]"></i>Completado</span>`;
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] text-slate-400"><span>${c.fecha}</span>${estadoBadge}</div>
+                    <p class="font-bold text-slate-200 mt-1">${c.canales.join(', ')}</p>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-800/50">
+                        <div class="flex gap-2">
+                            ${esProgreso ? `<button onclick="completeCampaign(${c.idCamp})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-2 py-1 rounded font-bold text-[9px] transition-colors cursor-pointer">Marcar Completado</button>` : ''}
+                            <button onclick="deleteCampaign(${c.idCamp})" class="bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white px-2 py-1 rounded font-bold text-[9px] transition-colors cursor-pointer"><i class="fa-solid fa-trash mr-1"></i>Eliminar</button>
+                        </div>
+                        <p class="text-emerald-400 font-black text-right">$${c.total} USD</p>
                     </div>
                 `;
-                container.appendChild(item);
+                container.appendChild(div);
+            });
+        }
+        
+        function completeCampaign(idCamp) {
+            historialCampanas = historialCampanas.map(c => c.idCamp === idCamp ? { ...c, estado: 'completado' } : c);
+            localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+            renderCampaigns();
+            triggerSuccessAnimation("Campaña Completada", "El estado ha sido actualizado con éxito.");
+        }
+
+        function deleteCampaign(idCamp) {
+            historialCampanas = historialCampanas.filter(c => c.idCamp !== idCamp);
+            localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
+            renderCampaigns();
+            triggerSuccessAnimation("Eliminado", "Registro borrado de tu cuenta.");
+        }
+
+        function clearCampaignHistory() { historialCampanas = []; localStorage.setItem('ads_historial', JSON.stringify(historialCampanas)); renderCampaigns(); }
+        function checkBannerFrequency() { if(!localStorage.getItem('ads_banner_hidden_time')) document.getElementById('banner-add-channel').classList.remove('hidden'); }
+        function closeBannerPermanently(e) { e.stopPropagation(); document.getElementById('banner-add-channel').classList.add('hidden'); localStorage.setItem('ads_banner_hidden_time', "true"); }
+        function openAddChannelModal() { document.getElementById('add-channel-modal').classList.remove('hidden'); }
+        function closeAddChannelModal() { document.getElementById('add-channel-modal').classList.add('hidden'); }
+        
+        function submitChannelRegistration(tipo) { 
+            let txt = "";
+            if(tipo === 'alta') {
+                const name = document.getElementById('reg-channel-name').value.trim();
+                const user = document.getElementById('reg-channel-user').value.trim();
+                const subs = document.getElementById('reg-channel-subs').value.trim();
+                const cat = document.getElementById('reg-channel-cat').value;
+                const price = document.getElementById('reg-channel-price').value.trim();
+                const payMethod = document.getElementById('reg-channel-payment').value;
+                
+                if(!name || !user || !subs || !price) { alert("Por favor complete todos los campos de alta."); return; }
+                txt = `¡Hola Administrador! Solicito registrar mi canal:\n📌 Nombre: ${name}\n🔗 Enlace: ${user}\n📊 Subs: ${subs}\n📁 Categoría: ${cat}\n💰 Precio sugerido: $${price} USD\n💳 Método de Pago: ${payMethod}`;
+            } else {
+                const user = document.getElementById('boost-channel-user').value.trim();
+                const pack = document.getElementById('boost-pack-type').value;
+                const payMethod = document.getElementById('boost-channel-payment').value;
+                if(!user) { alert("Por favor ingresa el @Username de tu canal registrado."); return; }
+                txt = `¡Hola Administrador! Deseo adquirir un potenciador de visibilidad:\n🔗 Canal: ${user}\n🚀 Plan elegido: ${pack === '7dias' ? 'Plan Cohete 7 Días ($9.99)' : 'Plan Cohete 1 Mes ($29.99)'}\n💳 Método de Pago: ${payMethod}`;
+            }
+            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(txt), "_blank");
+            closeAddChannelModal(); 
+        }
+        
+        function triggerSuccessAnimation(title, desc) {
+            document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
+            const t = document.getElementById('success-toast'); const b = document.getElementById('toast-box');
+            t.classList.remove('opacity-0', 'pointer-events-none'); b.classList.remove('scale-75');
+            setTimeout(() => { t.classList.add('opacity-0', 'pointer-events-none'); b.classList.add('scale-75'); }, 2800);
+        }
+
+        function renderMissions() {
+            const container = document.getElementById('missions-container'); if(!container) return; container.innerHTML = '';
+            misionesData.forEach(m => {
+                const isDone = claimedRewards.includes(m.id);
+                const isCounting = missionTimers[m.id] ? true : false;
+                
+                let btnHTML = '';
+                if(isDone) {
+                    btnHTML = `<button class="w-full bg-slate-950 border border-slate-900 text-emerald-500 font-bold text-[10px] py-1.5 rounded-xl cursor-not-allowed" disabled><i class="fa-solid fa-circle-check mr-1"></i> Completada</button>`;
+                } else if(isCounting) {
+                    btnHTML = `<button onclick="claimMissionReward('${m.id}')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[10px] py-1.5 rounded-xl animate-bounce">Reclamar +${m.points} Pts</button>`;
+                } else {
+                    btnHTML = `<button onclick="startMissionAction('${m.id}')" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] py-1.5 rounded-xl transition-colors">Iniciar Misión</button>`;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between space-y-3 shadow-md">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-xl flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid ${m.icon}"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-200 text-xs leading-snug">${m.title}</h3>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">${m.desc}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 pt-1">
+                            <div class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>+${m.points} Pts</div>
+                            <div class="flex-1 max-w-[130px]">${btnHTML}</div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        function clearCampaignHistory() { historialCampanas = []; localStorage.setItem('ads_historial', JSON.stringify([])); renderCampaignHistory(); }
+        function startMissionAction(id) {
+            if(id === 'miss_video') {
+                document.getElementById('video-mission-modal').classList.remove('hidden');
+                let bar = document.getElementById('video-progress-bar');
+                let txt = document.getElementById('video-timer-txt');
+                let actionBtnContainer = document.getElementById('video-action-container');
+                bar.style.width = "0%";
+                
+                let count = 60;
+                txt.innerText = `${count}s / 60s`;
+                
+                let inter = setInterval(() => {
+                    count--;
+                    txt.innerText = `${count}s / 60s`;
+                    bar.style.width = `${((60 - count) / 60) * 100}%`;
+                    
+                    if(count <= 0) {
+                        clearInterval(inter);
+                        actionBtnContainer.innerHTML = `<button onclick="validateVideoMissionReward()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2 rounded-xl text-xs font-black uppercase tracking-wider animate-pulse">Validar Recompensa</button>`;
+                    }
+                }, 1000);
+            } else {
+                let url = "https://t.me/ListaGolden";
+                if(id === 'miss_web') url = "https://lista-golden.com";
+                window.open(url, "_blank");
+                missionTimers[id] = true;
+                localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
+                renderMissions();
+            }
+        }
 
-        function filterCategory(cat, event) {
-            currentCategory = cat;
-            document.querySelectorAll('#category-filters button').forEach(b => {
-                b.classList.remove('bg-sky-500/20', 'text-sky-300', 'border-sky-500/30');
-                b.classList.add('bg-slate-800', 'text-slate-400', 'border-slate-700');
-            });
-            event.target.classList.remove('bg-slate-800', 'text-slate-400', 'border-slate-700');
-            event.target.classList.add('bg-sky-500/20', 'text-sky-300', 'border-sky-500/30');
-            renderChannels();
+        function validateVideoMissionReward() {
+            document.getElementById('video-mission-modal').classList.add('hidden');
+            document.getElementById('video-action-container').innerHTML = `<button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando...</button>`;
+            missionTimers['miss_video'] = true;
+            localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
+            renderMissions();
+            triggerSuccessAnimation("Video Completado", "Ya puedes reclamar tus puntos.");
+        }
+
+        function claimMissionReward(id) {
+            const m = misionesData.find(x => x.id === id);
+            if(!m) return;
+            
+            userPoints += m.points;
+            localStorage.setItem('ads_user_points', userPoints.toString());
+            
+            claimedRewards.push(id);
+            localStorage.setItem('ads_claimed_rewards', JSON.stringify(claimedRewards));
+            
+            delete missionTimers[id];
+            localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
+            
+            updatePointsDisplay();
+            renderMissions();
+            triggerSuccessAnimation(`+${m.points} Puntos`, "Misión validada y guardada.");
         }
 
         function calculateSponsorPrice(type) {
+            let base = 29.99;
             if(type === 'micro') {
-                let base = 29.99;
-                if(document.getElementById('micro-opt-img').checked) base += 15.00;
-                if(document.getElementById('micro-opt-vid').checked) base += 25.00;
-                if(document.getElementById('micro-opt-suprem').checked) base += 40.00;
+                if(document.getElementById('micro-opt-img').checked) base += 15;
+                if(document.getElementById('micro-opt-vid').checked) base += 25;
+                if(document.getElementById('micro-opt-suprem').checked) base += 40;
                 document.getElementById('price-micro').innerText = `$${base.toFixed(2)} USD`;
-                sponsorPrices.micro = base; // Almacenar precio dinámico calculado
             }
         }
 
         function addSponsorToCart(type) {
-            let desc = "Post Patrocinado Individual Completo";
+            let name = "Anuncio Patrocinado Compacto";
             let price = 49.99;
-
+            let detail = "Post Solo Texto (Hasta 200 caracteres)";
+            
             if(type === 'micro') {
-                desc = "Micro-Anuncio Patrocinado Red Golden";
-                price = sponsorPrices.micro; // Leer el valor real calculado dinámicamente
-                let extraArr = [];
-                if(document.getElementById('micro-opt-img').checked) extraArr.push("Imagen");
-                if(document.getElementById('micro-opt-vid').checked) extraArr.push("Vídeo");
-                if(document.getElementById('micro-opt-suprem').checked) extraArr.push("Pack Supremo");
-                if(extraArr.length > 0) desc += ` (+${extraArr.join(', ')})`;
-            }
-            if(type === 'completo') {
-                desc = "Anuncio Completo Patrocinado Premium";
-                price = 77.99;
-                if(document.getElementById('full-opt-spoiler').checked) desc += " (Con Spoiler)";
+                name = "Micro-Anuncio Patrocinado";
+                price = 29.99;
+                let addOns = [];
+                if(document.getElementById('micro-opt-img').checked) { price += 15; addOns.push("Imagen"); }
+                if(document.getElementById('micro-opt-vid').checked) { price += 25; addOns.push("Vídeo"); }
+                if(document.getElementById('micro-opt-suprem').checked) { price += 40; addOns.push("Pack Supremo"); }
+                detail = "Publicación Micro" + (addOns.length > 0 ? " + " + addOns.join(', ') : "");
+            } else if(type === 'completo') {
+                name = "Anuncio Patrocinado Completo";
+                price = 79.99;
+                detail = "Post Premium 500 palabras + Multimedia";
+                if(document.getElementById('full-opt-spoiler').checked) detail += " (Con Spoiler)";
             }
 
-            carrito.push({
-                idUnique: Date.now() + Math.floor(Math.random()*90),
-                idCanalOriginal: 666, 
-                customPrice: price,
-                detallesMejora: desc,
-                isSponsorAd: true,
-                duracion: '4h',
-                fijado: 'no'
-            });
-
+            carrito.push({ idUnique: Date.now(), idCanalOriginal: 666, isSponsorAd: true, customPrice: price, detallesMejora: detail, duracion: '4 Horas', fijado: 'no' });
             localStorage.setItem('ads_carrito', JSON.stringify(carrito));
             updateCartBadge();
-            triggerSuccessAnimation("Añadido", "Patrocinio agregado a la cesta.");
+            triggerSuccessAnimation("Añadido", "Anuncio patrocinado listo en cesta.");
         }
 
-        function openAddChannelModal() { document.getElementById('add-channel-modal').classList.remove('hidden'); }
-        function closeAddChannelModal() { document.getElementById('add-channel-modal').classList.add('hidden'); }
-
-        function submitChannelRegistration(mode) {
-            let msgText = "";
-            if(mode === 'alta') {
-                const name = document.getElementById('reg-channel-name').value.trim();
-                const user = document.getElementById('reg-channel-user').value.trim();
-                const subs = document.getElementById('reg-channel-subs').value.trim();
-                const t = document.getElementById('reg-channel-type').value;
-                const c = document.getElementById('reg-channel-cat').value;
-                const p = document.getElementById('reg-channel-price').value.trim();
-
-                if(!name || !user || !subs || !p) { alert("Por favor complete todos los datos del alta."); return; }
-                msgText = `¡Hola! Solicito el Alta Vitalicia de un nuevo canal para monetizar:\n\n📛 Nombre: ${name}\n🔗 Enlace: ${user}\n📊 Suscriptores: ${subs}\n⚙️ Tipo: ${t}\n📁 Categoría: ${c}\n💰 Precio asignado por Post: $${p} USD\n\nQuedo a la espera de instrucciones de pago ($19.99 Lifetime).`;
-            } else {
-                const user = document.getElementById('boost-channel-user').value.trim();
-                const pack = document.getElementById('boost-pack-type').value;
-                if(!user) { alert("Indique el @Username del canal a potenciar."); return; }
-                msgText = `¡Hola! Solicito un Potenciador de Cohete para mi canal registrado:\n\n🔗 Canal: ${user}\n🚀 Paquete: ${pack === '7dias' ? '7 Días de Visibilidad ($9.99 USD)' : '1 Mes de Visibilidad Top ($29.99 USD)'}`;
-            }
-
-            window.open("https://t.me/" + MI_TELEGRAM_USER + "?text=" + encodeURIComponent(msgText), "_blank");
-            closeAddChannelModal();
-        }
-
-        function triggerSuccessAnimation(title, desc) {
-            const toast = document.getElementById('success-toast');
-            const box = document.getElementById('toast-box');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-desc').innerText = desc;
-            
-            if (toast && box) {
-                toast.classList.remove('pointer-events-none', 'opacity-0');
-                box.classList.remove('scale-75');
-                setTimeout(() => {
-                    toast.classList.add('opacity-0', 'pointer-events-none');
-                    box.classList.add('scale-75');
-                }, 2800);
-            }
-        }
-
-        function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('hidden'); }
-        function closeUserMenuOutside(e) {
-            const menu = document.getElementById('user-dropdown');
-            if(menu && !menu.classList.contains('hidden')) menu.classList.add('hidden');
-        }
-
-        function checkBannerFrequency() {
-            const closed = localStorage.getItem('ads_banner_closed_permanently');
-            if (closed !== "true") document.getElementById('banner-add-channel').classList.remove('hidden');
-        }
-        function closeBannerPermanently(e) {
-            e.stopPropagation();
-            document.getElementById('banner-add-channel').classList.add('hidden');
-            localStorage.setItem('ads_banner_closed_permanently', "true");
-        }
-
-        function toggleSocialModal() { document.getElementById('social-golden-modal').classList.toggle('hidden'); }
-        function openAiFromSocial() { toggleSocialModal(); toggleAiChat(); }
-
-        function renderMissions() {
-            const container = document.getElementById('missions-container');
-            if(!container) return;
-            container.innerHTML = '';
-
-            misionesData.forEach(m => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3.5 relative shadow-md";
-                
-                const isClaimed = missionTimers[m.id] === 'claimed';
-                let btnHTML = '';
-                
-                if(isClaimed) {
-                    btnHTML = `<button class="w-full bg-slate-950 text-slate-600 font-bold py-2 rounded-xl text-xs border border-slate-850" disabled><i class="fa-solid fa-lock-open mr-1.5"></i>Recompensa Recibida</button>`;
-                } else if(m.id === 'miss_video') {
-                    btnHTML = `<button onclick="startVideoMission()" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-2 rounded-xl text-xs cursor-pointer shadow-md shadow-sky-500/10 uppercase tracking-wide">Comenzar Misión</button>`;
-                } else {
-                    btnHTML = `<button onclick="claimSocialMission('${m.id}')" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-2 rounded-xl text-xs cursor-pointer shadow-md shadow-sky-500/10 uppercase tracking-wide">Completar Misión</button>`;
-                }
-
-                card.innerHTML = `
-                    <div class="space-y-1.5 text-left">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xs"><i class="fa-solid ${m.icon}"></i></div>
-                            <div>
-                                <h3 class="text-xs font-black text-slate-200 uppercase">${m.title}</h3>
-                                <span class="text-[9px] text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>Recompensa: +${m.points} Pts</span>
-                            </div>
-                        </div>
-                        <p class="text-[10px] text-slate-400 leading-relaxed pt-1">${m.desc}</p>
-                    </div>
-                    <div>${btnHTML}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function claimSocialMission(id) {
-            const m = misionesData.find(x => x.id === id);
-            if(!m || missionTimers[id] === 'claimed') return;
-            
-            if(id === 'miss_tg') window.open("https://t.me/ListaGolden", "_blank");
-            if(id === 'miss_web') window.open("https://lista-golden.com", "_blank");
-            if(id === 'miss_share') window.open("https://t.me/share/url?url=https://t.me/ListaGolden&text=¡Únete%20a%20la%20mejor%20red%20de%20anuncios!", "_blank");
-
-            setTimeout(() => {
-                userPoints += m.points;
-                localStorage.setItem('ads_user_points', userPoints.toString());
-                missionTimers[id] = 'claimed';
-                localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
-                
-                updatePointsDisplay();
-                renderRewardsSlots();
-                renderMissions();
-                triggerSuccessAnimation(`+${m.points} Puntos`, "Misión completada correctamente.");
-            }, 1500);
-        }
-
-        function startVideoMission() {
-            if(missionTimers['miss_video'] === 'claimed') return;
-            document.getElementById('video-mission-modal').classList.remove('hidden');
-            let t = 60;
-            const bar = document.getElementById('video-progress-bar');
-            const txt = document.getElementById('video-timer-txt');
-            const actionBox = document.getElementById('video-action-container');
-
-            bar.style.width = '0%';
-            txt.innerText = `60s / 60s`;
-            actionBox.innerHTML = `<button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando vídeo (60s)...</button>`;
-
-            setTimeout(() => { bar.style.width = '100%'; }, 100);
-
-            let timer = setInterval(() => {
-                t--;
-                txt.innerText = `${t}s / 60s`;
-                actionBox.innerHTML = `<button class="w-full bg-slate-800 text-slate-400 py-2 rounded-xl text-xs font-bold" disabled>Visualizando vídeo (${t}s)...</button>`;
-                
-                if(t <= 0) {
-                    clearInterval(timer);
-                    actionBox.innerHTML = `<button onclick="claimVideoRewardPoints()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black py-2 rounded-xl text-xs uppercase tracking-wider animate-bounce cursor-pointer">Reclamar Puntos Ahora</button>`;
-                }
-            }, 1000);
-            window.activeVideoMissionInterval = timer;
-        }
-
-        function claimVideoRewardPoints() {
-            document.getElementById('video-mission-modal').classList.add('hidden');
-            if(window.activeVideoMissionInterval) clearInterval(window.activeVideoMissionInterval);
-
-            const m = misionesData.find(x => x.id === 'miss_video');
-            userPoints += m.points;
-            localStorage.setItem('ads_user_points', userPoints.toString());
-            missionTimers['miss_video'] = 'claimed';
-            localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
-
-            updatePointsDisplay();
-            renderRewardsSlots();
-            renderMissions();
-            triggerSuccessAnimation(`+${m.points} Puntos`, "Puntos de vídeo añadidos.");
-        }
-
-        // CHAT COMPLETO DE ASISTENTE DE IA
-        function toggleAiChat() { document.getElementById('ai-chat-window').classList.toggle('hidden'); }
-        
+        /* --- MÓDULO CHAT ASISTENTE IA CORREGIDO --- */
         function initAiAssistant() {
             const container = document.getElementById('ai-chat-messages');
-            if(!container) return;
-            container.innerHTML = `
-                <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl max-w-[85%] text-left text-slate-300">
-                    👋 ¡Hola! Soy tu asistente **Golden IA**. ¿En qué puedo ayudarte hoy? Te puedo guiar sobre los canales, las misiones o cómo programar tus anuncios.
-                </div>
-            `;
+            if(container && container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl text-slate-300 max-w-[85%] leading-normal">
+                        ¡Hola! 🤖 Soy tu **Asistente Golden IA**. ¿En qué te puedo colaborar hoy? Selecciona una de las preguntas sugeridas o escribe tu consulta.
+                    </div>
+                `;
+            }
+        }
+
+        function toggleAiChat() {
+            document.getElementById('ai-chat-window').classList.toggle('hidden');
+            scrollAiChatToBottom();
+        }
+
+        function openAiFromSocial() {
+            document.getElementById('social-golden-modal').classList.add('hidden');
+            document.getElementById('ai-chat-window').classList.remove('hidden');
+            scrollAiChatToBottom();
+        }
+
+        function suggestQuestion(questionText) {
+            document.getElementById('ai-user-input').value = questionText;
+            sendAiMessage();
         }
 
         function sendAiMessage() {
             const input = document.getElementById('ai-user-input');
-            const text = input.value.trim();
-            if(!text) return;
+            const txt = input.value.trim();
+            if(!txt) return;
 
             const container = document.getElementById('ai-chat-messages');
             
-            // Render user bubble
-            const uBubble = document.createElement('div');
-            uBubble.className = "bg-sky-600 text-white p-2.5 rounded-2xl max-w-[85%] ml-auto text-left shadow-sm";
-            uBubble.innerText = text;
-            container.appendChild(uBubble);
-            input.value = '';
-            container.scrollTop = container.scrollHeight;
+            // Render mensaje de usuario
+            container.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-sky-600 text-white p-2 rounded-xl max-w-[85%] font-medium leading-normal">${txt}</div>
+                </div>
+            `;
+            
+            input.value = "";
+            scrollAiChatToBottom();
 
-            // Generate responses based on context
+            // Simulación de respuesta automática IA
             setTimeout(() => {
-                let response = "Recibo tu mensaje. Si deseas asistencia comercial detallada o personalizada, te sugiero pulsar el botón de **Soporte Humano** para hablar directamente con el dueño de la red en Telegram.";
-                const lower = text.toLowerCase();
-
-                if (lower.includes('canal') || lower.includes('catálogo') || lower.includes('precio')) {
-                    response = "En la sección de **Catálogo** puedes explorar canales influyentes, filtrar por volumen de suscriptores, precios bajos o categorías específicas como *Finanzas* o *Tecnología*. Añade las opciones deseadas a tu cesta para comprarlas.";
-                } else if (lower.includes('misión') || lower.includes('punto') || lower.includes('gratis') || lower.includes('ruleta')) {
-                    response = "¡Puedes ganar puntos gratis! Ve a la pestaña **Misiones** y realiza tareas cotidianas, o presiona el botón dorado de la **Ruleta Diaria** cada 24 horas para inflar tu contador de puntos y desbloquear regalos permanentes.";
-                } else if (lower.includes('descuento') || lower.includes('cupón')) {
-                    response = "Actualmente, al unirte al canal comunitario oficial de @ListaGolden, obtienes el código exclusivo **LISTAGOLDEN20OFF**, el cual te otorga un 20% de rebaja directa sobre el total neto de tu cesta.";
-                } else if (lower.includes('pagar') || lower.includes('pago') || lower.includes('stars')) {
-                    response = "Aceptamos pagos tradicionales mediante **PayPal**, transacciones con criptomonedas estables (**USDT TRC20**) y el nuevo método nativo de **Telegram Stars (Estrellas)**. Configúralo dentro del menú de tu cesta.";
+                let resp = "Entendido tu consulta. Para asistencia personalizada o validaciones directas de saldo, también puedes pulsar la opción de **Soporte Humano** para abrir un chat privado directo con nuestro administrador general en Telegram.";
+                const query = txt.toLowerCase();
+                
+                if(query.includes('monetizar') || query.includes('añadir') || query.includes('canal')) {
+                    resp = "Para registrar o potenciar tu canal, pulsa el botón **🚀 Potenciar** en tu menú inferior o ve al banner principal. Rellena los datos básicos y se abrirá tu privado de Telegram para agendarlo inmediatamente.";
+                } else if(query.includes('pago') || query.includes('método') || query.includes('paypal') || query.includes('usdt')) {
+                    resp = "Aceptamos pagos automatizados y manuales mediante **PayPal, USDT (red TRC20)** y **Estrellas Oficiales de Telegram**. Configuras tu método preferido directo al procesar tu cesta.";
+                } else if(query.includes('ruleta') || query.includes('puntos')) {
+                    resp = "La **Ruleta de la Fortuna** se desbloquea gratis cada 24 horas. Te otorga de 10 a 250 puntos acumulables que puedes canjear por campañas publicitarias 100% gratis.";
                 }
 
-                const aiBubble = document.createElement('div');
-                aiBubble.className = "bg-slate-900 border border-slate-800 p-2.5 rounded-2xl max-w-[85%] text-left text-slate-300 animate-fade-in";
-                aiBubble.innerHTML = response;
-                container.appendChild(aiBubble);
-                container.scrollTop = container.scrollHeight;
+                container.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl text-slate-300 max-w-[85%] leading-normal">
+                        ${resp}
+                    </div>
+                `;
+                scrollAiChatToBottom();
             }, 800);
+        }
+
+        function scrollAiChatToBottom() {
+            const container = document.getElementById('ai-chat-messages');
+            if(container) {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
         }
     </script>
 </body>
