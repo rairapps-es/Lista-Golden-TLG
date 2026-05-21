@@ -34,8 +34,8 @@
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(12px); scale: 0.95; }
+            to { opacity: 1; transform: translateY(0); scale: 1; }
         }
         .animate-fade-in {
             animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -98,17 +98,77 @@
         </div>
     </div>
 
+    <!-- VENTANA FLOTANTE ANIMADA: PREMIOS POR PUNTOS -->
+    <div id="rewards-floating-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-5 rounded-3xl border border-slate-800 max-w-md w-full text-center space-y-4 shadow-2xl animate-fade-in relative max-h-[85vh] flex flex-col">
+            <button onclick="toggleRewardsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+            <div class="flex justify-between items-center border-b border-slate-800/80 pb-3 flex-shrink-0">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
+                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Premios para Desbloquear</h3>
+                </div>
+                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i>Tus puntos: <span id="rewards-points-counter">0</span> pts</span>
+            </div>
+            <div id="rewards-slots-container" class="grid gap-2.5 overflow-y-auto scrollbar-none flex-1 py-1 pr-1"></div>
+        </div>
+    </div>
+
     <!-- ANIMACIÓN DE REGALO FLOTANTE DESBLOQUEADO -->
     <div id="gift-reward-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-6 rounded-3xl border border-amber-400/40 max-w-sm w-full text-center space-y-4 shadow-2xl animate-fade-in">
             <div class="gift-box-anim">🎁</div>
             <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
-            <p class="text-xs text-slate-300">Has desbloqueado con éxito el premio especial:</p>
+            <p class="text-[10px] text-slate-300">Has desbloqueado con éxito el premio especial:</p>
             <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
                 Premio de Ejemplo
             </div>
             <p class="text-[10px] text-slate-400">El regalo se ha añadido a tu carrito de compras listo para enviar a Telegram.</p>
             <button onclick="closeGiftModal()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/20 cursor-pointer">¡Genial!</button>
+        </div>
+    </div>
+
+    <!-- VENTANA FLOTANTE ANIMADA: CONTRATACIÓN DE ANUNCIO SIMULADO -->
+    <div id="simulated-ad-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 w-full max-w-sm rounded-3xl border border-amber-400/30 p-5 space-y-4 shadow-2xl relative animate-fade-in">
+            <button onclick="toggleSimulatedAdModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 bg-amber-400/10 border border-amber-400/20 rounded-full flex items-center justify-center text-xl text-amber-400 mx-auto mb-1"><i class="fa-solid fa-rectangle-ad"></i></div>
+                <h3 class="text-sm font-black text-slate-200 uppercase tracking-wide">Impulsa tu Marca Global</h3>
+                <p class="text-[11px] text-slate-400">Selecciona el paquete de visibilidad prioritario que mejor se adapte a tus objetivos comerciales.</p>
+            </div>
+            <div class="space-y-2 pt-2 text-xs">
+                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="simulated-ad-plan" value="7dias" checked class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
+                        <div>
+                            <p class="font-bold text-slate-200">Campañas Básicas (7 Días)</p>
+                            <p class="text-[9px] text-slate-400">Soporte y tráfico garantizado</p>
+                        </div>
+                    </div>
+                    <span class="font-black text-emerald-400 font-mono">$19.99</span>
+                </label>
+                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="simulated-ad-plan" value="15dias" class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
+                        <div>
+                            <p class="font-bold text-slate-200">Impulso Premium (15 Días)</p>
+                            <p class="text-[9px] text-slate-400">Mayor indexación en listas altas</p>
+                        </div>
+                    </div>
+                    <span class="font-black text-emerald-400 font-mono">$34.99</span>
+                </label>
+                <label class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-slate-700 transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="simulated-ad-plan" value="1mes" class="text-sky-500 border-slate-800 bg-slate-900 focus:ring-0">
+                        <div>
+                            <p class="font-bold text-amber-400">Monopolio Total (1 Mes)</p>
+                            <p class="text-[9px] text-slate-400">Posicionamiento fijo y rotativo top</p>
+                        </div>
+                    </div>
+                    <span class="font-black text-emerald-400 font-mono">$59.99</span>
+                </label>
+            </div>
+            <button onclick="addSimulatedAdToCart()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/10 transition-transform hover:scale-[1.01] cursor-pointer mt-2">Agregar al carrito</button>
         </div>
     </div>
 
@@ -227,11 +287,17 @@
                     </div>
                     <p id="user-profile-tag" class="text-[10px] text-slate-400 font-mono">...</p>
                 </div>
-                <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                <!-- CAMBIO DE PERFIL DINÁMICO REQUERIDO -->
+                <button onclick="toggleUserRole(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-user-gear text-amber-400 w-4"></i> Rol: <span id="current-role-label">Anunciante</span></span>
+                    <span class="text-[8px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded-md uppercase">Cambiar</span>
+                </button>
+                <div class="border-t border-slate-800/60 my-1"></div>
+                <button onclick="switchView('campaigns'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors sub-advertiser-only">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="switchView('catalog'); showAndScrollToRewards(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
+                <button onclick="toggleRewardsModal(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
@@ -284,7 +350,7 @@
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
         
         <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
-        <section class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden">
+        <section class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden sub-advertiser-only">
             <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-fire animate-pulse"></i> Canales Destacados de la Semana</p>
             <div class="relative min-h-[75px] flex items-center">
                 <div id="carousel-track" class="w-full transition-all duration-300"></div>
@@ -293,18 +359,6 @@
                 <button onclick="prevCarousel()" class="w-5 h-5 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center text-[10px] text-slate-400 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
                 <button onclick="nextCarousel()" class="w-5 h-5 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center text-[10px] text-slate-400 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-        </section>
-
-        <!-- SECCIÓN DE PREMIOS POR PUNTOS -->
-        <section id="rewards-section" class="hidden-rewards bg-gradient-to-br from-slate-800/90 to-slate-900 p-4 rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-gift text-amber-400 text-sm"></i>
-                    <h3 class="text-xs font-black uppercase text-slate-200 tracking-wider">Premios para Desbloquear</h3>
-                </div>
-                <span class="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-star mr-1"></i>Tus puntos: <span id="rewards-points-counter">0</span> pts</span>
-            </div>
-            <div id="rewards-slots-container" class="grid gap-2.5"></div>
         </section>
 
         <!-- BANNER AGREGA TU CANAL -->
@@ -322,7 +376,7 @@
         </section>
 
         <!-- FILTROS Y CATEGORÍAS -->
-        <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
+        <section class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between sub-advertiser-only">
             <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
                 <button onclick="filterCategory('todos', event)" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30 whitespace-nowrap">Todos</button>
                 <button onclick="filterCategory('Tecnología', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap">Tecnología</button>
@@ -338,8 +392,24 @@
             </select>
         </section>
 
-        <!-- CONTENEDOR DE TARJETAS -->
-        <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
+        <!-- CONTENEDOR DE TARJETAS DE CANALES -->
+        <div id="channels-container" class="grid gap-4 sm:grid-cols-2 sub-advertiser-only"></div>
+
+        <!-- TARJETA INFERIOR: SIMULACIÓN DE ANUNCIO INTEGRADA -->
+        <div id="simulated-ad-card-box" class="sub-advertiser-only border-2 border-dashed border-indigo-500/40 bg-gradient-to-br from-slate-900 to-indigo-950/20 p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4 mt-2">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-xl flex items-center justify-center text-xl flex-shrink-0">📢</div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">Espacio Promocional</span>
+                        <span class="text-[9px] text-amber-400 font-bold"><i class="fa-solid fa-fire mr-1"></i>¡Alta Conversión!</span>
+                    </div>
+                    <h4 class="font-bold text-slate-200 text-xs mt-1 truncate">¿Tu Banner Aquí? Alcanza +10k visualizaciones directas</h4>
+                    <p class="text-[10px] text-slate-400 truncate mt-0.5">Posición exclusiva al pie del catálogo principal de la WebApp.</p>
+                </div>
+            </div>
+            <button onclick="toggleSimulatedAdModal()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[9px] px-2.5 py-1.5 rounded-lg uppercase tracking-wider shadow-md shadow-orange-500/10 cursor-pointer whitespace-nowrap transition-transform hover:scale-105">ANUNCIARME</button>
+        </div>
     </main>
 
     <!-- VISTA: MISIONES RECOMPENSADAS -->
@@ -458,7 +528,7 @@
         <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fade-in">
             <div class="p-4 bg-gradient-to-r from-amber-600 to-orange-600 flex justify-between items-center">
                 <span class="font-black text-xs text-slate-950 uppercase">Formulario de Monetización & Destacados</span>
-                <button onclick="closeAddChannelModal()" class="text-slate-950 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeAddChannelModal()" class="text-slate-955 text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none text-xs">
                 <div class="border-b border-slate-800 pb-3 mb-2">
@@ -569,13 +639,13 @@
         <button onclick="switchView('missions')" id="nav-missions" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
             <i class="fa-solid fa-list-check text-base"></i>Misiones
         </button>
-        <button onclick="switchView('sponsor-ads')" id="nav-sponsor-ads" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+        <button onclick="switchView('sponsor-ads')" id="nav-sponsor-ads" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
             <i class="fa-solid fa-rectangle-ad text-base"></i>Patrocinados
         </button>
-        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+        <button onclick="switchView('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
             <i class="fa-solid fa-star text-base"></i>Favoritos
         </button>
-        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer">
+        <button onclick="switchView('campaigns')" id="nav-campaigns" class="flex flex-col items-center gap-1 text-slate-400 py-1.5 px-2 text-[9px] sm:text-[10px] font-bold cursor-pointer sub-advertiser-only">
             <i class="fa-solid fa-clock-rotate-left text-base"></i>Historial
         </button>
     </nav>
@@ -697,10 +767,14 @@
         let dynamicAdCounts = {};
         let mejorasSeleccionadas = {}; 
 
+        // Variable global para gestionar el rol del usuario (anunciante o creador)
+        let currentUserRole = localStorage.getItem('ads_user_role') || 'anunciante';
+
         document.addEventListener("DOMContentLoaded", () => {
             initTelegramUserData();
             trackSessionCount();
             generateDailySeedCounters();
+            applyRoleInterface(); // Aplica los cambios acordes al perfil del usuario
             renderChannels();
             renderRewardsSlots();
             renderCarousel();
@@ -719,6 +793,71 @@
                 setTimeout(() => { if(loader) loader.remove(); }, 500);
             }, 500);
         });
+
+        // Alterna entre modo anunciante y creador de contenido
+        function toggleUserRole() {
+            currentUserRole = currentUserRole === 'anunciante' ? 'creador' : 'anunciante';
+            localStorage.setItem('ads_user_role', currentUserRole);
+            applyRoleInterface();
+            triggerSuccessAnimation("Perfil Cambiado", `Ahora navegas como ${currentUserRole === 'anunciante' ? 'Anunciante' : 'Creador de Contenido'}.`);
+        }
+
+        // Modifica la UI y oculta dinámicamente las secciones según el rol
+        function applyRoleInterface() {
+            const label = document.getElementById('current-role-label');
+            if(label) label.innerText = currentUserRole === 'anunciante' ? 'Anunciante' : 'Creador';
+
+            const targets = document.querySelectorAll('.sub-advertiser-only');
+            if(currentUserRole === 'creador') {
+                targets.forEach(el => el.style.setProperty('display', 'none', 'important'));
+                // Si el creador estaba en una pestaña de anunciante, lo redireccionamos a misiones
+                const currentTabActive = document.querySelector('nav .active-tab');
+                if(currentTabActive && (currentTabActive.id === 'nav-catalog' || currentTabActive.id === 'nav-sponsor-ads' || currentTabActive.id === 'nav-favorites' || currentTabActive.id === 'nav-campaigns')) {
+                    switchView('missions');
+                }
+            } else {
+                targets.forEach(el => el.style.removeProperty('display'));
+                renderChannels();
+            }
+        }
+
+        function toggleRewardsModal() {
+            const modal = document.getElementById('rewards-floating-modal');
+            if(modal) modal.classList.toggle('hidden');
+        }
+
+        function toggleSimulatedAdModal() {
+            const modal = document.getElementById('simulated-ad-modal');
+            if(modal) modal.classList.toggle('hidden');
+        }
+
+        function addSimulatedAdToCart() {
+            const radios = document.getElementsByName('simulated-ad-plan');
+            let selectedPlan = '7dias';
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) { selectedPlan = radios[i].value; break; }
+            }
+
+            let duracionStr = "7 Días";
+            let coste = 19.99;
+            if(selectedPlan === '15dias') { duracionStr = "15 Días"; coste = 34.99; }
+            if(selectedPlan === '1mes') { duracionStr = "1 Mes"; coste = 55.99; }
+
+            carrito.push({
+                idUnique: Date.now() + Math.floor(Math.random()*200),
+                idCanalOriginal: 777, // Identificador de simulación publicitaria
+                customPrice: coste,
+                detallesMejora: `Anuncio Catalogo Fijo (${duracionStr})`,
+                isSponsorAd: true,
+                duracion: selectedPlan,
+                fijado: 'si'
+            });
+
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            toggleSimulatedAdModal();
+            triggerSuccessAnimation("Añadido", "Simulación añadida a la cesta.");
+        }
 
         function initTelegramUserData() {
             let userTag = "@usuario_telegram";
@@ -891,7 +1030,6 @@
         function updateRewardsMenuBadge() {
             const badge = document.getElementById('menu-rewards-count');
             if (badge) {
-                // Filtramos los premios desbloqueados con saldo que NO se han metido al carro (sin usar)
                 let countUnused = 0;
                 premiosData.forEach(p => {
                     const yaReclamadoYEnCarro = carrito.some(item => item.isReward && item.detallesMejora.includes(p.name));
@@ -903,16 +1041,6 @@
             }
         }
 
-        function showAndScrollToRewards() {
-            const el = document.getElementById('rewards-section');
-            if(el) {
-                el.classList.remove('hidden-rewards'); 
-                setTimeout(() => {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            }
-        }
-
         function renderRewardsSlots() {
             const container = document.getElementById('rewards-slots-container');
             if(!container) return;
@@ -920,7 +1048,7 @@
 
             premiosData.forEach(reward => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs";
+                card.className = "bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs text-left";
                 
                 let buttonHTML = '';
                 const enCarro = carrito.some(item => item.isReward && item.detallesMejora.includes(reward.name));
@@ -928,9 +1056,9 @@
                 if (claimedRewards.includes(reward.id) || enCarro) {
                     buttonHTML = `<button class="bg-slate-950 text-slate-600 font-bold px-3 py-1.5 rounded-lg border border-slate-800" disabled>Reclamado 🔒</button>`;
                 } else if (userPoints >= reward.pointsRequired) {
-                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Reclamar Premio</button>`;
+                    buttonHTML = `<button onclick="fireRewardUnlock('${reward.id}')" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black px-4 py-1.5 rounded-lg uppercase tracking-tight shadow-md shadow-orange-500/10 cursor-pointer">Reclamar</button>`;
                 } else {
-                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Bloqueado 🔒</button>`;
+                    buttonHTML = `<button class="bg-slate-950 text-slate-500 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-900" disabled>Bloqueado</button>`;
                 }
 
                 card.innerHTML = `
@@ -964,6 +1092,7 @@
             const giftModal = document.getElementById('gift-reward-modal');
             giftModal.classList.remove('hidden');
             giftModal.setAttribute('data-active-reward', rewardId);
+            toggleRewardsModal(); // Cierra el modal de listado de premios para limpieza visual
         }
 
         function closeGiftModal() {
@@ -1013,6 +1142,7 @@
             ofertaFlashCanceladaHoy = false;
             activeCoupon = null;
             activeCouponPct = 0;
+            currentUserRole = 'anunciante';
 
             localStorage.setItem('ads_user_points', '0');
             localStorage.setItem('ads_favoritos', JSON.stringify([]));
@@ -1020,7 +1150,9 @@
             localStorage.setItem('ads_historial', JSON.stringify([]));
             localStorage.setItem('ads_claimed_rewards', JSON.stringify([]));
             localStorage.setItem('ads_mission_timers', JSON.stringify({}));
+            localStorage.setItem('ads_user_role', 'anunciante');
 
+            applyRoleInterface();
             updatePointsDisplay();
             updateCartBadge();
             updateRewardsMenuBadge();
@@ -1320,7 +1452,7 @@
             
             carrito.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs";
+                div.className = "bg-slate-800 p-2.5 rounded-xl flex flex-col gap-2 text-xs text-left";
                 
                 if(item.promoPack || item.isSponsorAd) {
                     div.innerHTML = `
@@ -1455,6 +1587,11 @@
         }
 
         function switchView(view) {
+            // Impedir el acceso a vistas comerciales si es creador de contenido
+            if(currentUserRole === 'creador' && (view === 'catalog' || view === 'sponsor-ads' || view === 'favorites' || view === 'campaigns')) {
+                view = 'missions';
+            }
+
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
             document.getElementById('view-catalog').classList.add('hidden');
             document.getElementById('view-missions').classList.add('hidden');
@@ -1494,7 +1631,7 @@
             
             historialCampanas.forEach((c) => {
                 const div = document.createElement('div'); 
-                div.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-800 text-xs space-y-2 animate-fade-in";
+                div.className = "bg-slate-800/40 p-3 rounded-xl border border-slate-800 text-xs space-y-2 animate-fade-in text-left";
                 
                 const esProgreso = c.estado === 'progreso';
                 const estadoBadge = esProgreso 
@@ -1580,203 +1717,135 @@
                 const reply = await res.text();
                 const loaderEl = document.getElementById(loaderId);
                 if(loaderEl) loaderEl.remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">${reply}</div>`;
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">${reply}</div>`;
             } catch {
                 const loaderEl = document.getElementById(loaderId);
                 if(loaderEl) loaderEl.remove();
-                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-rose-400 max-w-[85%] rounded-tl-none">Error de red. Contacta directamente a @Airdayz.</div>`;
+                container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">IA ocupada temporalmente. Por favor contacta soporte humano directo.</div>`;
             }
             container.scrollTop = container.scrollHeight;
         }
-        function initAiAssistant() {
-            document.getElementById('ai-chat-messages').innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none">👋 ¡Hola <strong class="text-sky-400">${tgUserName}</strong>! Estoy aquí para guiarte en Lista Golden. ¿Qué dudas tienes sobre las campañas? 👇</div>`;
-        }
-        function toggleAiChat() { const c = document.getElementById('ai-chat-window'); c.classList.toggle('hidden'); c.classList.toggle('flex'); }
 
-        /* NUEVAS LÓGICAS COMPLETAMENTE INTEGRADAS DE MANERA ADICIONAL */
-
-        function toggleSocialModal() {
-            document.getElementById('social-golden-modal').classList.toggle('hidden');
-        }
-
-        function openAiFromSocial() {
-            toggleSocialModal();
-            const win = document.getElementById('ai-chat-window');
-            if(win.classList.contains('hidden')) {
-                toggleAiChat();
-            }
-            const container = document.getElementById('ai-chat-messages');
-            container.innerHTML += `<div class="bg-slate-800 p-2.5 rounded-xl text-sky-400 max-w-[85%] rounded-tl-none font-bold">Hola! En qué puedo ayudarte?</div>`;
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function calculateSponsorPrice(type) {
-            if(type === 'micro') {
-                let base = 29.99;
-                if(document.getElementById('micro-opt-img').checked) base += 15.00;
-                if(document.getElementById('micro-opt-vid').checked) base += 25.00;
-                if(document.getElementById('micro-opt-suprem').checked) base += 40.00;
-                document.getElementById('price-micro').innerText = `$${base.toFixed(2)} USD`;
-            }
-        }
-
-        function addSponsorToCart(type) {
-            let descStr = "";
-            let finalPrice = 0;
-            
-            if(type === 'micro') {
-                finalPrice = 29.99;
-                descStr = "Micro-Anuncio base en +100 canales";
-                if(document.getElementById('micro-opt-img').checked) { finalPrice += 15.00; descStr += " + Imagen Destacada"; }
-                if(document.getElementById('micro-opt-vid').checked) { finalPrice += 25.00; descStr += " + Vídeo Suplemento"; }
-                if(document.getElementById('micro-opt-suprem').checked) { finalPrice += 40.00; descStr += " + Pack Supremo (3 Enlaces, 7 Emojis, 2 Img)"; }
-            } else if(type === 'compacto') {
-                finalPrice = 49.99;
-                descStr = "Anuncio Compacto Individual (200 carac, 2 enlaces)";
-            } else if(type === 'completo') {
-                finalPrice = 79.99;
-                descStr = "Anuncio Completo (500 palabras, multimedia)";
-                if(document.getElementById('full-opt-spoiler').checked) { descStr += " con Spoiler Activo"; }
-            }
-
-            carrito.push({
-                idUnique: Date.now() + Math.floor(Math.random()*200),
-                idCanalOriginal: 777,
-                isSponsorAd: true,
-                customPrice: finalPrice,
-                detallesMejora: descStr,
-                duracion: '4 Horas',
-                fijado: 'no'
-            });
-            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
-            updateCartBadge();
-            triggerSuccessAnimation("Añadido", "Anuncio Patrocinado sumado a la cesta.");
-        }
+        function toggleAiChat() { document.getElementById('ai-chat-window').classList.toggle('hidden'); }
+        function openAiFromSocial() { toggleSocialModal(); if(document.getElementById('ai-chat-window').classList.contains('hidden')) toggleAiChat(); }
+        function toggleSocialModal() { document.getElementById('social-golden-modal').classList.toggle('hidden'); }
 
         function renderMissions() {
-            const container = document.getElementById('missions-container');
-            if(!container) return;
-            container.innerHTML = '';
-
+            const container = document.getElementById('missions-container'); if(!container) return; container.innerHTML = '';
             const now = Date.now();
-
-            misionesData.forEach(mission => {
-                const lastClaim = missionTimers[mission.id] || 0;
-                const estaBloqueado = (now - lastClaim) < 24 * 60 * 60 * 1000;
-                
+            misionesData.forEach(m => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-xl";
+                card.className = "bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col justify-between space-y-3 shadow-md text-left";
                 
-                let actionBtnHTML = "";
-                if(estaBloqueado) {
+                let btnHTML = "";
+                const lastClaim = missionTimers[m.id];
+                const isBlocked = lastClaim && (now - lastClaim < 24 * 60 * 60 * 1000);
+
+                if(isBlocked) {
                     let diff = (24 * 60 * 60 * 1000) - (now - lastClaim);
-                    let hours = Math.floor(diff / (1000 * 60 * 60));
-                    let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    actionBtnHTML = `<button class="w-full bg-slate-950 text-slate-600 text-xs py-2 rounded-xl border border-slate-850 font-bold" disabled><i class="fa-solid fa-lock mr-1.5"></i> Bloqueado por ${hours}h ${mins}m</button>`;
+                    let h = Math.floor(diff / (1000*60*60));
+                    let min = Math.floor((diff % (1000*60*60)) / (1000*60));
+                    btnHTML = `<button class="w-full bg-slate-950 border border-slate-850 text-slate-500 font-bold py-2 rounded-xl text-[10px]" disabled><i class="fa-solid fa-lock mr-1.5"></i>Espera ${h}h ${min}m</button>`;
                 } else {
-                    actionBtnHTML = `<button onclick="executeMission('${mission.id}')" id="btn-action-${mission.id}" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold text-xs py-2 rounded-xl transition-transform hover:scale-[1.02] cursor-pointer">Completar Tarea</button>`;
+                    btnHTML = `<button onclick="claimMissionReward('${m.id}')" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-xl text-[10px] transition-all cursor-pointer shadow-md shadow-sky-600/10">Realizar Misión</button>`;
                 }
 
                 card.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-start">
-                            <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xs"><i class="fa-solid ${mission.icon}"></i></div>
-                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-md"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>+${mission.points} Pts</span>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid ${m.icon}"></i></div>
+                            <h3 class="font-bold text-slate-200 text-xs truncate flex-1">${m.title}</h3>
                         </div>
-                        <div>
-                            <h3 class="text-xs font-black text-slate-200 uppercase tracking-wide flex items-center gap-1.5">
-                                ${mission.title}
-                                ${estaBloqueado ? '<i class="fa-solid fa-lock text-[9px] text-slate-500"></i>' : ''}
-                            </h3>
-                            <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">${mission.desc}</p>
-                        </div>
+                        <p class="text-[10px] text-slate-400 leading-relaxed">${m.desc}</p>
                     </div>
-                    <div class="pt-1" id="wrapper-btn-${mission.id}">
-                        ${actionBtnHTML}
+                    <div class="flex items-center justify-between pt-1 gap-2">
+                        <div class="text-[10px] text-amber-400 font-bold bg-amber-400/5 border border-amber-400/10 px-2 py-0.5 rounded-md flex-shrink-0"><i class="fa-solid fa-coins mr-1 text-[8px]"></i>+${m.points} Pts</div>
+                        <div class="flex-1">${btnHTML}</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function executeMission(id) {
-            const mission = misionesData.find(m => m.id === id);
-            if(!mission) return;
-
+        function claimMissionReward(id) {
             if(id === 'miss_video') {
                 document.getElementById('video-mission-modal').classList.remove('hidden');
-                let progress = 0;
-                let counter = 60;
+                let bar = document.getElementById('video-progress-bar');
+                let txt = document.getElementById('video-timer-txt');
+                let container = document.getElementById('video-action-container');
+                bar.style.width = "0%"; txt.innerText = "60s / 60s";
+                container.innerHTML = `<button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando...</button>`;
                 
-                document.getElementById('video-timer-txt').innerText = `${counter}s restantes`;
-                document.getElementById('video-progress-bar').style.width = `0%`;
+                let secs = 60;
+                setTimeout(() => { bar.style.width = "100%"; }, 100);
                 
-                let interval = setInterval(() => {
-                    counter--;
-                    progress += (100 / 60);
-                    document.getElementById('video-timer-txt').innerText = `${counter}s restantes`;
-                    document.getElementById('video-progress-bar').style.width = `${progress}%`;
-                    
-                    if(counter <= 0) {
-                        clearInterval(interval);
-                        document.getElementById('video-action-container').innerHTML = `
-                            <button onclick="claimMissionPoints('miss_video')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-2 rounded-xl text-xs uppercase tracking-wider shadow-md shadow-orange-500/20 cursor-pointer">Reclamar Recompensa</button>
-                        `;
+                let vInterval = setInterval(() => {
+                    secs--;
+                    txt.innerText = `${secs}s / 60s`;
+                    if(secs <= 0) {
+                        clearInterval(vInterval);
+                        container.innerHTML = `<button onclick="confirmVideoMissionClaim()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-2 rounded-xl text-xs uppercase cursor-pointer shadow-md">Reclamar Puntos</button>`;
                     }
                 }, 1000);
-            } 
-            else if(id === 'miss_tg') {
-                window.open("https://t.me/ListaGolden", "_blank");
-                const btn = document.getElementById(`btn-action-${id}`);
-                btn.innerText = "Confirmar Suscripción";
-                btn.setAttribute("onclick", `confirmTelegramSubscription()`);
-            } 
-            else if(id === 'miss_web') {
-                window.open("https://lista-golden.com", "_blank");
-                claimMissionPoints('miss_web');
-            } 
-            else if(id === 'miss_share') {
-                window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/ListaGolden") + "&text=" + encodeURIComponent("¡Únete a Lista Golden Ads para conseguir y gestionar la mejor publicidad masiva de Telegram!"), "_blank");
-                claimMissionPoints('miss_share');
+                window.activeVideoInterval = vInterval;
+            } else {
+                executeMissionPointsAddition(id);
             }
         }
 
-        function confirmTelegramSubscription() {
-            const wrapper = document.getElementById('wrapper-btn-miss_tg');
-            wrapper.innerHTML = `
-                <div class="w-full bg-slate-950 border border-slate-850 rounded-xl p-2 text-center text-[10px] space-y-1">
-                    <p class="text-sky-400 font-bold flex items-center justify-center gap-1"><i class="fa-solid fa-spinner animate-spin"></i> Verificando tarea completa...</p>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                wrapper.innerHTML = `
-                    <button onclick="claimMissionPoints('miss_tg')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-2 rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer animate-bounce">Reclamar Recompensa</button>
-                `;
-            }, 15000);
+        function confirmVideoMissionClaim() {
+            document.getElementById('video-mission-modal').classList.add('hidden');
+            executeMissionPointsAddition('miss_video');
         }
 
-        function claimMissionPoints(id) {
-            const mission = misionesData.find(m => m.id === id);
-            if(!mission) return;
-
-            if(id === 'miss_video') {
-                document.getElementById('video-mission-modal').classList.add('hidden');
-                document.getElementById('video-action-container').innerHTML = `<button class="w-full bg-slate-800 text-slate-500 py-2 rounded-xl text-xs font-bold" disabled>Visualizando...</button>`;
-            }
-
-            userPoints += mission.points;
+        function executeMissionPointsAddition(id) {
+            const m = misionesData.find(m => m.id === id);
+            if(!m) return;
+            userPoints += m.points;
             localStorage.setItem('ads_user_points', userPoints.toString());
-            
             missionTimers[id] = Date.now();
             localStorage.setItem('ads_mission_timers', JSON.stringify(missionTimers));
-            
             updatePointsDisplay();
-            renderRewardsSlots();
             renderMissions();
-            
-            confetti({ particleCount: 80, spread: 50 });
-            triggerSuccessAnimation(`+${mission.points} Puntos`, "Misión completada correctamente.");
+            renderRewardsSlots();
+            triggerSuccessAnimation(`+${m.points} Puntos`, "Recompensa de misión guardada.");
+        }
+
+        function calculateSponsorPrice(pack) {
+            let base = 29.99;
+            if(pack === 'micro') {
+                if(document.getElementById('micro-opt-img').checked) base += 15;
+                if(document.getElementById('micro-opt-vid').checked) base += 25;
+                if(document.getElementById('micro-opt-suprem').checked) base += 40;
+                document.getElementById('price-micro').innerText = `$${base.toFixed(2)} USD`;
+            }
+        }
+
+        function addSponsorToCart(pack) {
+            let finalPrice = 29.99;
+            let label = "Micro-Anuncio Patrocinado";
+            if(pack === 'micro') {
+                let extras = [];
+                if(document.getElementById('micro-opt-img').checked) { finalPrice += 15; extras.push("Imagen"); }
+                if(document.getElementById('micro-opt-vid').checked) { finalPrice += 25; extras.push("Vídeo"); }
+                if(document.getElementById('micro-opt-suprem').checked) { finalPrice += 40; extras.push("Supremo"); }
+                if(extras.length > 0) label += ` (+ ${extras.join(', ')})`;
+            }
+            if(pack === 'compacto') { finalPrice = 49.99; label = "Anuncio Compacto Individual"; }
+            if(pack === 'completo') {
+                finalPrice = 79.99; label = "Anuncio Completo Premium";
+                if(document.getElementById('full-opt-spoiler').checked) label += " (+ Spoiler)";
+            }
+
+            carrito.push({ idUnique: Date.now(), idCanalOriginal: 666, customPrice: finalPrice, detallesMejora: label, isSponsorAd: true, duracion: '4 Horas', fijado: 'no' });
+            localStorage.setItem('ads_carrito', JSON.stringify(carrito));
+            updateCartBadge();
+            triggerSuccessAnimation("Añadido", "Patrocinado sumado a la cesta.");
+        }
+
+        function initAiAssistant() {
+            const container = document.getElementById('ai-chat-messages'); if(!container) return;
+            container.innerHTML = `<div class="bg-slate-800 p-2.5 rounded-xl text-slate-300 max-w-[85%] rounded-tl-none text-left">¡Hola, ${tgUserName}! Soy tu asistente personal de Golden Ads. ¿En qué canal o paquete publicitario deseas anunciarte hoy?</div>`;
         }
     </script>
 </body>
