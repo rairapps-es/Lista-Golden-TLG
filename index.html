@@ -1782,16 +1782,21 @@
             historialCampanas.unshift(nuevoPedido);
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
 
-            let stringTelegram = `¡Hola @${MI_TELEGRAM_USER}!.%0A%0A`;
-            stringTelegram += `**Quiero hacer un pedido #${nuevoPedido.idPedido}**%0A`;
-            stringTelegram += `━━━━━━━━━━━━━━━━━━━━━%0A`;
-            stringTelegram += `👤 Cliente: ${tgUserName}%0A`;
-            stringTelegram += `💳 Método de pago: ${selectedPayment}%0A`;
-            stringTelegram += `🛍️ Ítems del carro: ${nuevoPedido.resumenItems}%0A`;
-            stringTelegram += `💵 Importe Total: $${totalNeto.toFixed(2)} USD%0A`;
-            stringTelegram += `━━━━━━━━━━━━━━━━━━━━━%0A`;
-            stringTelegram += `Por favor, facilíteme los datos para completar la transferencia.`;
+            // 1. Creamos el texto de forma limpia y natural (con saltos de línea y espacios normales)
+let textoPlano = `¡Hola @${MI_TELEGRAM_USER}!\n\n` +
+                 `**Quiero hacer un pedido #${nuevoPedido.idPedido}**\n` +
+                 `━━━━━━━━━━━━━━━━━━━━━\n` +
+                 `👤 Cliente: ${tgUserName}\n` +
+                 `💳 Método de pago: ${selectedPayment}\n` +
+                 `🛍️ Ítems del carro: ${nuevoPedido.resumenItems}\n` +
+                 `💵 Importe Total: $${totalNeto.toFixed(2)} USD\n` +
+                 `━━━━━━━━━━━━━━━━━━━━━\n` +
+                 `Por favor, facilíteme los datos para completar la transferencia.`;
 
+// 2. Usamos encodeURIComponent para convertir automáticamente TODOS los espacios y caracteres especiales
+let stringTelegram = encodeURIComponent(textoPlano);
+
+// 3. Vaciamos el carrito
             carrito = [];
             activeCoupon = null;
             activeCouponPct = 0;
