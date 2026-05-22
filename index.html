@@ -275,7 +275,7 @@
 
             <button onclick="openCartModal()" class="relative bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-sky-500/20 hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-basket-shopping"></i>
-                <span>Cesta</span>
+                <span></span>
                 <span id="cart-count" class="bg-white text-slate-950 text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-black">0</span>
             </button>
         </div>
@@ -309,7 +309,7 @@
             <button onclick="toggleAdSimulationModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
             <div class="text-center space-y-1">
                 <div class="w-9 h-9 bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-full flex items-center justify-center text-base mx-auto mb-1"><i class="fa-solid fa-rectangle-ad"></i></div>
-                <h3 class="text-xs font-black text-slate-200 uppercase tracking-wide">Destacar mi Canal Aquí</h3>
+                <h3 class="text-xs font-black text-slate-200 uppercase tracking-wide">Destacar mi anuncio Aquí</h3>
                 <p class="text-[11px] text-slate-400">Consigue máxima visibilidad apareciendo fijo en la sección premium del catálogo.</p>
             </div>
             <div class="space-y-2">
@@ -373,7 +373,7 @@
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20">🚀</div>
                     <div>
                         <h4 class="text-xs font-black text-slate-100 uppercase tracking-wide">¿Quieres monetizar o destacar tu canal?</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Añade tu space o adquiere un Potenciador de 7 días o 1 mes.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Ofrece anuncios o potencia tu canal en el catálogo.</p>
                     </div>
                 </div>
             </button>
@@ -564,7 +564,7 @@
                             </select>
                         </div>
 
-                        <button onclick="submitChannelRegistration('boost')" class="w-full bg-gradient-to-r from-indigo-600 to-sky-600 p-2.5 rounded-xl font-black text-white uppercase tracking-wider text-[10px] cursor-pointer">Adquirir Potenciador Recomendado</button>
+                        <button onclick="submitChannelRegistration('boost')" class="w-full bg-gradient-to-r from-indigo-600 to-sky-600 p-2.5 rounded-xl font-black text-white uppercase tracking-wider text-[10px] cursor-pointer">Adquirir Potenciador</button>
                     </div>
                 </div>
             </div>
@@ -762,7 +762,7 @@
         let carrito = JSON.parse(localStorage.getItem('ads_carrito')) || [];
         let historialCampanas = JSON.parse(localStorage.getItem('ads_historial')) || [];
         let claimedRewards = JSON.parse(localStorage.getItem('ads_claimed_rewards')) || []; 
-        let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 2500; 
+        let userPoints = localStorage.getItem('ads_user_points') !== null ? parseInt(localStorage.getItem('ads_user_points')) : 0; 
         let lastSpinTime = localStorage.getItem('ads_last_spin_time') || null;
         let missionTimers = JSON.parse(localStorage.getItem('ads_mission_timers')) || {};
         
@@ -1782,8 +1782,8 @@
             historialCampanas.unshift(nuevoPedido);
             localStorage.setItem('ads_historial', JSON.stringify(historialCampanas));
 
-            let stringTelegram = `¡Hola Administrador @${MI_TELEGRAM_USER}! Vengo desde la WebApp comercial.%0A%0A`;
-            stringTelegram += `**DATOS DEL PEDIDO #${nuevoPedido.idPedido}**%0A`;
+            let stringTelegram = `¡Hola @${MI_TELEGRAM_USER}!.%0A%0A`;
+            stringTelegram += `**Quiero hacer un pedido #${nuevoPedido.idPedido}**%0A`;
             stringTelegram += `━━━━━━━━━━━━━━━━━━━━━%0A`;
             stringTelegram += `👤 Cliente: ${tgUserName}%0A`;
             stringTelegram += `💳 Método de pago: ${selectedPayment}%0A`;
