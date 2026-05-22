@@ -2465,14 +2465,14 @@ async function sendAiMessage() {
             activeUsers = 15; 
         } 
         // 2. Cada 2 sesiones, aplicamos la fluctuación ligera
-        else if (sessionCounter >= 2) {
+        else if (sessionCounter >= 1) {
             // Genera un cambio pequeño de entre -2 y +5
             const fluctuation = Math.floor(Math.random() * (5 - (-2) + 1)) + (-2);
             activeUsers += fluctuation;
 
             // Mantenemos el contador dentro de tus nuevos límites (5 - 22)
             if (activeUsers < 5) activeUsers = 5;
-            if (activeUsers > 22) activeUsers = 22;
+            if (activeUsers > 50) activeUsers = 50;
 
             sessionCounter = 0; // Reseteamos el contador de flutuación
         }
