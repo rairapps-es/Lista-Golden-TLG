@@ -2454,47 +2454,63 @@ async function sendAiMessage() {
 }
     </script>
     <script>
-        // ====== SISTEMA DE ESTADÍSTICAS SIMULADAS ======
-        function initSimulatedStats() {
-            let sessionCounter = parseInt(localStorage.getItem('golden_session_count')) || 0;
-            let activeUsers = parseInt(localStorage.getItem('golden_active_users')) || 0;
-            sessionCounter++;
+    // ====== SISTEMA DE ESTADÍSTICAS SIMULADAS ======
+    function initSimulatedStats() {
+        let sessionCounter = parseInt(localStorage.getItem('golden_session_count')) || 0;
+        let activeUsers = parseInt(localStorage.getItem('golden_active_users')) || 0;
+        sessionCounter++;
 
-            if (activeUsers === 0 || sessionCounter >= 2) {
-                activeUsers = Math.floor(Math.random() * (289 - 142 + 1)) + 142;
-                sessionCounter = 0;
-                localStorage.setItem('golden_active_users', activeUsers);
-            }
-            localStorage.setItem('golden_session_count', sessionCounter);
-            
-            const activeUsersEl = document.getElementById('simulated-active-users');
-            if (activeUsersEl) activeUsersEl.innerText = activeUsers.toLocaleString();
+        // 1. Si es la primera vez que entra, definimos un valor inicial intermedio fijo
+        if (activeUsers === 0) {
+            activeUsers = 215; 
+            localStorage.setItem('golden_active_users', activeUsers);
+        } 
+        // 2. Cada 2 recargas/sesiones, aplicamos una fluctuación ligera y realista
+        else if (sessionCounter >= 2) {
+            // Genera un cambio pequeño de entre -2 y +5
+            const fluctuation = Math.floor(Math.random() * (5 - (-2) + 1)) + (-2);
+            activeUsers += fluctuation;
 
-            let totalAds = parseInt(localStorage.getItem('golden_total_ads'));
-            let lastUpdateDate = localStorage.getItem('golden_last_ads_date');
-            const todayStr = new Date().toISOString().split('T')[0];
+            // Mantenemos el contador dentro de los límites lógicos originales (142 - 289)
+            if (activeUsers < 142) activeUsers = 142;
+            if (activeUsers > 289) activeUsers = 289;
 
-            if (isNaN(totalAds) || totalAds === null) {
-                totalAds = 7;
-                lastUpdateDate = todayStr;
+            sessionCounter = 0;
+            localStorage.setItem('golden_active_users', activeUsers);
+        }
+        
+        localStorage.setItem('golden_session_count', sessionCounter);
+        
+        const activeUsersEl = document.getElementById('simulated-active-users');
+        if (activeUsersEl) activeUsersEl.innerText = activeUsers.toLocaleString();
+
+        // ====== CONTADOR DE ANUNCIOS HISTÓRICOS (MANTIENE TU LÓGICA) ======
+        let totalAds = parseInt(localStorage.getItem('golden_total_ads'));
+        let lastUpdateDate = localStorage.getItem('golden_last_ads_date');
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        if (isNaN(totalAds) || totalAds === null) {
+            totalAds = 7;
+            lastUpdateDate = todayStr;
+            localStorage.setItem('golden_total_ads', totalAds);
+            localStorage.setItem('golden_last_ads_date', lastUpdateDate);
+        } else {
+            if (lastUpdateDate !== todayStr) {
+                const options = [3, 7, 12];
+                const randomAdd = options[Math.floor(Math.random() * options.length)];
+                totalAds += randomAdd;
                 localStorage.setItem('golden_total_ads', totalAds);
-                localStorage.setItem('golden_last_ads_date', lastUpdateDate);
-            } else {
-                if (lastUpdateDate !== todayStr) {
-                    const options = [3, 7, 12];
-                    const randomAdd = options[Math.floor(Math.random() * options.length)];
-                    totalAds += randomAdd;
-                    localStorage.setItem('golden_total_ads', totalAds);
-                    localStorage.setItem('golden_last_ads_date', todayStr);
-                }
+                localStorage.setItem('golden_last_ads_date', todayStr);
             }
-
-            const totalAdsEl = document.getElementById('simulated-total-ads');
-            if (totalAdsEl) totalAdsEl.innerText = totalAds.toLocaleString();
         }
 
-        // Ejecutar automáticamente al cargar la Web App
-        document.addEventListener('DOMContentLoaded', initSimulatedStats);
-    </script>
+        const totalAdsEl = document.getElementById('simulated-total-ads');
+        if (totalAdsEl) totalAdsEl.innerText = totalAds.toLocaleString();
+    }
+
+    // Ejecutar automáticamente al cargar la Web App
+    document.addEventListener('DOMContentLoaded', initSimulatedStats);
+</script>
+
 </body>
 </html>
