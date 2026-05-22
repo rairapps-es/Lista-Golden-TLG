@@ -282,14 +282,24 @@
     </header>
 
     <!-- LANZADORES FLOTANTES ALINEADOS PERFECTAMENTE UNO ENCIMA DEL OTRO -->
-    <div id="roulette-triggers-container" class="fixed bottom-24 right-4 z-40 flex flex-col gap-3 items-center justify-center">
-        <!-- BOTÓN SOCIAL -->
-        <button onclick="toggleSocialModal(true)" class="w-12 h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full shadow-2xl flex items-center justify-center text-white text-base border border-slate-900/60 cursor-pointer transition-transform hover:scale-110">
-            <i class="fa-solid fa-share-nodes"></i>
-        </button>
+<div id="roulette-triggers-container" class="fixed bottom-24 right-4 z-40 flex flex-col-reverse gap-3 items-center justify-center">
+    
+    <!-- 1. BOTÓN PRINCIPAL (El que controla el despliegue) -->
+    <button onclick="toggleFloatingMenu()" id="main-menu-trigger" class="w-12 h-12 bg-slate-800 text-amber-400 rounded-full shadow-2xl flex items-center justify-center text-base border border-slate-700 cursor-pointer transition-all duration-300 hover:scale-110">
+        <i id="main-menu-icon" class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- 2. CONTENEDOR DESPLEGABLE (Agrupa tus 3 herramientas) -->
+    <!-- 'max-h-0 opacity-0 pointer-events-none' hace que empiece completamente oculto y colapsado -->
+    <div id="sub-triggers-wrapper" class="flex flex-col gap-3 items-center justify-center max-h-0 opacity-0 pointer-events-none overflow-hidden transition-all duration-300 ease-in-out pb-1">
         
+        <!-- BOTÓN ASISTENTE IA CHAT -->
+        <button onclick="toggleAiChat(); toggleFloatingMenu();" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-base text-white cursor-pointer hover:scale-110 transition-transform border border-slate-900/60">
+            <i class="fa-solid fa-headset"></i>
+        </button>
+
         <!-- BOTÓN DE LA RULETA -->
-        <button id="floating-roulette-trigger" onclick="openRouletteModal()" class="w-12 h-12 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-base border border-slate-900/60 hidden cursor-pointer transition-transform hover:scale-110">
+        <button id="floating-roulette-trigger" onclick="openRouletteModal(); toggleFloatingMenu();" class="w-12 h-12 bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500 rounded-full shadow-2xl flex items-center justify-center text-slate-950 text-base border border-slate-900/60 hidden cursor-pointer transition-transform hover:scale-110">
             <i class="fa-solid fa-pie-chart"></i>
         </button>
         <div id="floating-roulette-blocked" class="w-12 h-12 bg-slate-800 border border-slate-700/60 rounded-full shadow-xl flex flex-col items-center justify-center text-slate-500 opacity-70 relative">
@@ -297,11 +307,13 @@
             <span class="text-[6px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">Ruleta</span>
         </div>
 
-        <!-- BOTÓN ASISTENTE IA CHAT -->
-        <button onclick="toggleAiChat()" class="w-12 h-12 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-base text-white cursor-pointer hover:scale-110 transition-transform border border-slate-900/60">
-            <i class="fa-solid fa-headset"></i>
+        <!-- BOTÓN SOCIAL -->
+        <button onclick="toggleSocialModal(true); toggleFloatingMenu();" class="w-12 h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 rounded-full shadow-2xl flex items-center justify-center text-white text-base border border-slate-900/60 cursor-pointer transition-transform hover:scale-110">
+            <i class="fa-solid fa-share-nodes"></i>
         </button>
+
     </div>
+</div>
 
     <!-- MODAL DE LA SIMULACIÓN DE ANUNCIARSE -->
     <div id="ad-simulation-modal" class="fixed inset-0 bg-black/85 z-50 backdrop-blur-md hidden flex items-center justify-center p-4">
@@ -1920,7 +1932,39 @@ let stringTelegram = encodeURIComponent(textoPlano);
             localStorage.setItem('ads_banner_hidden_permanently', 'true');
             document.getElementById('banner-add-channel').classList.add('hidden');
         }
-                // Mantener el historial de la conversación para que el asistente tenga memoria a corto plazo
+        function toggleFloatingMenu() {
+    const wrapper = document.getElementById('sub-triggers-wrapper');
+    const mainButton = document.getElementById('main-menu-trigger');
+    const icon = document.getElementById('main-menu-icon');
+    
+    // Comprobamos si el menú ya está abierto
+    const isOpen = !wrapper.classList.contains('pointer-events-none');
+    
+    if (isOpen) {
+        // Cerrar el menú: Volvemos a colapsar y ocultar el sub-contenedor
+        wrapper.classList.remove('max-h-[300px]', 'opacity-100');
+        wrapper.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
+        
+        // Estilo del botón principal al cerrar
+        mainButton.classList.remove('bg-amber-400', 'text-slate-950', 'rotate-90');
+        mainButton.classList.add('bg-slate-800', 'text-amber-400');
+        
+        // Cambiar el icono de vuelta a barras
+        icon.className = "fa-solid fa-bars";
+    } else {
+        // Abrir el menú: Damos altura suficiente para que quepan los 3 botones y los mostramos
+        wrapper.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none');
+        wrapper.classList.add('max-h-[300px]', 'opacity-100');
+        
+        // Estilo del botón principal al abrir (se ilumina y rota)
+        mainButton.classList.remove('bg-slate-800', 'text-amber-400');
+        mainButton.classList.add('bg-amber-400', 'text-slate-950', 'rotate-90');
+        
+        // Cambiar el icono a una 'X' de cierre
+        icon.className = "fa-solid fa-xmark";
+    }
+}
+        // Mantener el historial de la conversación para que el asistente tenga memoria a corto plazo
         let aiChatHistory = [];
 
         function toggleAiChat() {
