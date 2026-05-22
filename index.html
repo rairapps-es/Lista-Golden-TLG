@@ -567,41 +567,34 @@
         <!-- ====================================================================== -->
         <!-- 🌟 AQUÍ DEBES PEGAR TU TARJETA DE ESTADÍSTICAS (DEBAJO DE LA CABECERA) -->
         <!-- ====================================================================== -->
-        <!-- TARJETA DE ESTADÍSTICAS EN VIVO (MÉTRICAS SIMULADAS) -->
-        <div class="max-w-md mx-auto grid grid-cols-2 gap-3 p-4 bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-slate-800/60 rounded-2xl shadow-xl backdrop-blur-xl">
-            
-            <!-- CONTADOR 1: USUARIOS ACTIVOS -->
-            <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-4 -top-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="flex h-2 w-2 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">En Vivo</span>
-                </div>
-                <div>
-                    <h3 id="simulated-active-users" class="text-xl font-black text-slate-100 tracking-tight">--</h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">Usuarios activos en la app</p>
-                </div>
-            </div>
-
-            <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
-            <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-4 -top-4 w-12 h-12 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
-                <div class="flex items-center gap-1.5 mb-2 text-amber-400">
-                    <i class="fa-solid fa-chart-line text-[11px]"></i>
-                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Histórico</span>
-                </div>
-                <div>
-                    <h3 id="simulated-total-ads" class="text-xl font-black text-amber-400 tracking-tight">--</h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">Total anuncios publicados</p>
-                </div>
-            </div>
-
+        <!-- TARJETA DE ESTADÍSTICAS ULTRA-COMPACTA (OPTIMIZADA PARA MÓVIL) -->
+<div class="max-w-md mx-auto grid grid-cols-2 gap-2 p-2 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800/50 rounded-xl shadow-lg backdrop-blur-md">
+    
+    <!-- CONTADOR 1: USUARIOS ACTIVOS (MINI) -->
+    <div class="bg-slate-950/40 border border-slate-850/30 px-2.5 py-1.5 rounded-lg flex items-center justify-between relative overflow-hidden">
+        <div class="flex flex-col">
+            <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Usuarios Activos</span>
+            <h3 id="simulated-active-users" class="text-sm font-black text-slate-100 tracking-tight leading-none">--</h3>
         </div>
-        <!-- ====================================================================== -->
+        <!-- Punto parpadeante en vivo compacto -->
+        <span class="flex h-1.5 w-1.5 relative flex-shrink-0 ml-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+        </span>
+    </div>
 
+    <!-- CONTADOR 2: ANUNCIOS PUBLICADOS (MINI) -->
+    <div class="bg-slate-950/40 border border-slate-850/30 px-2.5 py-1.5 rounded-lg flex items-center justify-between relative overflow-hidden">
+        <div class="flex flex-col">
+            <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Anuncios en Web</span>
+            <h3 id="simulated-total-ads" class="text-sm font-black text-amber-400 tracking-tight leading-none">--</h3>
+        </div>
+        <!-- Icono sutil en lugar de texto extra -->
+        <i class="fa-solid fa-chart-line text-[10px] text-amber-500/50 flex-shrink-0 ml-2"></i>
+    </div>
+
+</div>
+        <!-- ====================================================================== -->
         <!-- 3. EL RESTO DE TUS COSAS (Botones de la Ruleta, Packs, Catálogo, etc.) -->
         <div class="bg-slate-900 p-4 rounded-xl">
             <!-- Tu ruleta o accesos rápidos de abajo... -->
