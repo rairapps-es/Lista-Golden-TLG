@@ -546,48 +546,42 @@
     </div>
     
         <!-- VISTA 1: CATÁLOGO -->
-    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
-        <!-- CONTENEDOR PRINCIPAL DE TU HOME (Suele ser este) -->
-<div>
-
-    <!-- 2. CONTENIDO SCROLLABLE DE TU HOME -->
-    <div class="p-4 space-y-4">
-        
-        <!-- 👋 Mensaje opcional de bienvenida si tienes uno (ej: Hola, Usuario) -->
+        <!-- VISTA 1: CATÁLOGO -->
+    <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-3">
 
         <!-- ====================================================================== -->
-        <!-- 🌟 AQUÍ DEBES PEGAR TU TARJETA DE ESTADÍSTICAS (DEBAJO DE LA CABECERA) -->
+        <!-- 🌟 TARJETA ULTRA-COMPACTA DE ESTADÍSTICAS -->
         <!-- ====================================================================== -->
-        <!-- TARJETA ULTRA-COMPACTA CON AJUSTE DE ESPACIO FORZADO -->
-<div class="max-w-md mx-auto grid grid-cols-2 gap-2 p-1.5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800/40 rounded-xl shadow-md backdrop-blur-sm my-0 mx-0 mt-1 mb-0">
-    
-    <!-- CONTADOR 1: USUARIOS ACTIVOS -->
-    <div class="bg-slate-950/30 border border-slate-850/20 px-2 py-1 rounded-lg flex items-center justify-between relative overflow-hidden">
-        <div class="flex flex-col">
-            <span class="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Usuarios Activos</span>
-            <h3 id="simulated-active-users" class="text-xs font-black text-slate-100 tracking-tight leading-none">--</h3>
-        </div>
-        <span class="flex h-1 w-1 relative flex-shrink-0 ml-1.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-1 w-1 bg-emerald-500"></span>
-        </span>
-    </div>
+        <div class="max-w-md mx-auto grid grid-cols-2 gap-2 p-1.5 bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800/40 rounded-xl shadow-md backdrop-blur-sm mt-1">
+            
+            <!-- CONTADOR 1: USUARIOS ACTIVOS -->
+            <div class="bg-slate-950/30 border border-slate-850/20 px-2 py-1 rounded-lg flex items-center justify-between relative overflow-hidden">
+                <div class="flex flex-col">
+                    <span class="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Usuarios Activos</span>
+                    <h3 id="simulated-active-users" class="text-xs font-black text-slate-100 tracking-tight leading-none">--</h3>
+                </div>
+                <span class="flex h-1 w-1 relative flex-shrink-0 ml-1.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1 w-1 bg-emerald-500"></span>
+                </span>
+            </div>
 
-    <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
-    <div class="bg-slate-950/30 border border-slate-850/20 px-2 py-1 rounded-lg flex items-center justify-between relative overflow-hidden">
-        <div class="flex flex-col">
-            <span class="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Anuncios en Web</span>
-            <h3 id="simulated-total-ads" class="text-xs font-black text-amber-400 tracking-tight leading-none">--</h3>
-        </div>
-        <i class="fa-solid fa-chart-line text-[9px] text-amber-500/40 flex-shrink-0 ml-1.5"></i>
-    </div>
+            <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
+            <div class="bg-slate-950/30 border border-slate-850/20 px-2 py-1 rounded-lg flex items-center justify-between relative overflow-hidden">
+                <div class="flex flex-col">
+                    <span class="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-none mb-0.5">Anuncios en Web</span>
+                    <h3 id="simulated-total-ads" class="text-xs font-black text-amber-400 tracking-tight leading-none">--</h3>
+                </div>
+                <i class="fa-solid fa-chart-line text-[9px] text-amber-500/40 flex-shrink-0 ml-1.5"></i>
+            </div>
 
-</div> <!-- Cierre de #view-catalog -->
+        </div> <!-- Cierre de la tarjeta -->
 
-    <!-- ============================================================ -->
-    <!-- ABAJO DE ESTO YA PUEDES PEGAR EL SCRIPT DE JAVASCRIPT Y EL </body> -->
-    <!-- ============================================================ -->
-  <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
+        <!-- ====================================================================== -->
+        <!-- EL RESTO DE TU CONTENIDO SE ACOPLA DEBAJO SIN AGUJEROS -->
+        <!-- ====================================================================== -->
+
+        <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
         <section id="carousel-section" class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden">
             <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-fire animate-pulse"></i> Anúnciate en los mejores canales de Telegram.</p>
             <div class="relative min-h-[75px] flex items-center">
@@ -632,7 +626,8 @@
 
         <!-- CONTENEDOR DE TARJETAS -->
         <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
-    </main>
+
+    </main> <!-- Cierre correcto de #view-catalog -->
 
     <!-- VISTA: MISIONES RECOMPENSADAS -->
     <main id="view-missions" class="p-4 max-w-4xl mx-auto space-y-4 hidden">
