@@ -101,7 +101,7 @@
             <h2 class="text-xl font-black text-amber-400">¡Enhorabuena, <span id="gift-username">crack</span>!</h2>
             <p class="text-[11px] text-slate-300">Has desbloqueado con éxito el premio especial:</p>
             <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-sm font-bold text-white" id="gift-reward-name">
-                Premio de Ejemplo
+                Premio
             </div>
             <p class="text-[10px] text-slate-400">El regalo se ha añadido a tu carrito de compras listo para enviar a Telegram.</p>
             <button onclick="closeGiftModal()" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/20 cursor-pointer">¡Genial!</button>
@@ -646,7 +646,7 @@
         <!-- Bloque de Input para escribir (ESTO ERA LO QUE TE FALTABA CERRAR) -->
         <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5 flex-shrink-0">
             <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-            <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
+            <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
         </div>
 
     </div> <!-- Cierre definitivo de la ventana principal -->
@@ -1157,10 +1157,10 @@
         function resetearTodoSistema() {
             localStorage.clear();
             favoritos = []; carrito = []; historialCampanas = []; claimedRewards = []; missionTimers = {};
-            userPoints = 2500; lastSpinTime = null; totalSesionesHoy = 0; ultimaSesionFecha = ""; ofertaFlashCanceladaHoy = false;
+            userPoints = 0; lastSpinTime = null; totalSesionesHoy = 0; ultimaSesionFecha = ""; ofertaFlashCanceladaHoy = false;
             activeCoupon = null; activeCouponPct = 0; userRole = "Anunciante";
 
-            localStorage.setItem('ads_user_points', '2500');
+            localStorage.setItem('ads_user_points', '0');
             localStorage.setItem('ads_favoritos', JSON.stringify([]));
             localStorage.setItem('ads_carrito', JSON.stringify([]));
             localStorage.setItem('ads_historial', JSON.stringify([]));
