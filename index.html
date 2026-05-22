@@ -263,9 +263,15 @@
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
                 <!-- 🌟 NUEVO ENLACE DIRECTO AL CENTRO DE AYUDA -->
-    <button onclick="navigateToSection('view-faq'); toggleAvatarMenu(false);" class="w-full text-left p-2 text-xs text-slate-300 hover:bg-slate-900 rounded-lg flex items-center gap-2 border-t border-slate-900 mt-1 pt-2">
-        <i class="fa-solid fa-circle-info text-amber-400"></i> Ayuda y FAQ
-    </button>
+<button onclick="navigateToSection('view-faq'); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors cursor-pointer border-t border-slate-800/40 mt-1 pt-2">
+    <span class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-question text-amber-400 w-4"></i> 
+        Soporte y Ayuda
+    </span>
+    <span class="text-[9px] bg-emerald-500/10 text-emerald-400 font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wide">
+        FAQ
+    </span>
+</button>
                 <div class="border-t border-slate-800/60 my-1"></div>
                 <!-- BOTÓN INTEGRADO DE RESETEO DE PRUEBA -->
                 <button onclick="resetearTodoSistema(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 flex items-center gap-2 transition-colors cursor-pointer">
