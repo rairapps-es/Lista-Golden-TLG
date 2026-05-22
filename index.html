@@ -88,48 +88,6 @@
         <h2 class="mt-6 font-bold text-xs text-slate-400 tracking-widest uppercase">Cargando Golden Ads...</h2>
     </div>
 
-    <!-- TARJETA DE ESTADÍSTICAS EN VIVO (MÉTRICAS SIMULADAS) -->
-<div class="max-w-md mx-auto grid grid-cols-2 gap-3 p-4 bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-slate-800/60 rounded-2xl shadow-xl backdrop-blur-xl my-4">
-    
-    <!-- CONTADOR 1: USUARIOS ACTIVOS -->
-    <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
-        <!-- Efecto de luz decorativa al fondo -->
-        <div class="absolute -right-4 -top-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
-        
-        <div class="flex items-center gap-2 mb-2">
-            <span class="flex h-2 w-2 relative">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">En Vivo</span>
-        </div>
-        
-        <div>
-            <!-- ID para el script de JavaScript -->
-            <h3 id="simulated-active-users" class="text-xl font-black text-slate-100 tracking-tight">--</h3>
-            <p class="text-[10px] text-slate-400 mt-0.5">Usuarios activos en la app</p>
-        </div>
-    </div>
-
-    <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
-    <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
-        <!-- Efecto de luz decorativa al fondo -->
-        <div class="absolute -right-4 -top-4 w-12 h-12 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
-        
-        <div class="flex items-center gap-1.5 mb-2 text-amber-400">
-            <i class="fa-solid fa-chart-line text-[11px]"></i>
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Histórico</span>
-        </div>
-        
-        <div>
-            <!-- ID para el script de JavaScript -->
-            <h3 id="simulated-total-ads" class="text-xl font-black text-amber-400 tracking-tight">--</h3>
-            <p class="text-[10px] text-slate-400 mt-0.5">Total anuncios publicados</p>
-        </div>
-    </div>
-
-</div>
-
     <!-- NOTIFICACIÓN POP-UP GLOBAL -->
     <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-slate-800 border border-slate-700/60 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center scale-75 transition-transform duration-300" id="toast-box">
@@ -589,7 +547,69 @@
 
     <!-- VISTA 1: CATÁLOGO -->
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-4">
+        <!-- CONTENEDOR PRINCIPAL DE TU HOME (Suele ser este) -->
+<div id="view-home" class="min-h-screen pb-24">
+
+    <!-- 1. TU CABECERA (Déjala intacta arriba del todo) -->
+    <header class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+        <!-- Aquí está tu logo de Golden Ads, saldo, avatar, etc. -->
+        <span class="font-bold text-amber-400">Golden Ads</span>
+    </header>
+
+    <!-- 2. CONTENIDO SCROLLABLE DE TU HOME -->
+    <div class="p-4 space-y-4">
         
+        <!-- 👋 Mensaje opcional de bienvenida si tienes uno (ej: Hola, Usuario) -->
+        <div class="text-xs text-slate-400">
+            ¡Hola, bienvenido de nuevo!
+        </div>
+
+        <!-- ====================================================================== -->
+        <!-- 🌟 AQUÍ DEBES PEGAR TU TARJETA DE ESTADÍSTICAS (DEBAJO DE LA CABECERA) -->
+        <!-- ====================================================================== -->
+        <!-- TARJETA DE ESTADÍSTICAS EN VIVO (MÉTRICAS SIMULADAS) -->
+        <div class="max-w-md mx-auto grid grid-cols-2 gap-3 p-4 bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-slate-800/60 rounded-2xl shadow-xl backdrop-blur-xl">
+            
+            <!-- CONTADOR 1: USUARIOS ACTIVOS -->
+            <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">En Vivo</span>
+                </div>
+                <div>
+                    <h3 id="simulated-active-users" class="text-xl font-black text-slate-100 tracking-tight">--</h3>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Usuarios activos en la app</p>
+                </div>
+            </div>
+
+            <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
+            <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-12 h-12 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
+                <div class="flex items-center gap-1.5 mb-2 text-amber-400">
+                    <i class="fa-solid fa-chart-line text-[11px]"></i>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Histórico</span>
+                </div>
+                <div>
+                    <h3 id="simulated-total-ads" class="text-xl font-black text-amber-400 tracking-tight">--</h3>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Total anuncios publicados</p>
+                </div>
+            </div>
+
+        </div>
+        <!-- ====================================================================== -->
+
+        <!-- 3. EL RESTO DE TUS COSAS (Botones de la Ruleta, Packs, Catálogo, etc.) -->
+        <div class="bg-slate-900 p-4 rounded-xl">
+            <!-- Tu ruleta o accesos rápidos de abajo... -->
+        </div>
+
+    </div>
+</div>
+
         <!-- CARRUSEL AUTOMÁTICO DE CANALES DESTACADOS -->
         <section id="carousel-section" class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-3.5 rounded-2xl shadow-xl relative overflow-hidden">
             <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-fire animate-pulse"></i> Anúnciate en los mejores canales de Telegram.</p>
