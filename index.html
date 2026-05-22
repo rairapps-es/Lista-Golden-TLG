@@ -2228,144 +2228,196 @@ let stringTelegram = encodeURIComponent(textoPlano);
     }
 }
         // Mantener el historial de la conversación para que el asistente tenga memoria a corto plazo
-        let aiChatHistory = [];
+        // Mantener el historial de la conversación para simular memoria corta si es necesario
+let aiChatHistory = [];
 
-        function toggleAiChat() {
-            const windowAi = document.getElementById('ai-chat-window');
-            windowAi.classList.toggle('hidden');
-            if(!windowAi.classList.contains('hidden')) {
-                const boxMsg = document.getElementById('ai-chat-messages');
-                boxMsg.scrollTop = boxMsg.scrollHeight;
-            }
-        }
+function toggleAiChat() {
+    const windowAi = document.getElementById('ai-chat-window');
+    windowAi.classList.toggle('hidden');
+    if(!windowAi.classList.contains('hidden')) {
+        const boxMsg = document.getElementById('ai-chat-messages');
+        boxMsg.scrollTop = boxMsg.scrollHeight;
+    }
+}
 
-        function openAiFromSocial() {
-            toggleSocialModal(false);
-            const windowAi = document.getElementById('ai-chat-window');
-            windowAi.classList.remove('hidden');
-            const boxMsg = document.getElementById('ai-chat-messages');
-            boxMsg.scrollTop = boxMsg.scrollHeight;
-        }
+function openAiFromSocial() {
+    toggleSocialModal(false); // Asumo que esta función existe en tu app externa
+    const windowAi = document.getElementById('ai-chat-window');
+    windowAi.classList.remove('hidden');
+    const boxMsg = document.getElementById('ai-chat-messages');
+    boxMsg.scrollTop = boxMsg.scrollHeight;
+}
 
-        function initAiAssistant() {
-            const container = document.getElementById('ai-chat-messages');
-            if(!container) return;
-            container.innerHTML = `
-                <div class="bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[85%] text-slate-300">
-                    👋 ¡Hola <strong>${tgUserName}</strong>! Soy el asistente virtual inteligente de Golden Ads. ¿En qué puedo ayudarte a potenciar tus campañas de Telegram hoy?
-                </div>
-            `;
-            // Reiniciar historial al inicializar
-            aiChatHistory = [];
-        }
+function initAiAssistant() {
+    const container = document.getElementById('ai-chat-messages');
+    if(!container) return;
+    // Usamos el nombre de Telegram de forma dinámica
+    const userName = typeof tgUserName !== 'undefined' ? tgUserName : 'Líder';
+    
+    container.innerHTML = `
+        <div class="bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[85%] text-slate-300 animate-fade-in">
+            👋 ¡Hola <strong>${userName}</strong>! Soy <strong>Golden AI</strong>, tu asistente virtual inteligente. ¿En qué puedo ayudarte a potenciar tus campañas de Telegram hoy?
+        </div>
+    `;
+    aiChatHistory = [];
+}
 
-        function suggestQuestion(text) {
-            document.getElementById('ai-user-input').value = text;
-            sendAiMessage();
-        }
+function suggestQuestion(text) {
+    document.getElementById('ai-user-input').value = text;
+    sendAiMessage();
+}
 
-        async function sendAiMessage() {
-            const input = document.getElementById('ai-user-input');
-            const val = input.value.trim();
-            if(!val) return;
+// 🤖 MOTOR INTERNO DE RESPUESTAS PREDEFINIDAS PROFESIONALES
+function getSimulatedAiResponse(userInput) {
+    // 1. Normalizar el texto del usuario: pasamos a minúsculas y limpiamos acentos/signos
+    const cleanText = userInput.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita acentos
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()??]/g,""); // Quita signos
 
-            const container = document.getElementById('ai-chat-messages');
-            
-            // 1. Añadir el mensaje del usuario a la pantalla
-            const userDiv = document.createElement('div');
-            userDiv.className = "bg-sky-600 text-white p-2.5 rounded-xl max-w-[85%] ml-auto text-right font-medium animate-fade-in";
-            userDiv.innerText = val;
-            container.appendChild(userDiv);
-            
-            input.value = "";
-            container.scrollTop = container.scrollHeight;
+    // Helper para verificar si el texto incluye palabras
+    const contains = (words) => words.some(word => cleanText.includes(word));
 
-            // Guardar en la memoria local el mensaje del usuario
-            aiChatHistory.push({ role: "user", content: val });
+    const userName = typeof tgUserName !== 'undefined' ? tgUserName : 'Usuario';
 
-            // 2. Crear burbuja de carga ("Escribiendo...")
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = "ai-loading-bubble";
-            loadingDiv.className = "bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[40%] text-slate-400 flex items-center gap-1 animate-fade-in";
-            loadingDiv.innerHTML = `
-                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-            `;
-            container.appendChild(loadingDiv);
-            container.scrollTop = container.scrollHeight;
+    // 2. MATRIZ DE CONFIGURACIÓN DE FILTROS Y PALABRAS CLAVE
+    
+    // Categoría: Ruleta de la fortuna
+    if (contains(['ruleta', 'suerte', 'fortuna', 'giro', 'gratis', 'puntos', 'ganar puntos'])) {
+        return `🎯 **¡La Ruleta de la Fortuna!** Es nuestra sección de recompensas diarias gratuitas.<br><br>
+        • Puedes girarla **cada 24 horas** de forma garantizada.<br>
+        • Otorga de manera aleatoria hasta **250 puntos acumulables**.<br>
+        • No requiere inversión y puedes usar esos puntos directamente en la sección de premios.<br><br>
+        ¿Te interesa saber cómo cambiar esos puntos, **${userName}**?`;
+    }
 
-            // 3. System Prompt exhaustivo con toda la data de la app
-            const systemPrompt = `Eres "Golden AI", el asistente virtual inteligente de "Golden Ads" (la plataforma publicitaria oficial y ecosistema de ListaGolden para Telegram). Tu objetivo es guiar de forma entusiasta, concisa, profesional y directa a los usuarios en base a las siguientes reglas e información del sistema:
-- Cliente actual interactuando: Su nombre es ${tgUserName || 'Usuario'}. Háblale de manera personalizada.
-- Formato de respuesta: Usa negritas (**texto**) para destacar elementos cruciales y emojis para mantener una lectura visual y ágil. Sé breve, tus respuestas deben caber cómodamente en una pantalla de chat pequeña.
+    // Categoría: Canjear Premios / Tienda de Puntos
+    if (contains(['canjear', 'premios', 'tienda', 'recompensa', 'reclamar', 'intercambiar', 'puntos por saldo'])) {
+        return `🎁 **Sección Canjear Premios:** Aquí es donde ocurre la magia con los puntos que ganas en la ruleta.<br><br>
+        Puedes intercambiar tus puntos acumulados por:<br>
+        • **Saldo de publicidad gratis** para tus campañas en canales.<br>
+        • **Mejoras exclusivas de catálogo** para destacar tus ofertas.<br><br>
+        Accede a este apartado rápidamente pulsando el botón de tu **Avatar** arriba a la derecha y seleccionando **"Canjear Premios"**.`;
+    }
 
-INFORMACIÓN DE LA WEB APP / LISTAGOLDEN:
-1. Roles del Sistema:
-   - Anunciante (Comprador de publicidad): Por defecto. Compra packs de promoción o espacios en canales.
-   - Creador de contenido: Para registrar, verificar y rentabilizar canales de Telegram propios. Se cambia pulsando en el Avatar (arriba a la derecha).
-2. Métodos de pago automáticos: Aceptamos de manera nativa e inmediata PayPal, USDT (Red TRC20) y Estrellas Oficiales de Telegram.
-3. Secciones especiales:
-   - Ruleta de la Fortuna: Recompensa gratis cada 24 horas. Otorga de forma aleatoria hasta 250 puntos acumulables.
-   - Canjear Premios: Menú donde los puntos acumulados de la ruleta se intercambian por saldo de publicidad gratis o mejoras de catálogo.
-   - Mega Pack Especial: Promociones empaquetadas con descuentos masivos para impulsar tráfico de canales.
-4. Soporte técnico Humano: Si el usuario tiene un problema con un pago, requiere una verificación manual o reporta un fallo crítico, indícale amablemente que use la opción "Soporte Telegram" ubicada en el menú de su Avatar o en el área de Comunidad para hablar con un administrador real.
+    // Categoría: Métodos de pago
+    if (contains(['pago', 'pagar', 'comprar', 'paypal', 'usdt', 'crypto', 'cripto', 'estrellas', 'trc20', 'recargar', 'saldo'])) {
+        return `💳 **Métodos de Pago Automatizados:** En **Golden Ads** procesamos todo de manera inmediata y nativa para tu comodidad.<br><br>
+        Aceptamos de forma 100% automatizada:<br>
+        • 🅿️ **PayPal** (Carga segura)<br>
+        • 🪙 **USDT (Red TRC20)** (Ideal para transacciones cripto sin fricción)<br>
+        • ⭐ **Estrellas Oficiales de Telegram** (Directo desde la app)<br><br>
+        El saldo se acredita en tu cuenta en segundos tras la confirmación de la red.`;
+    }
 
-Responde únicamente basándote en este contexto técnico. Si te preguntan algo totalmente ajeno a Telegram o a la plataforma publicitaria, redirige la conversación elegantemente hacia Golden Ads.`;
+    // Categoría: Mega Packs de Promoción
+    if (contains(['pack', 'megapack', 'mega pack', 'oferta', 'descuento', 'promocion', 'barato'])) {
+        return `🔥 **Mega Packs Especiales:** Diseñados específicamente para inversores y anunciantes que buscan el máximo rendimiento.<br><br>
+        • Son ofertas empaquetadas por la administración con **descuentos masivos de hasta un 40% OFF**.<br>
+        • Ideales para generar picos de tráfico rápidos y masivos hacia tus canales, bots o proyectos.<br>
+        • Puedes ver los packs disponibles directamente en la sección principal de la app.`;
+    }
 
-            // Construir el payload respetando el formato de Pollinations
-            const messagesPayload = [
-                { role: "system", content: systemPrompt },
-                ...aiChatHistory
-            ];
+    // Categoría: Creadores de contenido (Registrar canales)
+    if (contains(['creador', 'canal', 'canales', 'vender', 'registrar', 'añadir canal', 'miembros', 'requisitos'])) {
+        return `📣 **Sección para Creadores de Contenido:** ¡Monetiza tu comunidad de Telegram de forma profesional con nosotros!<br><br>
+        **Pasos para comenzar:**<br>
+        1. Pulsa en tu **Avatar** (arriba a la derecha) y cambia tu perfil al rol de **"Creador de Contenido"**.<br>
+        2. Ve a **"Mis Canales"** e introduce el enlace de tu comunidad.<br>
+        3. Sigue las instrucciones de nuestro bot oficial para verificar la propiedad.<br><br>
+        *Requisitos mínimos:* Contar con al menos **100 miembros reales**, interacción orgánica comprobable y contenido limpio que cumpla las normativas de Telegram.`;
+    }
 
-            try {
-                // Petición HTTP a Pollinations usando el modelo de texto OpenAI/Mistral equilibrado
-                const response = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: messagesPayload,
-                        model: "openai", // Usa arquitecturas avanzadas para procesamiento rápido
-                        jsonMode: false
-                    })
-                });
+    // Categoría: Anunciantes
+    if (contains(['anunciante', 'comprar publicidad', 'catalogo', 'publicar', 'campaña'])) {
+        return `📈 **Perfil de Anunciante:** Es el rol por defecto en nuestra Web App, enfocado en hacer despegar tus métricas.<br><br>
+        • Explora nuestro **Catálogo de Canales** verificados y segmentados por nichos.<br>
+        • Agrega los espacios que desees a la cesta de compras y gestiona los textos/enlaces de tus publicaciones de forma centralizada.<br>
+        • Monitorea el estado de tus campañas programadas en tiempo real.`;
+    }
 
-                if (!response.ok) throw new Error("Error en la respuesta de red");
-                
-                const replyText = await response.text();
+    // Categoría: Saludos y halagos
+    if (contains(['hola', 'buenas', 'saludos', 'tal', 'buenos dias', 'buenas noches'])) {
+        return `👋 ¡Hola de nuevo, **${userName}**! Qué gusto saludarte. Estoy aquí listo y optimizado para darte soporte sobre el ecosistema de **Golden Ads**. ¿Qué sección o duda te gustaría que verifiquemos hoy?`;
+    }
 
-                // Eliminar indicador de carga
-                if (document.getElementById('ai-loading-bubble')) {
-                    loadingDiv.remove();
-                }
+    // Categoría: Soporte Humano / Fallos críticos
+    if (contains(['ayuda', 'humano', 'soporte', 'admin', 'administrador', 'error', 'fallo', 'no funciona', 'ticket', 'problema'])) {
+        return `🛠️ **Centro de Asistencia Humana:** Entendido, si presentas algún inconveniente con un pago, requieres una verificación manual especial o quieres reportar algo inusual, necesitas un agente real.<br><br>
+        Por favor, dirígete al menú de tu **Avatar** arriba a la derecha y selecciona **"Soporte Telegram"** o usa los enlaces de nuestra comunidad. Serás redirigido con un administrador para darte una solución personalizada de inmediato.`;
+    }
 
-                // 4. Pintar respuesta real de la IA
-                const aiDiv = document.createElement('div');
-                aiDiv.className = "bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[85%] text-slate-300 animate-fade-in";
-                
-                // Formateamos saltos de línea por si la IA devuelve estructuras limpias
-                aiDiv.innerHTML = replyText.replace(/\n/g, '<br>');
-                container.appendChild(aiDiv);
+    // Categoría: Filtro de insultos o palabras no debidas
+    if (contains(['mierda', 'puta', 'estafa', 'pendejo', 'robar', 'mal', 'basura'])) {
+        return `🛡️ **Aviso del Sistema:** En **Golden Ads** mantenemos un ambiente profesional y automatizado de alto nivel. Si tienes un inconveniente o dudas sobre los términos de servicio, te sugiero contactar de forma educada a nuestro **Soporte Humano** desde el menú del Avatar para revisar tu caso minuciosamente.`;
+    }
 
-                // Guardar en el historial interno la respuesta del asistente para el hilo conversacional
-                aiChatHistory.push({ role: "assistant", content: replyText });
+    // 3. RESPUESTA DEFAULT INTELIGENTE (Si no detecta keywords)
+    return `🤖 **Golden AI:** He analizado tu consulta, **${userName}**, pero requiere mayor precisión corporativa.<br><br>
+    Para ayudarte de forma exacta, por favor asegúrate de mencionar una de mis especialidades:<br>
+    • 🎯 La **Ruleta de la Fortuna** o los **Premios**.<br>
+    • 💳 Métodos de pago (**PayPal, USDT, Estrellas**).<br>
+    • 🔥 Cómo comprar un **Mega Pack** promocional.<br>
+    • 📣 Cómo registrar tus **Canales** como Creador.<br><br>
+    *O si lo prefieres, escribe **"soporte"** para contactar a un administrador humano.*`;
+}
 
-            } catch (error) {
-                console.error("Error en Golden AI:", error);
-                if (document.getElementById('ai-loading-bubble')) {
-                    loadingDiv.remove();
-                }
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = "bg-red-950/40 border border-red-900/50 p-2.5 rounded-xl max-w-[85%] text-red-300 text-xs";
-                errorDiv.innerHTML = "❌ He tenido una microinterrupción en mi conexión con los servidores de Golden Ads. Por favor, intenta enviar tu mensaje de nuevo.";
-                container.appendChild(errorDiv);
-            }
+// ⚡ FUNCIÓN DE ENVÍO Y RENDERIZADO SIMULADO
+async function sendAiMessage() {
+    const input = document.getElementById('ai-user-input');
+    const val = input.value.trim();
+    if(!val) return;
 
-            // Desplazar el scroll vertical automáticamente al final de la conversación
-            container.scrollTop = container.scrollHeight;
-        }
+    const container = document.getElementById('ai-chat-messages');
+    
+    // 1. Imprimir mensaje del usuario
+    const userDiv = document.createElement('div');
+    userDiv.className = "bg-sky-600 text-white p-2.5 rounded-xl max-w-[85%] ml-auto text-right font-medium animate-fade-in";
+    userDiv.innerText = val;
+    container.appendChild(userDiv);
+    
+    input.value = "";
+    container.scrollTop = container.scrollHeight;
+
+    // Guardar en la memoria local por si acaso
+    aiChatHistory.push({ role: "user", content: val });
+
+    // 2. Crear indicador de carga realista ("Escribiendo...")
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = "ai-loading-bubble";
+    loadingDiv.className = "bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[40%] text-slate-400 flex items-center gap-1 animate-fade-in";
+    loadingDiv.innerHTML = `
+        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+    `;
+    container.appendChild(loadingDiv);
+    container.scrollTop = container.scrollHeight;
+
+    // 3. Simular retardo de procesamiento de la IA (Entre 800ms y 1.5s para realismo puro)
+    const delay = Math.floor(Math.random() * 700) + 800;
+
+    setTimeout(() => {
+        // Remover indicador de carga de forma segura
+        const bubble = document.getElementById('ai-loading-bubble');
+        if (bubble) bubble.remove();
+
+        // Obtener la respuesta calculada por el motor de palabras clave
+        const replyText = getSimulatedAiResponse(val);
+
+        // 4. Renderizar la respuesta simulada hiper-profesional
+        const aiDiv = document.createElement('div');
+        aiDiv.className = "bg-slate-900 border border-slate-850 p-2.5 rounded-xl max-w-[85%] text-slate-300 animate-fade-in leading-relaxed text-xs";
+        aiDiv.innerHTML = replyText;
+        
+        container.appendChild(aiDiv);
+        
+        // Guardar respuesta en historial
+        aiChatHistory.push({ role: "assistant", content: replyText });
+        
+        // Scroll automático
+        container.scrollTop = container.scrollHeight;
+    }, delay);
+}
     </script>
 </body>
 </html>
