@@ -2462,7 +2462,7 @@ async function sendAiMessage() {
 
         // 1. Si es la primera vez que entra, definimos un valor inicial intermedio fijo
         if (activeUsers === 0) {
-            activeUsers = 215; 
+            activeUsers = 15; 
             localStorage.setItem('golden_active_users', activeUsers);
         } 
         // 2. Cada 2 recargas/sesiones, aplicamos una fluctuación ligera y realista
@@ -2472,8 +2472,8 @@ async function sendAiMessage() {
             activeUsers += fluctuation;
 
             // Mantenemos el contador dentro de los límites lógicos originales (142 - 289)
-            if (activeUsers < 142) activeUsers = 142;
-            if (activeUsers > 289) activeUsers = 289;
+            if (activeUsers < 5) activeUsers = 5;
+            if (activeUsers > 22) activeUsers = 22;
 
             sessionCounter = 0;
             localStorage.setItem('golden_active_users', activeUsers);
