@@ -815,22 +815,8 @@
         </div>
     </main>
 
-    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
-       <!-- ASISTENTE CHAT FLOTANTE CON IA -->
-<div id="ai-chat-window" class="fixed bottom-24 right-4 z-50 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col animate-fade-in h-96">
-    
-    <!-- Cabecera del Asistente (Fijo arriba) -->
-    <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center flex-shrink-0">
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-            <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
-        </div>
-        <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
-    </div>
-    
-    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
-<!-- ====================================================================== -->
-<!-- ASISTENTE CHAT FLOTANTE CON IA (COMPLETAMENTE AISLADO Y CERRADO) -->
+   <!-- ====================================================================== -->
+<!-- ASISTENTE CHAT FLOTANTE CON IA (CORREGIDO SIN DUPLICADOS)              -->
 <!-- ====================================================================== -->
 <div id="ai-chat-window" class="fixed bottom-24 right-4 z-50 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden flex-col animate-fade-in h-96">
     
@@ -843,8 +829,8 @@
         <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
     </div>
     
-    <!-- 2. Contenedor de Mensajes (Con scroll y cálculo rígido para evitar desbordamientos) -->
-    <div id="ai-chat-messages" style="height: calc(384px - 175px);" class="p-3 overflow-y-auto space-y-2 text-[11px] bg-slate-950/40 flex-1"></div>
+    <!-- 2. Contenedor de Mensajes (Con scroll y cálculo para evitar que se escondan) -->
+    <div id="ai-chat-messages" style="height: calc(384px - 175px); min-h-0;" class="p-3 overflow-y-auto space-y-2 text-[11px] bg-slate-950/40 flex-1"></div>
     
     <!-- 3. Bloque de Sugerencias Rápidas -->
     <div id="ai-suggestions" class="p-2 bg-slate-950/80 border-t border-slate-850 flex flex-col gap-1 flex-shrink-0">
@@ -859,7 +845,9 @@
         <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
     </div>
 
-</div> <!-- <-- ESTE ES EL CIERRE EXCLUSIVO DEL CHAT FLOTANTE -->
+</div> <!-- Cierre total de la ventana -->
+ 
+<!-- <-- ESTE ES EL CIERRE EXCLUSIVO DEL CHAT FLOTANTE -->
 <!-- Tu menú inferior (Navbar) debe empezar AQUÍ ABAJO, completamente libre del chat -->
 
  <!-- Cierre definitivo de la ventana principal -->
