@@ -137,7 +137,7 @@
     <!-- ENCABEZADO FIJO DE LA PÁGINA -->
     <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center safe-top">
         <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-            <i class="fa-solid fa-circle-question"></i> Centro de Ayuda Profesional
+            <i class="fa-solid fa-circle-question"></i> Centro de Ayuda
         </h2>
         <!-- Botón para cerrar la página y volver atrás -->
         <button onclick="closeFaqPage()" class="text-slate-400 hover:text-slate-200 text-xs bg-slate-800 hover:bg-slate-750 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
@@ -154,7 +154,7 @@
 
         <!-- PESTAÑAS DE NAVEGACIÓN (SELECTOR DE ROL) -->
         <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 max-w-md mx-auto">
-            <button onclick="switchFaqTab('anunciante')" id="tab-faq-anunciante" class="py-2 text-xs font-bold rounded-lg transition-all bg-amber-400 text-slate-950 shadow cursor-pointer">
+            <button onclick="switchFaqTab('anunciante'); lanzarFuegosArtificiales()" id="tab-faq-anunciante" class="py-2 text-xs font-bold rounded-lg transition-all bg-amber-400 text-slate-950 shadow cursor-pointer">
                 <i class="fa-solid fa-bullhorn mr-1"></i> Anunciantes
             </button>
             <button onclick="switchFaqTab('creador')" id="tab-faq-creador" class="py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200 cursor-pointer">
@@ -417,7 +417,7 @@
                 
                 <!-- ALTERNADOR DE PERFIL / ROL -->
                 <div class="px-4 py-1.5">
-                    <button onclick="toggleUserRole(); toggleUserMenu(event)" class="w-full bg-gradient-to-r from-slate-850 to-slate-800 border border-slate-750 p-2 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer">
+                    <button onclick="toggleUserRole(); toggleUserMenu(event); lanzarFuegosArtificiales()" class="w-full bg-gradient-to-r from-slate-850 to-slate-800 border border-slate-750 p-2 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer">
                         <div>
                             <p class="text-[9px] text-slate-500 uppercase font-bold">Perfil Actual</p>
                             <p id="role-display-text" class="text-xs font-black text-sky-400">Anunciante</p>
@@ -431,7 +431,7 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-rectangle-ad text-sky-400 w-4"></i> Mis Campañas</span>
                     <span id="menu-campaigns-count" class="text-[9px] bg-sky-500/20 text-sky-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
-                <button onclick="toggleRewardsModal(true); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors cursor-pointer">
+                <button onclick="toggleRewardsModal(true); toggleUserMenu(event); lanzarConfeti()" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors cursor-pointer">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
@@ -546,7 +546,6 @@
     </div>
     
         <!-- VISTA 1: CATÁLOGO -->
-        <!-- VISTA 1: CATÁLOGO -->
     <main id="view-catalog" class="p-4 max-w-4xl mx-auto space-y-3">
 
         <!-- ====================================================================== -->
@@ -596,7 +595,7 @@
         <!-- BANNER AGREGA TU CANAL -->
         <section id="banner-add-channel" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-[1.5px] rounded-2xl shadow-xl hidden relative">
             <button onclick="closeBannerPermanently(event)" class="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/40 text-slate-300 flex items-center justify-center text-[10px] hover:bg-black/60 z-10 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            <button onclick="openAddChannelModal()" class="w-full bg-slate-900 hover:bg-slate-850 p-3.5 rounded-[15px] flex items-center justify-between cursor-pointer text-left pr-8">
+            <button onclick="openAddChannelModal(); lanzarFuegosArtificiales()" class="w-full bg-slate-900 hover:bg-slate-850 p-3.5 rounded-[15px] flex items-center justify-between cursor-pointer text-left pr-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl border border-orange-500/20">🚀</div>
                     <div>
@@ -610,7 +609,7 @@
         <!-- FILTROS Y CATEGORÍAS -->
         <section id="filters-section" class="bg-slate-800/40 p-3 rounded-2xl border border-slate-700/40 flex items-center gap-2 justify-between">
             <div class="flex gap-1.5 overflow-x-auto scrollbar-none py-0.5" id="category-filters">
-                <button onclick="filterCategory('todos', event)" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30 whitespace-nowrap cursor-pointer">Todos</button>
+                <button onclick="filterCategory('todos', event); lanzarFuegosArtificiales()" class="cat-btn bg-sky-500/20 text-sky-300 px-3 py-1 rounded-xl text-xs font-semibold border border-sky-500/30 whitespace-nowrap cursor-pointer">Todos</button>
                 <button onclick="filterCategory('Tecnología', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap cursor-pointer">Tecnología</button>
                 <button onclick="filterCategory('Finanzas', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap cursor-pointer">Finanzas</button>
                 <button onclick="filterCategory('Entretenimiento', event)" class="cat-btn bg-slate-800 text-slate-400 px-3 py-1 rounded-xl text-xs font-semibold border border-slate-700 whitespace-nowrap cursor-pointer">Entretenimiento</button>
@@ -735,7 +734,7 @@
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="closeFlashOffer(false)" class="bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 cursor-pointer">Rechazar</button>
-                <button onclick="claimFlashOffer()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/10 cursor-pointer">Comprar</button>
+                <button onclick="claimFlashOffer(); lanzarConfeti()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-500/10 cursor-pointer">Comprar</button>
             </div>
         </div>
     </div>
@@ -770,7 +769,7 @@
                             </select>
                         </div>
 
-                        <button onclick="submitChannelRegistration('alta')" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 hover:from-amber-500 hover:to-orange-600 p-2.5 rounded-xl font-bold text-slate-200 hover:text-slate-950 transition-all uppercase tracking-wider text-[10px] cursor-pointer">Solicitar Alta ($19.99 Lifetime)</button>
+                        <button onclick="submitChannelRegistration('alta'); lanzarConfeti()" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 hover:from-amber-500 hover:to-orange-600 p-2.5 rounded-xl font-bold text-slate-200 hover:text-slate-950 transition-all uppercase tracking-wider text-[10px] cursor-pointer">Solicitar Alta ($19.99 Lifetime)</button>
                     </div>
                 </div>
 
@@ -924,7 +923,7 @@
                         ¿Tienes un cupón de descuento?
                     </button>
                     <div id="coupon-input-field" class="hidden mt-2 flex gap-2">
-                        <input type="text" id="coupon-code-input" placeholder="LISTAGOLDEN20OFF" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 focus:outline-none text-[11px]">
+                        <input type="text" id="coupon-code-input" placeholder="LISTAGOLDEN38Shi" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 focus:outline-none text-[11px]">
                         <button onclick="validateCouponCode()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-xl text-[11px] cursor-pointer">Validar</button>
                     </div>
                     <div id="coupon-error-box" class="hidden mt-2 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-rose-400 text-[10px]">
@@ -959,7 +958,7 @@
                     <div class="flex justify-between items-center pt-1 border-t border-slate-800"><span class="text-slate-200 font-bold text-sm">Total Neto:</span><span id="cart-total" class="text-xl font-black text-emerald-400">$0.00 USD</span></div>
                 </div>
                 
-                <button onclick="checkout()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer text-white shadow-lg">
+                <button onclick="checkout(); lanzarConfeti()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex justify-center items-center gap-2 cursor-pointer text-white shadow-lg">
                     <i class="fa-brands fa-telegram"></i> Hacer Pedido en Telegram
                 </button>
             </div>
@@ -2513,6 +2512,47 @@ async function sendAiMessage() {
     // Ejecutar automáticamente al cargar la Web App
     document.addEventListener('DOMContentLoaded', initSimulatedStats);
 </script>
+    <script>
+// 🎉 EFECTO 1: Explosión de Confeti desde el centro
+function lanzarConfeti() {
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }, // Sale un poco más abajo del centro, ideal para móviles
+        colors: ['#f59e0b', '#38bdf8', '#10b981', '#ec4899', '#f43f5e'] // Colores combinados con tu tema Slate/Amber
+    });
+}
 
+// 🎆 EFECTO 2: Fuegos Artificiales Continuos (Dura 3 segundos)
+function lanzarFuegosArtificiales() {
+    const duration = 3 * 1000; // 3 segundos
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+            return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        
+        // Dispara fuegos artificiales aleatoriamente por los lados de la pantalla
+        confetti(Object.assign({}, defaults, { 
+            particleCount, 
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+        }));
+        confetti(Object.assign({}, defaults, { 
+            particleCount, 
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+        }));
+    }, 250);
+}
+</script>
 </body>
 </html>
