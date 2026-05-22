@@ -88,6 +88,48 @@
         <h2 class="mt-6 font-bold text-xs text-slate-400 tracking-widest uppercase">Cargando Golden Ads...</h2>
     </div>
 
+    <!-- TARJETA DE ESTADÍSTICAS EN VIVO (MÉTRICAS SIMULADAS) -->
+<div class="max-w-md mx-auto grid grid-cols-2 gap-3 p-4 bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-slate-800/60 rounded-2xl shadow-xl backdrop-blur-xl my-4">
+    
+    <!-- CONTADOR 1: USUARIOS ACTIVOS -->
+    <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
+        <!-- Efecto de luz decorativa al fondo -->
+        <div class="absolute -right-4 -top-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+        
+        <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">En Vivo</span>
+        </div>
+        
+        <div>
+            <!-- ID para el script de JavaScript -->
+            <h3 id="simulated-active-users" class="text-xl font-black text-slate-100 tracking-tight">--</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Usuarios activos en la app</p>
+        </div>
+    </div>
+
+    <!-- CONTADOR 2: ANUNCIOS PUBLICADOS -->
+    <div class="bg-slate-950/50 border border-slate-850/40 p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden group">
+        <!-- Efecto de luz decorativa al fondo -->
+        <div class="absolute -right-4 -top-4 w-12 h-12 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
+        
+        <div class="flex items-center gap-1.5 mb-2 text-amber-400">
+            <i class="fa-solid fa-chart-line text-[11px]"></i>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Histórico</span>
+        </div>
+        
+        <div>
+            <!-- ID para el script de JavaScript -->
+            <h3 id="simulated-total-ads" class="text-xl font-black text-amber-400 tracking-tight">--</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">Total anuncios publicados</p>
+        </div>
+    </div>
+
+</div>
+
     <!-- NOTIFICACIÓN POP-UP GLOBAL -->
     <div id="success-toast" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-slate-800 border border-slate-700/60 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center scale-75 transition-transform duration-300" id="toast-box">
@@ -2418,6 +2460,49 @@ async function sendAiMessage() {
         container.scrollTop = container.scrollHeight;
     }, delay);
 }
+    </script>
+    <script>
+        // ====== SISTEMA DE ESTADÍSTICAS SIMULADAS ======
+        function initSimulatedStats() {
+            let sessionCounter = parseInt(localStorage.getItem('golden_session_count')) || 0;
+            let activeUsers = parseInt(localStorage.getItem('golden_active_users')) || 0;
+            sessionCounter++;
+
+            if (activeUsers === 0 || sessionCounter >= 2) {
+                activeUsers = Math.floor(Math.random() * (289 - 142 + 1)) + 142;
+                sessionCounter = 0;
+                localStorage.setItem('golden_active_users', activeUsers);
+            }
+            localStorage.setItem('golden_session_count', sessionCounter);
+            
+            const activeUsersEl = document.getElementById('simulated-active-users');
+            if (activeUsersEl) activeUsersEl.innerText = activeUsers.toLocaleString();
+
+            let totalAds = parseInt(localStorage.getItem('golden_total_ads'));
+            let lastUpdateDate = localStorage.getItem('golden_last_ads_date');
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (isNaN(totalAds) || totalAds === null) {
+                totalAds = 7;
+                lastUpdateDate = todayStr;
+                localStorage.setItem('golden_total_ads', totalAds);
+                localStorage.setItem('golden_last_ads_date', lastUpdateDate);
+            } else {
+                if (lastUpdateDate !== todayStr) {
+                    const options = [3, 7, 12];
+                    const randomAdd = options[Math.floor(Math.random() * options.length)];
+                    totalAds += randomAdd;
+                    localStorage.setItem('golden_total_ads', totalAds);
+                    localStorage.setItem('golden_last_ads_date', todayStr);
+                }
+            }
+
+            const totalAdsEl = document.getElementById('simulated-total-ads');
+            if (totalAdsEl) totalAdsEl.innerText = totalAds.toLocaleString();
+        }
+
+        // Ejecutar automáticamente al cargar la Web App
+        document.addEventListener('DOMContentLoaded', initSimulatedStats);
     </script>
 </body>
 </html>
