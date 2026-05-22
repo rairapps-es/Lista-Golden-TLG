@@ -262,6 +262,10 @@
                     <span class="flex items-center gap-2"><i class="fa-solid fa-gift text-amber-400 w-4"></i> Canjear Premios</span>
                     <span id="menu-rewards-count" class="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
                 </button>
+                <!-- 🌟 NUEVO ENLACE DIRECTO AL CENTRO DE AYUDA -->
+    <button onclick="navigateToSection('view-faq'); toggleAvatarMenu(false);" class="w-full text-left p-2 text-xs text-slate-300 hover:bg-slate-900 rounded-lg flex items-center gap-2 border-t border-slate-900 mt-1 pt-2">
+        <i class="fa-solid fa-circle-info text-amber-400"></i> Ayuda y FAQ
+    </button>
                 <div class="border-t border-slate-800/60 my-1"></div>
                 <!-- BOTÓN INTEGRADO DE RESETEO DE PRUEBA -->
                 <button onclick="resetearTodoSistema(); toggleUserMenu(event)" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/20 flex items-center gap-2 transition-colors cursor-pointer">
@@ -959,7 +963,57 @@
                 dynamicAdCounts[c.id] = Math.abs(hash) % 4; 
             });
         }
+// 1. Alternar entre la pestaña de Anunciantes y Creadores
+function switchFaqTab(role) {
+    const tabAnunciante = document.getElementById('tab-faq-anunciante');
+    const tabCreador = document.getElementById('tab-faq-creador');
+    const wrapAnunciante = document.getElementById('wrapper-faq-anunciante');
+    const wrapCreador = document.getElementById('wrapper-faq-creador');
 
+    if(role === 'anunciante') {
+        // Estilos de botones activos/inactivos
+        tabAnunciante.className = "py-2 text-xs font-bold rounded-lg transition-all bg-amber-400 text-slate-950 shadow";
+        tabCreador.className = "py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200";
+        // Mostrar/Ocultar bloques
+        wrapAnunciante.classList.remove('hidden');
+        wrapCreador.classList.add('hidden');
+    } else {
+        tabCreador.className = "py-2 text-xs font-bold rounded-lg transition-all bg-amber-400 text-slate-950 shadow";
+        tabAnunciante.className = "py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200";
+        wrapCreador.classList.remove('hidden');
+        wrapAnunciante.classList.add('hidden');
+    }
+}
+// 2. Controlar la animación de colapsar/desplegar las respuestas (Acordeón)
+function toggleAccordion(idSuffix) {
+    const content = document.getElementById(`content-${idSuffix}`);
+    const icon = document.getElementById(`icon-${idSuffix}`);
+    
+    // Si ya está abierto, lo cerramos
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        content.style.maxHeight = '0px';
+        icon.classList.remove('rotate-180');
+    } else {
+        // Primero cerramos cualquier otro acordeón abierto para limpieza visual (opcional)
+        document.querySelectorAll('[id^="content-faq-"]').forEach(el => el.style.maxHeight = '0px');
+        document.querySelectorAll('[id^="icon-faq-"]').forEach(el => el.classList.remove('rotate-180'));
+        
+        // Abrimos el acordeón seleccionado calculando su altura real de contenido en pixeles
+        content.style.maxHeight = content.scrollHeight + "px";
+        icon.classList.add('rotate-180');
+    }
+}
+
+// 3. Abrir la ventana del chat de IA de Pollinations directo desde el FAQ
+function openAiFromFaq() {
+    // Si usas el sistema de vistas por ID, aseguramos abrir la ventana flotante
+    const windowAi = document.getElementById('ai-chat-window');
+    if(windowAi) {
+        windowAi.classList.remove('hidden');
+        const boxMsg = document.getElementById('ai-chat-messages');
+        if(boxMsg) boxMsg.scrollTop = boxMsg.scrollHeight;
+    }
+}
         function triggerFlashOfferModal() {
             document.getElementById('flash-offer-modal').classList.remove('hidden');
             let t = 3600;
@@ -1011,6 +1065,23 @@
             }, 16000);
         }
 
+function navigateToSection(targetId) {
+    // 1. Lista de todas las vistas/secciones principales que tienes en tu HTML
+    const sections = ['view-home', 'view-catalog', 'view-chat-ai', 'view-faq']; 
+    
+    // 2. Ocultamos todas las secciones añadiendo 'hidden'
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    
+    // 3. Mostramos únicamente la sección solicitada quitando 'hidden'
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+        targetElement.classList.remove('hidden');
+    }
+}
+        
         function checkRouletteAvailability() {
             const now = Date.now();
             const btnFlotante = document.getElementById('floating-roulette-trigger');
