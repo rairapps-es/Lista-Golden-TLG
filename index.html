@@ -126,6 +126,174 @@
         </div>
     </div>
 
+    <!-- PÁGINA FLOTANTE DE SOPORTE (PANTALLA COMPLETA) -->
+<div id="view-faq" class="fixed inset-0 z-50 bg-slate-950 flex flex-col hidden animate-fade-in">
+    
+    <!-- ENCABEZADO FIJO DE LA PÁGINA -->
+    <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center safe-top">
+        <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-circle-question"></i> Centro de Ayuda Profesional
+        </h2>
+        <!-- Botón para cerrar la página y volver atrás -->
+        <button onclick="closeFaqPage()" class="text-slate-400 hover:text-slate-200 text-xs bg-slate-800 hover:bg-slate-750 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </button>
+    </div>
+
+    <!-- CONTENIDO CON SCROLL INDEPENDIENTE (Para que no se corte nada) -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-5 pb-8">
+        
+        <div class="text-center max-w-sm mx-auto my-2">
+            <p class="text-[11px] text-slate-400">Resuelve tus dudas al instante divididas por tu rol en Golden Ads o consulta directamente a nuestra Inteligencia Artificial.</p>
+        </div>
+
+        <!-- PESTAÑAS DE NAVEGACIÓN (SELECTOR DE ROL) -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 max-w-md mx-auto">
+            <button onclick="switchFaqTab('anunciante')" id="tab-faq-anunciante" class="py-2 text-xs font-bold rounded-lg transition-all bg-amber-400 text-slate-950 shadow cursor-pointer">
+                <i class="fa-solid fa-bullhorn mr-1"></i> Anunciantes
+            </button>
+            <button onclick="switchFaqTab('creador')" id="tab-faq-creador" class="py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200 cursor-pointer">
+                <i class="fa-solid fa-pen-nib mr-1"></i> Creadores
+            </button>
+        </div>
+        
+        <!-- ================= CONTEXTO ANUNCIANTES ================= -->
+        <div id="wrapper-faq-anunciante" class="space-y-2.5 max-w-md mx-auto">
+            <!-- Pregunta 1 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-a1')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Cómo compro publicidad en los canales?</span>
+                    <i id="icon-faq-a1" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-a1" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Es muy sencillo. Explora el **Catálogo de Canales**, selecciona los que se adapten a tu nicho, agrégalos a tu cesta de compras y procede al pago. Tu campaña se programará automáticamente en el sistema.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 2 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-a2')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Qué métodos de pago aceptan?</span>
+                    <i id="icon-faq-a2" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-a2" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Aceptamos de forma automatizada e inmediata **PayPal**, criptomonedas como **USDT (Red TRC20)** y **Estrellas de Telegram**. El saldo se acredita en segundos tras la confirmación de la red.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 3 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-a3')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Qué es el Mega Pack Promocional?</span>
+                    <i id="icon-faq-a3" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-a3" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Son ofertas especiales empaquetadas con **descuentos masivos** (de hasta un 40% OFF) diseñadas por la administración para generar picos de tráfico rápidos y económicos hacia tus canales o proyectos.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 4 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-a4')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Puedo cancelar o editar una campaña activa?</span>
+                    <i id="icon-faq-a4" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-a4" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Las campañas se pueden editar desde tu panel de control siempre y cuando falten más de **12 horas** para su publicación programada. Una vez lanzada al canal de Telegram, no podrá modificarse.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 5 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-a5')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Cómo aplico un código de descuento?</span>
+                    <i id="icon-faq-a5" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-a5" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        En la pantalla de pago de tu carrito de compras, verás una casilla que indica **"¿Tienes un cupón?"**. Digita allí tu código promocional activo para descontar el porcentaje al instante.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- ================= CONTEXTO CREADORES DE CONTENIDO ================= -->
+        <div id="wrapper-faq-creador" class="space-y-2.5 max-w-md mx-auto hidden">
+            <!-- Pregunta 1 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-c1')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Cómo registro mi canal para vender anuncios?</span>
+                    <i id="icon-faq-c1" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-c1" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Primero, cambia tu perfil a **"Creador de Contenido"** desde tu Avatar. Luego, ve a la sección "Mis Canales", añade el enlace de tu canal y sigue los pasos del bot de verificación.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 2 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-c2')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Cuáles son los requisitos de aprobación?</span>
+                    <i id="icon-faq-c2" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-c2" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Tu canal debe contar con un mínimo de **100 miembros reales**, contenido activo y limpio (sin infringir normas de Telegram), y mantener una tasa de interacción orgánica verificable.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 3 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-c3')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Cuándo y cómo cobro mis ganancias?</span>
+                    <i id="icon-faq-c3" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-c3" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Los retiros se procesan cada vez que acumules un saldo mínimo de **$10.00 USD**. Puedes solicitar transferencias directas vía **USDT TRC20** o transferirlo a saldo de publicidad.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 4 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-c4')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Qué pasa si olvido publicar un anuncio vendido?</span>
+                    <i id="icon-faq-c4" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-c4" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        Si expira el tiempo pactado y el post no se detecta en el canal, los fondos son devueltos íntegramente al anunciante y tu reputación interna como creador se verá afectada.
+                    </p>
+                </div>
+            </div>
+            <!-- Pregunta 5 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <button onclick="toggleAccordion('faq-c5')" class="w-full text-left p-3.5 text-xs font-semibold flex justify-between items-center focus:outline-none hover:bg-slate-850/50 cursor-pointer">
+                    <span>¿Puedo rechazar un anuncio si no me gusta?</span>
+                    <i id="icon-faq-c5" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="content-faq-c5" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-950/40">
+                    <p class="p-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/40">
+                        **Sí totalmente**. Tienes un margen de 4 horas desde que llega la solicitud para rechazar una campaña si consideras que el contenido no encaja con la temática de tu comunidad.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCESO AL CHAT ASISTENTE IA POLLINATIONS -->
+        <div class="mt-4 pt-4 border-t border-slate-800 text-center max-w-md mx-auto">
+            <p class="text-[10px] text-slate-400 mb-3">¿Prefieres una asesoría guiada? Conversa con nuestro bot inteligente de IA.</p>
+            <button onclick="openAiFromFaq()" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-brain animate-pulse"></i> Consultar a Golden AI (Pollinations)
+            </button>
+        </div>
+
+    </div>
+</div>
     <!-- TARJETA FLOTANTE DE REPRODUCTOR DE VÍDEO (MISIONES) -->
     <div id="video-mission-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-sm p-5 rounded-2xl text-center space-y-4 shadow-2xl relative">
