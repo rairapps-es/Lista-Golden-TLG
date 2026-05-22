@@ -2460,31 +2460,33 @@ async function sendAiMessage() {
         let activeUsers = parseInt(localStorage.getItem('golden_active_users')) || 0;
         sessionCounter++;
 
-        // 1. Si es la primera vez que entra, definimos un valor inicial intermedio fijo
+        // 1. Si es la primera vez (0 o vacío), asignamos el valor inicial de forma segura
         if (activeUsers === 0) {
             activeUsers = 15; 
-            localStorage.setItem('golden_active_users', activeUsers);
         } 
-        // 2. Cada 2 recargas/sesiones, aplicamos una fluctuación ligera y realista
+        // 2. Cada 2 sesiones, aplicamos la fluctuación ligera
         else if (sessionCounter >= 2) {
             // Genera un cambio pequeño de entre -2 y +5
             const fluctuation = Math.floor(Math.random() * (5 - (-2) + 1)) + (-2);
             activeUsers += fluctuation;
 
-            // Mantenemos el contador dentro de los límites lógicos originales (142 - 289)
+            // Mantenemos el contador dentro de tus nuevos límites (5 - 22)
             if (activeUsers < 5) activeUsers = 5;
             if (activeUsers > 22) activeUsers = 22;
 
-            sessionCounter = 0;
-            localStorage.setItem('golden_active_users', activeUsers);
+            sessionCounter = 0; // Reseteamos el contador de flutuación
         }
         
+        // Guardamos AMBOS datos siempre actualizados en el localStorage
+        localStorage.setItem('golden_active_users', activeUsers);
         localStorage.setItem('golden_session_count', sessionCounter);
         
+        // Pintamos en el HTML
         const activeUsersEl = document.getElementById('simulated-active-users');
         if (activeUsersEl) activeUsersEl.innerText = activeUsers.toLocaleString();
 
-        // ====== CONTADOR DE ANUNCIOS HISTÓRICOS (MANTIENE TU LÓGICA) ======
+
+        // ====== CONTADOR DE ANUNCIOS HISTÓRICOS ======
         let totalAds = parseInt(localStorage.getItem('golden_total_ads'));
         let lastUpdateDate = localStorage.getItem('golden_last_ads_date');
         const todayStr = new Date().toISOString().split('T')[0];
