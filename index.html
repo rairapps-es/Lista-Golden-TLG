@@ -828,23 +828,36 @@
         <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
     </div>
     
-    <!-- 🌟 Contenedor de Mensajes (CORREGIDO: min-h-0 obliga al scroll a quedarse en su sitio) -->
-    <div id="ai-chat-messages" class="flex-1 min-h-0 p-3 overflow-y-auto space-y-2 text-[11px] bg-slate-950/40"></div>
+    <!-- ASISTENTE CHAT FLOTANTE CON IA -->
+<div id="ai-chat-window" class="fixed bottom-24 right-4 z-50 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden grid grid-rows-[auto_1fr_auto_auto] animate-fade-in h-96">
     
-    <!-- Bloque de Sugerencias Rápidas (Fijo abajo) -->
-    <div id="ai-suggestions" class="p-2 bg-slate-950/80 border-t border-slate-850 flex flex-col gap-1 flex-shrink-0">
+    <!-- Cabecera del Asistente -->
+    <div class="p-3 bg-gradient-to-r from-sky-600 to-indigo-600 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <span class="text-xs font-black uppercase text-slate-100">Asistente Golden AI</span>
+        </div>
+        <button onclick="toggleAiChat()" class="text-slate-200 text-sm cursor-pointer"><i class="fa-solid fa-minus"></i></button>
+    </div>
+    
+    <!-- Contenedor de Mensajes (En Grid, el overflow-y-auto funciona al 100% sin romperse) -->
+    <div id="ai-chat-messages" class="p-3 overflow-y-auto space-y-2 text-[11px] bg-slate-950/40"></div>
+    
+    <!-- Bloque de Sugerencias Rápidas -->
+    <div id="ai-suggestions" class="p-2 bg-slate-950/80 border-t border-slate-850 flex flex-col gap-1">
         <button onclick="suggestQuestion('¿Cómo puedo añadir y monetizar mi propio canal?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors cursor-pointer">🚀 ¿Cómo puedo añadir y monetizar mi propio canal?</button>
         <button onclick="suggestQuestion('¿Qué métodos de pago acepta la plataforma?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors cursor-pointer">💳 ¿Qué métodos de pago acepta la plataforma?</button>
         <button onclick="suggestQuestion('¿Cómo funciona la Ruleta de la Fortuna diaria?')" class="w-full text-left bg-slate-900 hover:bg-slate-800 text-[10px] text-sky-400 py-1 px-2 rounded border border-slate-800/60 truncate transition-colors cursor-pointer">💎 ¿Cómo funciona la Ruleta de la Fortuna diaria?</button>
     </div>
 
-    <!-- Bloque de Input para escribir (Fijo abajo) -->
-    <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5 flex-shrink-0">
+    <!-- Bloque de Input para escribir -->
+    <div class="p-2 bg-slate-950 border-t border-slate-800 flex gap-1.5">
         <input type="text" id="ai-user-input" onkeypress="if(event.key === 'Enter') sendAiMessage()" placeholder="Pregunta sobre la app..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
         <button onclick="sendAiMessage()" class="bg-sky-600 text-white p-2 rounded-xl text-xs cursor-pointer"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
     </div>
 
-</div> <!-- Cierre definitivo de la ventana principal -->
+</div>
+ <!-- Cierre definitivo de la ventana principal -->
 
     <!-- MENÚ INFERIOR FIJO EXTENDIDO -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around p-2 z-40 shadow-2xl">
