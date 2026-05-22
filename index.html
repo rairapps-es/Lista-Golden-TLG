@@ -1260,6 +1260,19 @@ function navigateToSection(targetId) {
         targetElement.classList.remove('hidden');
     }
 }
+
+        // Función para cerrar la página de soporte y redirigir al catálogo
+function closeFaqPage() {
+    // 1. Ocultamos la pantalla flotante de soporte
+    const faqPage = document.getElementById('view-faq');
+    if (faqPage) {
+        faqPage.classList.add('hidden');
+    }
+    
+    // 2. Activamos la vista del catálogo automáticamente
+    // Asegúrate de que 'view-catalog' coincida exactamente con el ID de tu sección de catálogo
+    navigateToSection('view-catalog'); 
+}
         
         function checkRouletteAvailability() {
             const now = Date.now();
