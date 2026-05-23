@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Barra de direcciones oscura en Android (Chrome, Edge, etc.) -->
-<meta name="theme-color" content="#020617">
+<meta name="theme-color" content="#0f172a">
 <!-- Barra de estado oscura en iOS (Safari para iPhone) -->
 <!-- 'black' tiñe la barra superior de negro sólido y pone los textos (hora/batería) en blanco -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -289,7 +289,7 @@
             </div>
         </div>
 
-        <!-- ACCESO AL CHAT ASISTENTE IA POLLINATIONS -->
+        <!-- ACCESO AL CHAT ASISTENTE IA -->
         <div class="mt-4 pt-4 border-t border-slate-800 text-center max-w-md mx-auto">
             <p class="text-[10px] text-slate-400 mb-3">¿Prefieres una asesoría guiada? Conversa con nuestro bot inteligente de IA.</p>
             <button onclick="openAiFromFaq()" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
@@ -2525,7 +2525,7 @@ async function sendAiMessage() {
         const todayStr = new Date().toISOString().split('T')[0];
 
         if (isNaN(totalAds) || totalAds === null) {
-            totalAds = 7;
+            totalAds = 57;
             lastUpdateDate = todayStr;
             localStorage.setItem('golden_total_ads', totalAds);
             localStorage.setItem('golden_last_ads_date', lastUpdateDate);
