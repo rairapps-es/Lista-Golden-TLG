@@ -625,6 +625,40 @@
 
         <!-- CONTENEDOR DE TARJETAS -->
         <div id="channels-container" class="grid gap-4 sm:grid-cols-2"></div>
+<!-- ====================================================================== -->
+<!-- ⭐ SECCIÓN DE TESTIMONIOS ROTATIVOS AUTOMÁTICOS ⭐ -->
+<!-- ====================================================================== -->
+<section class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800/60 p-5 rounded-2xl shadow-xl relative overflow-hidden mt-2">
+    <!-- Encabezado de la sección -->
+    <div class="flex items-center justify-between mb-4">
+        <p class="text-[10px] text-amber-400 font-black tracking-widest uppercase flex items-center gap-1.5">
+            <i class="fa-solid fa-star animate-pulse"></i> Casos de éxito en Golden Ads
+        </p>
+        <!-- Estrellas globales -->
+        <div class="flex text-amber-400 text-[10px]" id="testimonial-stars">
+            <!-- Se rellenará dinámicamente con JS -->
+        </div>
+    </div>
+
+    <!-- Contenedor del Testimonio Variable (Efecto de transición fluida) -->
+    <div class="min-h-[90px] flex flex-col justify-between transition-all duration-500 ease-in-out opacity-100" id="testimonial-card">
+        
+        <!-- Texto de la Reseña -->
+        <p id="testimonial-text" class="text-xs text-slate-300 italic leading-relaxed font-medium">
+            "Cargando testimonios..."
+        </p>
+
+        <!-- Info del Cliente -->
+        <div class="flex items-center gap-3 mt-4 pt-3 border-t border-slate-800/50">
+            <img id="testimonial-avatar" src="" alt="Avatar" class="w-9 h-9 rounded-xl object-cover border border-slate-700/60 shadow-inner">
+            <div>
+                <h4 id="testimonial-name" class="text-xs font-bold text-slate-100 leading-none">---</h4>
+                <p id="testimonial-role" class="text-[10px] text-sky-400 font-semibold mt-1 leading-none">---</p>
+            </div>
+        </div>
+
+    </div>
+</section>
 
     </main> <!-- Cierre correcto de #view-catalog -->
 
@@ -2553,6 +2587,93 @@ function lanzarFuegosArtificiales() {
         }));
     }, 250);
 }
+</script>
+    <script>
+    // ====== SISTEMA DE RESEÑAS ROTATIVAS AUTOMÁTICAS ======
+const testimonials = [
+    {
+        name: "Carlos Mendoza",
+        role: "Fundador de CriptoAlfa 🚀",
+        text: "¡Increíble la conversión! Publiqué una oferta de mi canal de finanzas y en menos de 48 horas capté 340 nuevos suscriptores reales. La inversión se pagó sola.",
+        rating: 5.0,
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" // Foto profesional de perfil masculino
+    },
+    {
+        name: "Elena Rostova",
+        role: "Admin de TechMundo 💻",
+        text: "Llevaba meses intentando vender espacios publicitarios en mi comunidad sin éxito. Gracias al catálogo de Golden Ads, marcas top me contactan directo por Telegram semanalmente.",
+        rating: 4.8,
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" // Foto profesional de perfil femenino
+    },
+    {
+        name: "Javier Ortiz",
+        role: "Director en ApuestasPro ⚽",
+        text: "Al principio dudaba por las estadísticas de usuarios activos, pero los números son 100% reales. Conseguí la visibilidad masiva que necesitaba en mi nicho.",
+        rating: 4.7,
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+    },
+    {
+        name: "Valeria Gómez",
+        role: "Creadora de Contenido / Moda & Estilo ✨",
+        text: "La interfaz es intuitiva y hermosa. Poner mi canal aquí impulsó mis estadísticas hacia arriba y me dio el sello de confianza que mis patrocinadores buscaban.",
+        rating: 5.0,
+        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80"
+    }
+];
+
+let currentTestimonialIndex = 0;
+
+function updateTestimonial() {
+    const card = document.getElementById('testimonial-card');
+    if (!card) return;
+
+    // Efecto de desvanecimiento (Fade out)
+    card.classList.add('opacity-0');
+    card.classList.remove('opacity-100');
+
+    setTimeout(() => {
+        const t = testimonials[currentTestimonialIndex];
+        
+        // Actualizar Textos e Imágenes
+        document.getElementById('testimonial-text').innerText = `"${t.text}"`;
+        document.getElementById('testimonial-name').innerText = t.name;
+        document.getElementById('testimonial-role').innerText = t.role;
+        document.getElementById('testimonial-avatar').src = t.avatar;
+
+        // Renderizar las estrellas dinámicamente según la nota (4.5 a 5)
+        const starsContainer = document.getElementById('testimonial-stars');
+        starsContainer.innerHTML = '';
+        
+        // Dibujar 5 estrellas (llenas o medias dependiendo de la nota)
+        for (let i = 1; i <= 5; i++) {
+            if (i <= Math.floor(t.rating)) {
+                starsContainer.innerHTML += '<i class="fa-solid fa-star mr-0.5"></i>';
+            } else if (i - 0.5 <= t.rating) {
+                starsContainer.innerHTML += '<i class="fa-solid fa-star-half-stroke mr-0.5"></i>';
+            } else {
+                starsContainer.innerHTML += '<i class="fa-regular fa-star mr-0.5"></i>';
+            }
+        }
+        // Añadir el número textual al lado
+        starsContainer.innerHTML += `<span class="text-slate-400 font-bold ml-1 text-[9px]">${t.rating.toFixed(1)}</span>`;
+
+        // Efecto de aparición (Fade in)
+        card.classList.remove('opacity-0');
+        card.classList.add('opacity-100');
+
+        // Avanzar al siguiente testimonio
+        currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonials.length;
+    }, 400); // Pequeño retraso para que la transición de opacidad se vea suave
+}
+
+// Inicializar el rotador y configurar el intervalo de 3 segundos (3000ms)
+function initTestimonialRotator() {
+    updateTestimonial(); // Carga el primero de inmediato
+    setInterval(updateTestimonial, 3000); 
+}
+
+// Enganchar a la carga de la página
+document.addEventListener('DOMContentLoaded', initTestimonialRotator);
 </script>
 </body>
 </html>
