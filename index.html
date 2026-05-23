@@ -2851,5 +2851,57 @@ function updateTimer() {
 // Inicializar la carga
 document.addEventListener('DOMContentLoaded', checkDailyReward);
 </script>
+    <script>
+    // ====== CONTROL DEL GLOBO DE TEXTO (POINTS TOOLTIP) ======
+
+function togglePointsTooltip(event) {
+    // Evita que el evento se propague y cierre el menú inmediatamente
+    event.stopPropagation();
+    
+    const tooltip = document.getElementById('points-tooltip');
+    if (!tooltip) return;
+
+    if (tooltip.classList.contains('hidden')) {
+        // 1. Lo hacemos visible en el DOM
+        tooltip.classList.remove('hidden');
+        
+        // 2. Pequeño delay para que Tailwind aplique la transición animada de entrada
+        setTimeout(() => {
+            tooltip.classList.remove('scale-95', 'opacity-0');
+            tooltip.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    } else {
+        closePointsTooltip();
+    }
+}
+
+function closePointsTooltip() {
+    const tooltip = document.getElementById('points-tooltip');
+    if (!tooltip || tooltip.classList.contains('hidden')) return;
+
+    // Aplicamos animación de salida
+    tooltip.classList.remove('scale-100', 'opacity-100');
+    tooltip.classList.add('scale-95', 'opacity-0');
+
+    // Esperamos a que termine la animación (200ms) para volver a ocultarlo con 'hidden'
+    setTimeout(() => {
+        tooltip.classList.add('hidden');
+    }, 200);
+}
+
+function goToMissions(event) {
+    event.stopPropagation(); // Evita conflictos de clics
+    closePointsTooltip();
+    
+    // Aquí pones la lógica para llevar al usuario a la sección de misiones
+    // Por ejemplo, si tienes un sistema de vistas: showView('missions');
+    console.log("Redirigiendo a la pantalla de misiones...");
+}
+
+// Cerrar el globo automáticamente si el usuario hace clic fuera de él
+document.addEventListener('click', () => {
+    closePointsTooltip();
+});
+</script>
 </body>
 </html>
