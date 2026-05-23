@@ -619,9 +619,7 @@
         <!-- EL RESTO DE TU CONTENIDO SE ACOPLA DEBAJO SIN AGUJEROS -->
         <!-- ====================================================================== -->
 
-        <!-- ====================================================================== -->
-<!-- 🎁 CONTENEDOR DE RECOMPENSA DIARIA CON CUENTA ATRÁS 🎁 -->
-<!-- ====================================================================== -->
+        <!-- 🎁 CONTENEDOR DE RECOMPENSA DIARIA CON CUENTA ATRÁS 🎁 -->
 <div id="daily-reward-container" class="hidden max-w-md mx-auto bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800/80 p-3.5 rounded-2xl shadow-xl text-center relative overflow-hidden my-3">
     
     <!-- 1. PANTALLA: REGALO DISPONIBLE -->
@@ -629,19 +627,19 @@
         <div class="text-2xl mb-1.5 animate-bounce">🎁</div>
         <h3 class="text-xs font-black text-amber-400 uppercase tracking-wider">¡Tu Recompensa Diaria está lista!</h3>
         <p class="text-[10px] text-slate-400 mt-0.5 mb-2.5">Abre tu regalo de hoy para sumar puntos en tu cuenta.</p>
-        <button onclick="claimDailyReward()" 
-            class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-md shadow-orange-500/10 cursor-pointer active:scale-95">
+        <button onclick="claimDailyReward()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-md shadow-orange-500/10 cursor-pointer active:scale-95">
             Abrir Regalo 🌟
         </button>
     </div>
-    <!-- 2. PANTALLA: ÉXITO ANIMADO (Temporal por unos segundos) -->
+
+    <!-- 2. PANTALLA: ÉXITO ANIMADO -->
     <div id="reward-success-content" class="hidden py-2 animate-fade-in">
         <div class="text-2xl mb-1">🎉</div>
         <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wide">¡Recompensa Reclamada!</h3>
         <p class="text-[11px] text-slate-200 mt-0.5">Has ganado <span id="claimed-points-display" class="font-black text-amber-400">0</span> puntos.</p>
     </div>
 
-    <!-- 3. PANTALLA: TARJETA BLOQUEADA CON CUENTA ATRÁS (Discreta y elegante) -->
+    <!-- 3. PANTALLA: TARJETA BLOQUEADA CON CUENTA ATRÁS -->
     <div id="reward-countdown-content" class="hidden py-1.5 flex items-center justify-between px-2 bg-slate-950/40 border border-slate-850/30 rounded-xl opacity-60">
         <div class="flex items-center gap-2 text-left">
             <span class="text-xs bg-slate-800/80 p-1.5 rounded-lg text-slate-400"><i class="fa-solid fa-lock text-[11px]"></i></span>
@@ -650,12 +648,10 @@
                 <p class="text-[9px] text-slate-500 mt-0.5 leading-none">Regresa mañana para otra sorpresa.</p>
             </div>
         </div>
-        <!-- Cronómetro digital -->
         <div class="bg-slate-900 border border-slate-800/60 px-2.5 py-1 rounded-lg">
             <span id="countdown-timer" class="text-xs font-mono font-bold text-amber-500/90 tracking-wider">00:00:00</span>
         </div>
     </div>
-
 </div>
     <!-- Mensaje de éxito animado (Oculto inicialmente) -->
     <div id="reward-success-content" class="hidden py-4 animate-fade-in">
