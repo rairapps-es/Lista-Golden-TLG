@@ -581,26 +581,43 @@
         <!-- ====================================================================== -->
 
         <!-- ====================================================================== -->
-<!-- 🎁 CONTENEDOR DE RECOMPENSA DIARIA SORPRESA 🎁 -->
+<!-- 🎁 CONTENEDOR DE RECOMPENSA DIARIA CON CUENTA ATRÁS 🎁 -->
 <!-- ====================================================================== -->
-<div id="daily-reward-container" class="hidden max-w-md mx-auto bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-slate-950 border border-amber-500/30 p-4 rounded-2xl shadow-xl text-center relative overflow-hidden my-3">
+<div id="daily-reward-container" class="hidden max-w-md mx-auto bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800/80 p-3.5 rounded-2xl shadow-xl text-center relative overflow-hidden my-3">
     
-    <!-- Luces de fondo decorativas -->
-    <div class="absolute -top-10 -left-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl"></div>
-    <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-orange-500/10 rounded-full blur-xl"></div>
-
-    <!-- Contenido del Regalo -->
+    <!-- 1. PANTALLA: REGALO DISPONIBLE -->
     <div id="reward-box-content">
-        <div class="text-3xl mb-2 animate-bounce">🎁</div>
+        <div class="text-2xl mb-1.5 animate-bounce">🎁</div>
         <h3 class="text-xs font-black text-amber-400 uppercase tracking-wider">¡Tu Recompensa Diaria está lista!</h3>
-        <p class="text-[11px] text-slate-400 mt-1 mb-3.5">Reclama tus puntos sorpresa de hoy para subir de nivel en la plataforma.</p>
-        
+        <p class="text-[10px] text-slate-400 mt-0.5 mb-2.5">Abre tu regalo sorpresa de hoy para sumar puntos en tu cuenta.</p>
         <button onclick="claimDailyReward()" 
-            class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-orange-500/20 cursor-pointer active:scale-95">
+            class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-md shadow-orange-500/10 cursor-pointer active:scale-95">
             Abrir Regalo 🌟
         </button>
     </div>
+    <!-- 2. PANTALLA: ÉXITO ANIMADO (Temporal por unos segundos) -->
+    <div id="reward-success-content" class="hidden py-2 animate-fade-in">
+        <div class="text-2xl mb-1">🎉</div>
+        <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wide">¡Recompensa Reclamada!</h3>
+        <p class="text-[11px] text-slate-200 mt-0.5">Has ganado <span id="claimed-points-display" class="font-black text-amber-400">0</span> puntos.</p>
+    </div>
 
+    <!-- 3. PANTALLA: TARJETA BLOQUEADA CON CUENTA ATRÁS (Discreta y elegante) -->
+    <div id="reward-countdown-content" class="hidden py-1.5 flex items-center justify-between px-2 bg-slate-950/40 border border-slate-850/30 rounded-xl opacity-60">
+        <div class="flex items-center gap-2 text-left">
+            <span class="text-xs bg-slate-800/80 p-1.5 rounded-lg text-slate-400"><i class="fa-solid fa-lock text-[11px]"></i></span>
+            <div>
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wide leading-none">Próximo regalo</h4>
+                <p class="text-[9px] text-slate-500 mt-0.5 leading-none">Regresa mañana para otra sorpresa.</p>
+            </div>
+        </div>
+        <!-- Cronómetro digital -->
+        <div class="bg-slate-900 border border-slate-800/60 px-2.5 py-1 rounded-lg">
+            <span id="countdown-timer" class="text-xs font-mono font-bold text-amber-500/90 tracking-wider">00:00:00</span>
+        </div>
+    </div>
+
+</div>
     <!-- Mensaje de éxito animado (Oculto inicialmente) -->
     <div id="reward-success-content" class="hidden py-4 animate-fade-in">
         <div class="text-3xl mb-2">🎉</div>
@@ -2705,68 +2722,108 @@ function initTestimonialRotator() {
 // Enganchar a la carga de la página
 document.addEventListener('DOMContentLoaded', initTestimonialRotator);
 </script>
-    // ====== SISTEMA DE RECOMPENSA DIARIA CON PROBABILIDAD SESGADA ======
 <script>
+// ====== SISTEMA DE RECOMPENSA DIARIA CON CUENTA ATRÁS ======
+let countdownInterval;
+
 function checkDailyReward() {
     const container = document.getElementById('daily-reward-container');
     if (!container) return;
 
     const lastClaimDate = localStorage.getItem('ads_daily_reward_claimed');
-    const todayStr = new Date().toISOString().split('T')[0]; // Formato "AAAA-MM-DD"
+    const todayStr = new Date().toISOString().split('T')[0];
 
-    // Si la fecha guardada NO es la de hoy, mostramos el módulo quitando 'hidden'
-    if (lastClaimDate !== todayStr) {
-        container.classList.remove('hidden');
+    container.classList.remove('hidden'); // Siempre visible como elemento del diseño
+
+    if (lastClaimDate === todayStr) {
+        // Si ya reclamó hoy, saltamos directo a la tarjeta bloqueada de cuenta atrás
+        showLockedCountdown();
+    } else {
+        // Si no ha reclamado, mostramos la caja de regalo lista
+        document.getElementById('reward-box-content').classList.remove('hidden');
+        document.getElementById('reward-success-content').classList.add('hidden');
+        document.getElementById('reward-countdown-content').classList.add('hidden');
     }
 }
 
 function claimDailyReward() {
-    // 1. Algoritmo de probabilidad sesgada (Mayor probabilidad de puntos bajos de 2 a 100)
-    // Usamos una potencia (Math.pow) para empujar los números hacia abajo de forma orgánica
-    const randomBias = Math.pow(Math.random(), 3); // Elevar al cubo aplasta la curva
+    // 1. Probabilidad sesgada (2 a 100 puntos - Mayor frecuencia de puntuaciones bajas)
+    const randomBias = Math.pow(Math.random(), 3);
     const minPoints = 2;
     const maxPoints = 100;
-    
-    // Calcula la puntuación final aplicando el sesgo
     const pointsWon = Math.floor(randomBias * (maxPoints - minPoints + 1)) + minPoints;
 
-    // 2. Guardar y acumular puntos en 'ads_user_points'
+    // 2. Guardar puntos en LocalStorage
     let currentPoints = parseInt(localStorage.getItem('ads_user_points')) || 0;
     currentPoints += pointsWon;
     localStorage.setItem('ads_user_points', currentPoints);
 
-    // 3. Bloquear para que no pueda volver a reclamar hoy
+    // 3. Bloquear fecha actual
     const todayStr = new Date().toISOString().split('T')[0];
     localStorage.setItem('ads_daily_reward_claimed', todayStr);
 
-    // 4. 🎉 ¡DISPARAR TU CONFETI! 🎉
+    // 4. 🎉 ¡Efecto Confeti! 🎉
     if (typeof lanzarConfeti === 'function') {
         lanzarConfeti();
-        // Un segundo disparo opcional para que se sienta aún más premium
-        setTimeout(lanzarConfeti, 200);
     }
 
-    // 5. Animación de intercambio de pantallas e interfaz
+    // 5. Transición a pantalla de Éxito
     document.getElementById('reward-box-content').classList.add('hidden');
     document.getElementById('claimed-points-display').innerText = `+${pointsWon}`;
-    
-    const successContent = document.getElementById('reward-success-content');
-    successContent.classList.remove('hidden');
+    document.getElementById('reward-success-content').classList.remove('hidden');
 
-    // Desvanecer por completo todo el contenedor tras 4 segundos para limpiar la pantalla limpia
+    // 6. Pasados 3 segundos de celebración, cambiamos fluidamente a la tarjeta de bloqueo
     setTimeout(() => {
-        const container = document.getElementById('daily-reward-container');
-        container.style.transition = 'all 0.5s ease';
-        container.style.opacity = '0';
-        container.style.height = '0';
-        container.style.padding = '0';
-        container.style.margin = '0';
-        container.style.border = 'none';
-        setTimeout(() => container.classList.add('hidden'), 500);
-    }, 4000);
+        document.getElementById('reward-success-content').classList.add('hidden');
+        showLockedCountdown();
+    }, 3000);
 }
 
-// Enganchar la comprobación automática al arrancar la Web App
+function showLockedCountdown() {
+    document.getElementById('reward-box-content').classList.add('hidden');
+    document.getElementById('reward-success-content').classList.add('hidden');
+    
+    const countdownView = document.getElementById('reward-countdown-content');
+    countdownView.classList.remove('hidden');
+
+    // Iniciar el reloj regresivo en tiempo real hasta la medianoche exacta
+    updateTimer();
+    clearInterval(countdownInterval); // Limpiar intervalos fantasmas previos
+    countdownInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    const timerDisplay = document.getElementById('countdown-timer');
+    if (!timerDisplay) return;
+
+    const now = new Date();
+    // Definimos el objetivo: Las 23:59:59 de hoy (Medianoche exacta)
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+
+    const diff = midnight - now;
+
+    // Si el tiempo expira, reiniciamos la vista para que el regalo vuelva a activarse
+    if (diff <= 0) {
+        clearInterval(countdownInterval);
+        checkDailyReward();
+        return;
+    }
+
+    // Desglose matemático a Horas, Minutos y Segundos
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    // Añadir ceros a la izquierda (Formato estricto 00:00:00 digitales)
+    const hStr = hours < 10 ? '0' + hours : hours;
+    const mStr = minutes < 10 ? '0' + minutes : minutes;
+    const sStr = seconds < 10 ? '0' + seconds : seconds;
+
+    timerDisplay.innerText = `${hStr}:${mStr}:${sStr}`;
+}
+
+// Inicializar la carga
 document.addEventListener('DOMContentLoaded', checkDailyReward);
 </script>
 </body>
