@@ -2852,7 +2852,7 @@ function updateTimer() {
 document.addEventListener('DOMContentLoaded', checkDailyReward);
 </script>
     <script>
-    // ====== CONTROL DEL GLOBO DE TEXTO (POINTS TOOLTIP) ======
+// ====== CONTROL DEL GLOBO DE TEXTO (POINTS TOOLTIP) ======
 
 function togglePointsTooltip(event) {
     // Evita que el evento se propague y cierre el menú inmediatamente
@@ -2889,19 +2889,35 @@ function closePointsTooltip() {
     }, 200);
 }
 
+// 🎯 FUNCIÓN ACTUALIZADA CON TU IDENTIFICADOR 'view-missions'
 function goToMissions(event) {
     event.stopPropagation(); // Evita conflictos de clics
     closePointsTooltip();
     
-    // Aquí pones la lógica para llevar al usuario a la sección de misiones
-    // Por ejemplo, si tienes un sistema de vistas: showView('missions');
-    console.log("Redirigiendo a la pantalla de misiones...");
+    // Capturamos ambas vistas
+    const catalogView = document.getElementById('view-catalog');
+    const missionsView = document.getElementById('view-missions');
+
+    // Transición de pantallas elegante
+    if (catalogView && missionsView) {
+        // Ocultamos el catálogo con suavidad si manejas opacidades, o directamente con hidden
+        catalogView.classList.add('hidden');
+        
+        // Mostramos la sección de misiones
+        missionsView.classList.remove('hidden');
+        
+        // Opcional: Si quieres que la pantalla haga scroll automático hacia arriba al cambiar de sección
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        console.warn("No se encontraron los contenedores 'view-catalog' o 'view-missions' en el HTML.");
+    }
 }
 
 // Cerrar el globo automáticamente si el usuario hace clic fuera de él
 document.addEventListener('click', () => {
     closePointsTooltip();
 });
+        
 </script>
 </body>
 </html>
